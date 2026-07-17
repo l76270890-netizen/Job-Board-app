@@ -1,0 +1,81 @@
+.app-layout {
+  display: flex;
+}
+
+.main-content {
+  flex: 1;
+  margin-left: 260px;
+  padding: 30px;
+  background: #f8fafc;
+  min-height: 100vh;
+}
+
+.content-row {
+  display: grid;
+  grid-template-columns: 1fr 320px;
+  gap: 30px;
+  margin-top: 30px;
+  align-items: start;
+}
+
+.left-content {
+  width: 100%;
+}
+
+.right-content {
+  width: 320px;
+}
+
+
+/* ======================
+   TABLET
+====================== */
+
+@media (max-width: 992px) {
+
+  .content-row {
+    grid-template-columns: 1fr;
+  }
+
+  .right-content {
+    width: 100%;
+  }
+
+}
+
+
+/* ======================
+   MOBILE
+====================== */
+
+@media (max-width: 768px) {
+
+  .main-content {
+    margin-left: 0;      /* Remove sidebar space */
+    padding: 20px;
+    padding-bottom: 90px; /* Space for bottom navigation */
+  }
+
+  .content-row {
+    grid-template-columns: 1fr;
+    gap: 20px;
+  }
+
+  .right-content,
+  .left-content {
+    width: 100%;
+  }
+
+}
+
+
+/* Small phones */
+
+@media (max-width: 480px) {
+
+  .main-content {
+    padding: 15px;
+    padding-bottom: 90px;
+  }
+
+}

@@ -1,0 +1,375 @@
+/* ===========================
+   ALL JOBS PAGE
+=========================== */
+
+.allJobs {
+  background: #f8fafc;
+  min-height: 100vh;
+  padding: 40px 6%;
+}
+
+/* ===========================
+   HEADER
+=========================== */
+
+.jobsHeader {
+  text-align: center;
+  margin-bottom: 40px;
+}
+
+.jobsHeader h1 {
+  font-size: 2.5rem;
+  color: #111827;
+  margin-bottom: 25px;
+}
+
+/* ===========================
+   SEARCH BOX
+=========================== */
+
+.searchBox {
+  max-width: 1000px;
+  margin: auto;
+  background: #fff;
+  display: flex;
+  align-items: center;
+  gap: 15px;
+  padding: 15px;
+  border-radius: 18px;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.08);
+}
+
+.searchItem {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  background: #f8fafc;
+  padding: 14px 18px;
+  border-radius: 12px;
+}
+
+.searchItem svg {
+  color: #2563eb;
+}
+
+.searchItem input {
+  width: 100%;
+  border: none;
+  background: transparent;
+  outline: none;
+  font-size: 0.95rem;
+}
+
+.searchBox button {
+  padding: 15px 30px;
+  border: none;
+  border-radius: 12px;
+  background: #2563eb;
+  color: white;
+  font-size: 1rem;
+  cursor: pointer;
+  transition: 0.3s;
+}
+
+.searchBox button:hover {
+  background: #1d4ed8;
+}
+
+/* ===========================
+   MAIN LAYOUT
+=========================== */
+
+.jobsContainer {
+  display: grid;
+  grid-template-columns: 280px 1fr;
+  gap: 30px;
+  margin-top: 40px;
+}
+
+/* ===========================
+   FILTERS
+=========================== */
+
+.filters {
+  background: white;
+  border-radius: 18px;
+  padding: 25px;
+  height: fit-content;
+  box-shadow: 0 8px 25px rgba(0, 0, 0, 0.06);
+}
+
+.filters h3 {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  color: #111827;
+  margin-bottom: 25px;
+}
+
+.filterGroup {
+  margin-bottom: 30px;
+}
+
+.filterGroup h4 {
+  margin-bottom: 15px;
+  color: #111827;
+}
+
+.filterGroup label {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 12px;
+  color: #64748b;
+  cursor: pointer;
+}
+
+.filterGroup input[type="checkbox"] {
+  accent-color: #2563eb;
+}
+
+.filterGroup input[type="range"] {
+  width: 100%;
+}
+
+/* ===========================
+   JOB LIST
+=========================== */
+
+.jobList {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+/* ===========================
+   JOB CARD
+=========================== */
+
+.jobCard {
+  background: white;
+  border-radius: 18px;
+  padding: 22px;
+  display: flex;
+  gap: 22px;
+  align-items: flex-start;
+  transition: 0.3s;
+  border: 1px solid #e5e7eb;
+}
+
+.jobCard:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 15px 35px rgba(0, 0, 0, 0.08);
+}
+
+.jobCard img {
+  width: 70px;
+  height: 70px;
+  border-radius: 16px;
+  object-fit: contain;
+  background: #f8fafc;
+  padding: 10px;
+}
+
+.jobContent {
+  flex: 1;
+}
+
+.top {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.top h2 {
+  font-size: 1.3rem;
+  color: #111827;
+}
+
+.top p {
+  color: #64748b;
+  margin-top: 5px;
+}
+
+.top svg {
+  cursor: pointer;
+  color: #64748b;
+  transition: 0.3s;
+}
+
+.top svg:hover {
+  color: #2563eb;
+}
+
+.jobInfo {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 18px;
+  margin: 20px 0;
+}
+
+.jobInfo span {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  color: #475569;
+  font-size: 0.92rem;
+}
+
+.jobInfo svg {
+  color: #2563eb;
+}
+
+.jobContent button {
+  padding: 12px 28px;
+  border: none;
+  border-radius: 10px;
+  background: #2563eb;
+  color: white;
+  cursor: pointer;
+  transition: 0.3s;
+}
+
+.jobContent button:hover {
+  background: #1d4ed8;
+}
+
+/* ===========================
+   PAGINATION
+=========================== */
+
+.pagination {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 12px;
+  margin-top: 50px;
+}
+
+.pagination button {
+  padding: 12px 18px;
+  border: none;
+  background: white;
+  border-radius: 10px;
+  cursor: pointer;
+  transition: 0.3s;
+  box-shadow: 0 5px 15px rgba(0, 0, 0, 0.06);
+}
+
+.pagination button:hover {
+  background: #2563eb;
+  color: white;
+}
+
+.pagination .active {
+  background: #2563eb;
+  color: white;
+}
+.more-btn {
+  width: 40px;
+  height: 40px;
+  border: none;
+  background: white;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  color: #475569;
+  transition: 0.3s;
+  box-shadow: 0 4px 10px rgba(0,0,0,0.08);
+}
+
+.more-btn:hover {
+  background: #2563eb;
+  color: white;
+  transform: rotate(90deg);
+}
+
+
+
+
+/* ===========================
+   TABLET
+=========================== */
+
+@media (max-width: 992px) {
+
+  .jobsContainer {
+    grid-template-columns: 1fr;
+  }
+
+  .filters {
+    order: 2;
+  }
+
+  .jobList {
+    order: 1;
+  }
+
+  .searchBox {
+    flex-wrap: wrap;
+  }
+
+  .searchBox button {
+    width: 100%;
+  }
+}
+
+/* ===========================
+   MOBILE
+=========================== */
+
+@media (max-width: 768px) {
+
+  .allJobs {
+    padding: 25px 20px;
+  }
+
+  .jobsHeader h1 {
+    font-size: 2rem;
+  }
+
+  .searchBox {
+    flex-direction: column;
+    gap: 15px;
+    padding: 18px;
+  }
+
+  .searchItem {
+    width: 100%;
+  }
+
+  .searchBox button {
+    width: 100%;
+  }
+
+  .jobCard {
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+  }
+
+  .jobCard img {
+    width: 80px;
+    height: 80px;
+  }
+
+  .top {
+    flex-direction: column;
+    gap: 12px;
+  }
+
+  .jobInfo {
+    justify-content: center;
+  }
+
+  .jobContent button {
+    width: 100%;
+  }
+
+  .pagination {
+    flex-wrap: wrap;
+  }
+}

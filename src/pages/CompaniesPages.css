@@ -1,0 +1,360 @@
+/* Base Section Styling */
+.companies-section {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 2.5rem 1.5rem;
+  font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+}
+
+.companies-header {
+  margin-bottom: 2rem;
+  
+}
+
+.companies-title {
+  font-size: 2.4rem;
+  color: #111827;
+  text-align: center;
+  font-weight: 700;
+  margin: 0 0 0.35rem 0;
+  letter-spacing: -0.02em;
+}
+
+.companies-subtitle {
+  font-size: 0.95rem;
+  color: #6b7280;
+   position: relative;
+    left: 460px;
+}
+
+/* Grid Layout */
+.companies-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+  gap: 1.5rem;
+}
+
+/* Card Container */
+.company-card {
+  background-color: #ffffff;
+  border: 1px solid #dcfce7 ;
+  border-radius: 16px;
+  padding: 1.5rem;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  gap: 1.25rem;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.02);
+  transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.company-card:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 12px 20px -8px rgba(0, 0, 0, 0.08);
+  border-color: #cbd5e1;
+}
+
+/* Top Section (Logo + Name/Tag) */
+.company-card-top {
+  display: flex;
+  align-items: flex-start;
+  gap: 1rem;
+}
+
+.logo-wrapper {
+  flex-shrink: 0;
+  border: 1px solid #f1f5f9;
+  border-radius: 12px;
+  overflow: hidden;
+  padding: 2px;
+  background-color: #ffffff;
+}
+
+.logo-wrapper img {
+  width: 52px;
+  height: 52px;
+  object-fit: contain;
+  border-radius: 10px;
+}
+
+.company-meta {
+  display: flex;
+  flex-direction: column;
+  gap: 0.35rem;
+  min-width: 0; /* Ensures truncation works safely */
+}
+
+.company-name {
+  margin: 0;
+  font-size: 1.15rem;
+  font-weight: 600;
+  color: #0f172a;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+/* Industry Tag */
+.company-tag span {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  align-self: flex-start;
+  padding: 0.25rem 0.65rem;
+  background-color: #f0fdf4; /* Soft green tint */
+  color: #166534; /* Deep forest green */
+  font-size: 0.75rem;
+  font-weight: 600;
+  border-radius: 20px;
+  max-width: 100%;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+/* Bottom Section (Location + Button) */
+.company-card-bottom {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  padding-top: 1rem;
+  border-top: 1px dashed #dcfce7;
+}
+
+.company-location {
+  display: flex;
+  align-items: center;
+  gap: 0.35rem;
+  color: #22C55E;
+  font-size: 0.85rem;
+  min-width: 0;
+}
+
+.company-location span {
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+
+/* Action Button */
+.view-jobs-btn {
+  background-color: #22C55E; /* Clean blue */
+  color: #ffffff;
+  border: none;
+  padding: 0.5rem 1rem;
+  font-size: 0.85rem;
+  font-weight: 600;
+  border-radius: 8px;
+  cursor: pointer;
+  white-space: nowrap;
+  transition: background-color 0.2s ease;
+}
+
+.view-jobs-btn:hover {
+  background-color: #16a34a; /* Darker blue on hover */
+}
+
+
+.View-button{
+  color: #16a34a;
+  text-align: center;
+  padding: 6px;
+  border-radius:8px;
+  position: relative;
+  bottom: 550px;
+  text-align: end;
+cursor: pointer;
+}
+
+
+/* Mobile Responsiveness Fine-Tuning */
+@media (max-width: 480px) {
+  .companies-grid {
+    grid-template-columns: 1fr;
+  }
+  .company-card-bottom {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 0.75rem;
+  }
+  .view-jobs-btn {
+    width: 100%;
+    display: none;
+    text-align: center;
+  }
+
+  .company-location {
+  display: flex;
+  align-items: center;
+  gap: 0.35rem;
+  color: #64748b;
+  font-size: 0.85rem;
+  min-width: 0;
+  position: relative;
+  left: 87px;
+  top: -50px;
+}
+
+.company-location span {
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.company-card{
+    height: 160px;
+}
+
+.companies-subtitle {
+  font-size: 0.95rem;
+  color: #6b7280;
+   position: relative;
+    left: 41px;
+}
+
+
+.View-button{
+  background-color: #fff;
+  color: #16a34a;
+  text-align: center;
+  padding: 10px;
+  position: relative;
+  left: 120px;
+  width: 40%;
+  border-radius:8px;
+  border: 1px  #16a34a solid;
+  top: 20px;
+}
+
+
+.companies-title {
+ font-size:1.8rem;
+  color: #111827;
+  text-align: center;
+  font-family: serif;
+  font-weight: 700;
+  margin: 0 0 0.35rem 0;
+  letter-spacing: -0.02em;
+}
+
+
+}
+
+
+/* ===========================
+   SEARCH BAR
+=========================== */
+
+.search-wrapper{
+    max-width:700px;
+    margin:30px auto 40px;
+
+    display:flex;
+    align-items:center;
+    gap:14px;
+
+    background:#FFFFFF;
+
+    border:1px solid #E5E7EB;
+    border-radius:18px;
+
+    padding:16px 20px;
+
+    box-shadow:0 8px 24px rgba(15,23,42,.05);
+
+    transition:.3s ease;
+}
+
+.search-wrapper:focus-within{
+    border-color:#22C55E;
+    box-shadow:0 0 0 4px rgba(34,197,94,.12);
+}
+
+.search-wrapper svg{
+    color:#94A3B8;
+    flex-shrink:0;
+}
+
+.search-wrapper input{
+    flex:1;
+    border:none;
+    outline:none;
+    background:transparent;
+
+    font-size:15px;
+    color:#111827;
+}
+
+.search-wrapper input::placeholder{
+    color:#94A3B8;
+}
+
+.clear-btn{
+    color:#94A3B8;
+    cursor:pointer;
+    transition:.25s;
+}
+
+.clear-btn:hover{
+    color:#EF4444;
+    transform:rotate(90deg);
+}
+
+/* ===========================
+   TABLET
+=========================== */
+
+@media (max-width:768px){
+
+.search-wrapper{
+
+    width:100%;
+    margin:24px 0 30px;
+
+    padding:14px 16px;
+
+    border-radius:16px;
+}
+
+.search-wrapper input{
+
+    font-size:14px;
+}
+
+.search-wrapper svg{
+
+    width:18px;
+    height:18px;
+}
+
+}
+
+/* ===========================
+   SMALL PHONES
+=========================== */
+
+@media (max-width:480px){
+
+.search-wrapper{
+
+    padding:12px 14px;
+
+    gap:10px;
+
+    border-radius:14px;
+}
+
+.search-wrapper input{
+
+    font-size:13px;
+}
+
+.search-wrapper svg{
+
+    width:16px;
+    height:16px;
+}
+
+}

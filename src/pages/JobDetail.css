@@ -1,0 +1,323 @@
+/* =========================
+   PAGE
+========================= */
+
+.jobDetail{
+  min-height:100vh;
+  background:#f8fafc;
+  padding:40px 6%;
+  display:grid;
+  grid-template-columns:2fr 380px;
+  gap:30px;
+}
+
+/* =========================
+   LEFT
+========================= */
+
+.jobDetailLeft{
+  display:flex;
+  flex-direction:column;
+  gap:25px;
+}
+
+/* =========================
+   BACK BTN
+========================= */
+
+.detailBackBtn{
+  width:fit-content;
+  display:flex;
+  align-items:center;
+  gap:8px;
+  border:none;
+  background:white;
+  padding:12px 18px;
+  border-radius:12px;
+  cursor:pointer;
+  font-weight:600;
+  box-shadow:0 5px 15px rgba(0,0,0,.06);
+}
+
+.detailBackBtn svg{
+  color:#2563eb;
+}
+
+/* =========================
+   HERO CARD
+========================= */
+
+.jobHeroCard{
+  background:white;
+  border-radius:24px;
+  padding:30px;
+  box-shadow:0 10px 30px rgba(0,0,0,.05);
+}
+
+.jobHeroTop{
+  display:flex;
+  align-items:flex-start;
+  gap:20px;
+}
+
+.jobHeroTop img{
+  width:90px;
+  height:90px;
+  border-radius:20px;
+  background:#f1f5f9;
+  padding:15px;
+  object-fit:contain;
+}
+
+.jobHeroInfo{
+  flex:1;
+}
+
+.jobHeroInfo h1{
+  font-size:2rem;
+  color:#111827;
+  margin-bottom:8px;
+}
+
+.jobHeroInfo h3{
+  color:#64748b;
+  margin-bottom:18px;
+}
+
+.heroMeta{
+  display:flex;
+  flex-wrap:wrap;
+  gap:15px;
+}
+
+.heroMeta span{
+  display:flex;
+  align-items:center;
+  gap:6px;
+  color:#475569;
+  font-size:14px;
+}
+
+.saveBtn{
+  width:50px;
+  height:50px;
+  border:none;
+  border-radius:14px;
+  background:#eff6ff;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  cursor:pointer;
+}
+
+.saveBtn svg{
+  color:#2563eb;
+}
+
+.heroActions{
+  display:flex;
+  gap:15px;
+  margin-top:30px;
+}
+
+.applyNowBtn,
+.messageBtn{
+  padding:14px 24px;
+  border-radius:12px;
+  font-weight:600;
+  cursor:pointer;
+  border:none;
+}
+
+.applyNowBtn{
+  background:#2563eb;
+  color:white;
+}
+
+.messageBtn{
+  background:#eff6ff;
+  color:#2563eb;
+}
+
+/* =========================
+   CONTENT CARDS
+========================= */
+
+.detailCard{
+  background:white;
+  border-radius:24px;
+  padding:30px;
+  box-shadow:0 10px 30px rgba(0,0,0,.05);
+}
+
+.detailCard h2{
+  margin-bottom:20px;
+  color:#111827;
+}
+
+.detailCard p{
+  color:#64748b;
+  line-height:1.8;
+}
+
+/* =========================
+   RESPONSIBILITIES
+========================= */
+
+.responsibilityList{
+  display:flex;
+  flex-direction:column;
+  gap:16px;
+}
+
+.responsibilityItem{
+  display:flex;
+  gap:12px;
+  align-items:center;
+}
+
+.responsibilityItem svg{
+  color:#22c55e;
+}
+
+/* =========================
+   SKILLS
+========================= */
+
+.skillsWrap{
+  display:flex;
+  flex-wrap:wrap;
+  gap:12px;
+}
+
+.skillsWrap span{
+  background:#eff6ff;
+  color:#2563eb;
+  padding:10px 18px;
+  border-radius:30px;
+  font-size:14px;
+  font-weight:600;
+}
+
+/* =========================
+   RIGHT PANEL
+========================= */
+
+.jobDetailRight{
+  display:flex;
+  flex-direction:column;
+  gap:25px;
+}
+
+.sideCard{
+  background:white;
+  border-radius:24px;
+  padding:28px;
+  box-shadow:0 10px 30px rgba(0,0,0,.05);
+}
+
+.sideCard h3{
+  margin-bottom:25px;
+  color:#111827;
+}
+
+.overviewItem{
+  display:flex;
+  gap:14px;
+  margin-bottom:20px;
+}
+
+.overviewItem svg{
+  color:#2563eb;
+}
+
+.overviewItem span{
+  color:#94a3b8;
+  font-size:14px;
+}
+
+.overviewItem p{
+  color:#111827;
+  font-weight:600;
+}
+
+.sideCard ul{
+  padding-left:18px;
+}
+
+.sideCard li{
+  margin-bottom:14px;
+  color:#475569;
+}
+
+/* =========================
+   TABLET
+========================= */
+
+@media (max-width:992px){
+
+.jobDetail{
+  grid-template-columns:1fr;
+}
+
+.jobDetailRight{
+  flex-direction:row;
+}
+
+.sideCard{
+  flex:1;
+}
+
+}
+
+/* =========================
+   MOBILE
+========================= */
+
+@media (max-width:768px){
+
+.jobDetail{
+  padding:20px 16px 40px;
+  gap:20px;
+  background-color: #f8fafc;
+}
+
+.jobHeroCard,
+.detailCard,
+.sideCard{
+  border-radius:20px;
+  padding:22px;
+}
+
+.jobHeroTop{
+  flex-direction:column;
+}
+
+.jobHeroTop img{
+  width:75px;
+  height:75px;
+}
+
+.jobHeroInfo h1{
+  font-size:1.5rem;
+}
+
+.heroActions{
+  flex-direction:column;
+}
+
+.applyNowBtn,
+.messageBtn{
+  width:100%;
+}
+
+.jobDetailRight{
+  flex-direction:column;
+}
+
+.heroMeta{
+  flex-direction:column;
+  gap:10px;
+}
+
+}

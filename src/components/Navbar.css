@@ -1,0 +1,387 @@
+/* ========================================== */
+/* 1. DESKTOP NAVBAR STYLING (Preserved)       */
+/* ========================================== */
+.desktop-navbar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 1rem 2rem;
+  background-color: #ffffff;
+  border-bottom: 1px solid #e5e7eb;
+}
+.logo-SearchBar{
+  display: none;
+}
+
+.logo {
+  display: flex;
+  align-items: center;
+  gap: .5rem;
+  font-size: 1.25rem;
+  font-weight: 700;
+  color: #111827;
+}
+
+.logo-dot {
+  width: 8px;
+  height: 8px;
+  background-color: #2563eb;
+  border-radius: 50%;
+}
+
+.desktop-navbar .nav {
+  display: flex;
+  gap: 1.5rem;
+}
+
+.desktop-navbar .nav a {
+  text-decoration: none;
+  color: #4b5563;
+  font-weight: 500;
+  font-size: 0.95rem;
+  transition: color 0.15s ease;
+}
+
+.desktop-navbar .nav a:hover,
+.desktop-navbar .nav a.active-tab {
+  color: #2563eb;
+}
+
+.navbar-right {
+  display: flex;
+  align-items: center;
+  gap: 1.25rem;
+  color: #4b5563;
+}
+
+.navbar-right svg {
+  cursor: pointer;
+  transition: color 0.15s ease;
+}
+
+.navbar-right svg:hover {
+  color: #2563eb;
+}
+
+.login-btn {
+  background-color: #111827;
+  color: #ffffff;
+  border: none;
+  padding: 0.5rem 1.25rem;
+  border-radius: 8px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background-color 0.15s ease;
+}
+
+.login-btn:hover {
+  background-color: #1f2937;
+}
+
+.menu-btn {
+  display: none; /* Hidden on desktop screens */
+  background: none;
+  border: none;
+  cursor: pointer;
+}
+
+/* ========================================== */
+/* 2. UPGRADED PREMIUM MOBILE BOTTOM VIEW     */
+/* ========================================== */
+
+/* Desktop Display Defaults vs Mobile Swapping */
+@media (min-width: 769px) {
+  .mobile-bottom-nav,
+  .mobile-menu-overlay,
+  .mobile-menu-sheet {
+    display: none !important; /* Forces layout stability on wide screens */
+  }
+}
+
+@media (max-width: 768px) {
+  .desktop-navbar {
+    padding: 1.6rem;
+    position: fixed;
+    width: 100%;
+    border: none;
+    border-bottom: 1px #15803D solid;
+    z-index: 10;
+    background-color: #fff;
+  }
+  .desktop-navbar .nav,
+  .navbar-right {
+    display: none; /* Removes clutter since items moved safely to mobile drawers */
+  }
+  .menu-btn {
+    display: none; /* Disables classic fallback drawer layout toggle */
+  }
+
+  /* Bottom Navigation Panel Baseline */
+  .mobile-bottom-nav {
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    height: 64px;
+    background-color: #ffffff;
+    border-top: 1px solid #e5e7eb;
+    display: flex;
+    align-items: center;
+    justify-content: space-around;
+    z-index: 1000;
+    box-shadow: 0 -4px 12px rgba(0, 0, 0, 0.03);
+    padding-bottom: env(safe-area-inset-bottom); /* Fixes notch spacing rules for iOS */
+  }
+
+  /* Individual App Dock Grid Elements */
+  .mobile-nav-item {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 0.25rem;
+    background: none;
+    border: none;
+    color: #6b7280;
+    text-decoration: none;
+    font-family: system-ui, -apple-system, sans-serif;
+    font-size: 0.7rem;
+    font-weight: 500;
+    flex: 1;
+    height: 100%;
+    cursor: pointer;
+    transition: color 0.15s ease;
+    -webkit-tap-highlight-color: transparent;
+  }
+
+  /* Active/Current Active Tabs Route Highlights */
+  .mobile-nav-item.active-tab,
+  .mobile-nav-item:active {
+    color: #2563eb;
+  }
+
+  /* Translucent Ambient Modal Cover Shading */
+  .mobile-menu-overlay {
+    position: fixed;
+    inset: 0;
+    background-color: rgba(15, 23, 42, 0.4);
+    backdrop-filter: blur(4px);
+    z-index: 998;
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.25s ease;
+  }
+
+  .mobile-menu-overlay.show {
+    opacity: 1;
+    pointer-events: auto;
+  }
+
+  /* Slide Up Modular Sheet Panel Tray Drawer */
+  .mobile-menu-sheet {
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    background-color: #ffffff;
+    border-top-left-radius: 20px;
+    border-top-right-radius: 20px;
+    padding: 1.25rem 1.25rem calc(68px + env(safe-area-inset-bottom)) 1.25rem; /* Offsets bottom nav padding */
+    z-index: 999;
+    transform: translateY(100%);
+    transition: transform 0.28s cubic-bezier(0.4, 0, 0.2, 1);
+    box-shadow: 0 -10px 25px -5px rgba(0, 0, 0, 0.08);
+  }
+
+  .mobile-menu-sheet.open {
+    transform: translateY(0);
+  }
+
+  /* Inside Expanded Drawer Headings */
+  .sheet-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 1.25rem;
+    border-bottom: 1px solid #f3f4f6;
+    padding-bottom: 0.75rem;
+  }
+
+  .sheet-header h3 {
+    margin: 0;
+    font-size: 1.05rem;
+    font-weight: 600;
+    color: #111827;
+  }
+
+  .sheet-close-btn {
+    background: #f3f4f6;
+    border: none;
+    color: #4b5563;
+    padding: 0.4rem;
+    border-radius: 50%;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  /* Hidden Sheet List Blocks Layout links */
+  .sheet-links {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+  }
+
+  .sheet-item {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    padding: 0.8rem 1rem;
+    color: #374151;
+    text-decoration: none;
+    font-size: 0.95rem;
+    font-weight: 500;
+    border-radius: 10px;
+    background: none;
+    border: none;
+    width: 100%;
+    text-align: left;
+    cursor: pointer;
+    transition: background-color 0.15s ease;
+  }
+
+  .sheet-item:active {
+    background-color: #f3f4f6;
+  }
+
+  .sheet-divider {
+    height: 1px;
+    background-color: #e5e7eb;
+    margin: 0.4rem 0;
+  }
+
+  .logout-btn {
+    color: #dc2626;
+  }
+ 
+
+  .logo-SearchBar{
+    position: relative;
+    left: 230px;
+     top: 2px;
+  }
+
+  .Profile-header{
+    background-color: #fff;
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    text-align: center;
+  }
+/* ===========================
+   MOBILE SECTIONS
+=========================== */
+
+.mobile-section{
+    background:#ffffff;
+    border:1px solid #E5E7EB;
+    border-radius:20px;
+    padding:18px;
+    box-shadow:0 8px 20px rgba(15,23,42,.05);
+}
+
+.mobile-section h3{
+    font-size:17px;
+    font-weight:700;
+    color:#111827;
+    margin-bottom:16px;
+}
+
+/* ===========================
+   GRID
+=========================== */
+
+.chip-grid{
+    display:grid;
+    grid-template-columns:repeat(2,1fr);
+    gap:12px;
+}
+
+/* ===========================
+   BUTTONS
+=========================== */
+
+.chip-grid button{
+    display:flex;
+    justify-content:center;
+    align-items:center;
+
+    width:100%;
+    min-height:48px;
+
+    border:none;
+    border-radius:14px;
+
+    background:#F0FDF4;
+    color:#166534;
+
+    font-size:13px;
+    font-weight:600;
+
+    cursor:pointer;
+
+    transition:.25s ease;
+}
+
+.chip-grid button:hover{
+    background:#22C55E;
+    color:#fff;
+    transform:translateY(-2px);
+}
+
+.chip-grid button:active{
+    transform:scale(.96);
+}
+
+/* ===========================
+   SMALL PHONES
+=========================== */
+
+@media (max-width:400px){
+
+.mobile-section{
+    padding:16px;
+    border-radius:18px;
+}
+
+.mobile-section h3{
+    font-size:16px;
+}
+
+.chip-grid{
+    gap:10px;
+}
+
+.chip-grid button{
+    min-height:44px;
+    font-size:12px;
+    padding:0 8px;
+}
+
+}
+
+/* ===========================
+   LARGE PHONES
+=========================== */
+
+@media (min-width:401px) and (max-width:768px){
+
+.chip-grid button{
+    min-height:50px;
+    font-size:14px;
+}
+
+}
+
+}

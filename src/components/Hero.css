@@ -1,0 +1,894 @@
+
+.desktop-view, 
+.hero {
+  display: block;
+}
+
+
+.mobile-view, 
+.hero-mobile {
+  display: none !important;
+}
+
+
+
+/* ==========================================================================
+   DESKTOP HERO STYLES (Only active on wider screens)
+   ========================================================================== */
+
+.hero {
+  position: relative;
+  height: 86.5vh;
+  background: url("https://images.unsplash.com/photo-1521737604893-d14cc237f11d?w=1600") center/cover no-repeat;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 20px 6% 10px;
+  overflow: hidden;
+}
+
+.hero-overlay {
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(rgba(15, 23, 42, 0.72), rgba(15, 23, 42, 0.72));
+}
+
+.hero-content {
+  position: relative;
+  z-index: 2;
+  max-width: 1300px;
+  width: 100%;
+  text-align: center;
+  color: #fff;
+}
+
+.hero-badge {
+  display: inline-block;
+  background: rgba(41, 10, 10, 0.12);
+  backdrop-filter: blur(10px);
+  border: 1px solid rgba(255,255,255,.2);
+  padding: 10px 20px;
+  border-radius: 50px;
+  margin-bottom: 27px;
+  font-weight: 600;
+}
+
+.hero h1 {
+  font-size: 4rem;
+  line-height: 1.15;
+  font-weight: 800;
+  margin-bottom: 28px;
+}
+
+.hero h1 span{
+color:#22C55E;
+}
+
+.hero p {
+  max-width: 720px;
+  margin: auto;
+  color: rgba(255,255,255,.9);
+  line-height: 1.8;
+  font-size: 1.1rem;
+}
+
+/* Desktop Search Bar */
+.hero-search {
+  margin-top: 25px;
+  background: rgba(255,255,255,.15);
+  backdrop-filter: blur(3px);
+  border: 1px solid rgba(255,255,255,.2);
+  border-radius: 20px;
+  padding: 18px;
+  display: flex;
+  gap: 15px;
+  align-items: center;
+}
+
+.search-item {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  background: rgba(255,255,255,.12);
+  border-radius: 14px;
+  padding: 15px;
+}
+
+.search-item svg {
+  color: white;
+}
+
+.search-item input,
+.search-item select {
+  width: 100%;
+  border: none;
+  outline: none;
+  background: transparent;
+  color: white;
+  font-size: .95rem;
+}
+
+.search-item input::placeholder {
+  color: rgba(255,255,255,.75);
+}
+
+.search-item select option {
+  color: black;
+}
+
+.hero-search button {
+  border: none;
+ background:#22C55E;
+  color: white;
+  padding: 16px 30px;
+  border-radius: 14px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-weight: 600;
+  transition: .3s;
+}
+
+.hero-search button:hover {
+  background: #16a34a;
+}
+
+/* Desktop Tags & Stats */
+.popular-searches {
+  margin-top: 30px;
+  display: none; /* Changed from none to flex so they show on desktop */
+  justify-content: center;
+  flex-wrap: wrap;
+  gap: 12px;
+}
+
+.popular-searches span {
+  color: rgba(255,255,255,.8);
+  
+}
+
+.popular-searches a {
+  text-decoration: none;
+  color: white;
+  background: rgba(255,255,255,.15);
+  padding: 8px 16px;
+  border-radius: 50px;
+  transition: .3s;
+}
+
+.popular-searches a:hover {
+  background:#22C55E;
+}
+
+.hero-stats {
+  display: flex;
+  justify-content: center;
+  gap: 80px;
+  margin-top: 70px;
+}
+
+.hero-stats h2 {
+  font-size: 2.3rem;
+}
+
+.hero-stats span {
+  color: rgba(255,255,255,.8);
+}
+
+/* ==========================================================================
+   1. FOOLPROOF RESPONSIVE SHOW/HIDE LAYOUTS
+   ========================================================================== */
+
+/* Default State: Desktop is visible, Mobile is completely hidden */
+.desktop-view, 
+.hero {
+  display: block !important;
+}
+
+.mobile-hero-container {
+  display: none !important;
+}
+
+/* ==========================================================================
+   1. SHOW/HIDE LAYOUT SEPARATION RULES
+   ========================================================================== */
+
+/* Default Desktop State */
+.desktop-view, 
+.hero {
+  display: block !important;
+}
+
+.mobile-hero-container {
+  display: none !important;
+}
+
+
+
+
+/* ==========================================
+   MOBILE VIEW
+==========================================*/
+
+@media screen and (max-width:768px){
+
+/* Hide Desktop */
+
+.desktop-view,
+.hero{
+    display:none !important;
+}
+
+/* Main Container */
+
+.mobile-hero-container{
+    display:flex !important;
+    flex-direction:column;
+    width:100%;
+    min-height:100vh;
+    background:#F8FAFC;
+    padding:16px;
+    gap:22px;
+    overflow-x:hidden;
+    box-sizing:border-box;
+}
+
+.mobile-hero-container,
+.mobile-hero-container *{
+    box-sizing:border-box;
+    font-family:Inter,sans-serif;
+}
+
+/* Header */
+
+.mobile-header{
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+}
+
+.user-profile{
+    display:flex;
+    align-items:center;
+    gap:12px;
+}
+
+.avatar-badge{
+    width:44px;
+    height:44px;
+    border-radius:14px;
+    background:linear-gradient(135deg,#22C55E,#15803D);
+    color:#fff;
+    display:flex;
+    justify-content:center;
+    align-items:center;
+    font-weight:700;
+    font-size:15px;
+}
+
+.user-info{
+    display:flex;
+    flex-direction:column;
+}
+
+.welcome-text{
+    font-size:18px;
+    font-weight:700;
+    color:#111827;
+}
+
+.sub-welcome{
+    font-size:13px;
+    color:#64748B;
+}
+
+.icon-notification-btn{
+    width:42px;
+    height:42px;
+    border-radius:12px;
+    border:1px solid #E2E8F0;
+    background:#fff;
+    display:flex;
+    justify-content:center;
+    align-items:center;
+    color:#475569;
+}
+
+/* Hero Card */
+
+.hero-feature-card{
+    position:relative;
+    overflow:hidden;
+    background:linear-gradient(135deg,#22C55E,#15803D);
+    border-radius:24px;
+    padding:28px 22px;
+    box-shadow:0 15px 40px rgba(34,197,94,.22);
+}
+
+.feature-overlay{
+    position:absolute;
+    inset:0;
+    background-image:radial-gradient(rgba(255,255,255,.08) 1px,transparent 1px);
+    background-size:20px 20px;
+}
+
+.feature-content{
+    position:relative;
+    z-index:2;
+    display:flex;
+    flex-direction:column;
+    gap:18px;
+}
+
+.feature-tag{
+    display:inline-flex;
+    width:max-content;
+    background:rgba(255,255,255,.15);
+    color:#fff;
+    padding:8px 14px;
+    border-radius:999px;
+    font-size:13px;
+    font-weight:600;
+}
+
+.feature-title{
+    color:#fff;
+    font-size:2rem;
+    line-height:1.15;
+    font-weight:800;
+}
+
+.feature-description{
+    color:#ECFDF5;
+    font-size:15px;
+    line-height:1.7;
+}
+
+.action-cta-btn{
+    width:100%;
+    height:52px;
+    border:none;
+    border-radius:14px;
+    background:#fff;
+    color:#15803D;
+    font-size:15px;
+    font-weight:700;
+    cursor:pointer;
+    transition:.25s;
+}
+
+.action-cta-btn:active{
+    transform:scale(.98);
+}
+
+/* Search */
+
+.mobile-search-widget{
+    background:#fff;
+    border:1px solid #E2E8F0;
+    border-radius:18px;
+    padding:16px;
+    box-shadow:0 6px 18px rgba(15,23,42,.05);
+}
+
+.input-field-group{
+    display:flex;
+    align-items:center;
+    gap:12px;
+    padding:14px 0;
+}
+
+.field-divider{
+    border-bottom:1px solid #F1F5F9;
+}
+
+.field-icon{
+    color:#94A3B8;
+}
+
+.widget-input{
+    flex:1;
+    border:none;
+    outline:none;
+    background:transparent;
+    font-size:14px;
+}
+
+.widget-input::placeholder{
+    color:#94A3B8;
+}
+
+.widget-submit-btn{
+    width:100%;
+    height:48px;
+    border:none;
+    border-radius:12px;
+    background:#22C55E;
+    color:#fff;
+    font-weight:700;
+    margin-top:12px;
+}
+/* ==========================================
+   MOBILE CATEGORIES
+==========================================*/
+
+.categories-widget{
+    display:flex;
+    flex-direction:column;
+    gap:14px;
+}
+
+.section-widget-title{
+    font-size:18px;
+    font-weight:700;
+    color:#111827;
+    margin-bottom:2px;
+}
+
+/* Horizontal Scroll */
+
+.scrollable-tags-row{
+    display:flex;
+    gap:12px;
+    overflow-x:auto;
+    overflow-y:hidden;
+    padding:4px 0 8px;
+    scroll-behavior:smooth;
+    scrollbar-width:none;
+    -webkit-overflow-scrolling:touch;
+}
+
+.scrollable-tags-row::-webkit-scrollbar{
+    display:none;
+}
+
+/* Pills */
+
+.pill-tag{
+    flex-shrink:0;
+    white-space:nowrap;
+    border:none;
+    outline:none;
+    cursor:pointer;
+
+    padding:12px 18px;
+
+    border-radius:999px;
+
+    background:#FFFFFF;
+
+    color:#374151;
+
+    border:1px solid #E5E7EB;
+
+    font-size:13px;
+
+    font-weight:600;
+
+    transition:.25s;
+}
+
+.pill-tag:hover{
+
+    background:#22C55E;
+
+    color:#fff;
+
+    border-color:#22C55E;
+}
+
+.pill-tag.active{
+
+    background:#DCFCE7;
+
+    color:#166534;
+
+    border-color:#BBF7D0;
+}
+
+/* Divider */
+
+.mobile-hero-container hr{
+
+    border:none;
+
+    border-top:1px solid #E5E7EB;
+
+    margin:0;
+}
+
+/* Section spacing */
+
+.categories-widget + .categories-widget{
+
+    margin-top:4px;
+}
+
+/* ==========================
+   SMALL PHONES
+==========================*/
+
+@media (max-width:400px){
+
+.mobile-hero-container{
+
+    padding:14px 12px 24px;
+
+    gap:20px;
+}
+
+.mobile-header{
+
+    margin-bottom:2px;
+}
+
+.hero-feature-card{
+
+    padding:22px 18px;
+
+    border-radius:20px;
+}
+
+.feature-title{
+
+    font-size:1.7rem;
+}
+
+.feature-description{
+
+    font-size:14px;
+}
+
+.feature-tag{
+
+    font-size:12px;
+
+    padding:7px 12px;
+}
+
+.action-cta-btn{
+
+    height:48px;
+
+    font-size:14px;
+}
+
+.mobile-search-widget{
+
+    padding:14px;
+}
+
+.section-widget-title{
+
+    font-size:17px;
+}
+
+.scrollable-tags-row{
+
+    gap:10px;
+}
+
+.pill-tag{
+
+    font-size:12px;
+
+    padding:10px 16px;
+}
+
+}
+
+/* ==========================
+   LARGE PHONES
+==========================*/
+
+@media (min-width:401px) and (max-width:768px){
+
+.mobile-hero-container{
+
+    max-width:430px;
+
+    margin:auto;
+}
+
+.hero-feature-card{
+
+    padding:28px 24px;
+}
+
+.feature-title{
+
+    font-size:2.1rem;
+}
+
+}
+
+/* ==========================
+   TABLETS
+==========================*/
+
+@media (min-width:769px){
+
+.mobile-hero-container{
+
+    display:none !important;
+}
+
+}
+
+/* ==========================================
+   MOBILE PREMIUM FINISH
+==========================================*/
+
+/* Smooth scrolling */
+
+html{
+    scroll-behavior:smooth;
+}
+
+/* Prevent horizontal scrolling */
+
+body{
+    overflow-x:hidden;
+}
+
+.mobile-hero-container{
+    overflow-x:hidden;
+}
+
+/* Fade Animation */
+
+.hero-feature-card,
+.mobile-search-widget,
+.categories-widget{
+
+    animation:fadeUp .5s ease;
+}
+
+@keyframes fadeUp{
+
+    from{
+
+        opacity:0;
+        transform:translateY(20px);
+
+    }
+
+    to{
+
+        opacity:1;
+        transform:translateY(0);
+
+    }
+
+}
+
+/* Better Button Effects */
+
+.action-cta-btn{
+
+    transition:.3s;
+}
+
+.action-cta-btn:hover{
+
+    background:#F8FAFC;
+    transform:translateY(-2px);
+
+}
+
+.action-cta-btn:active{
+
+    transform:scale(.97);
+}
+
+/* Search Focus */
+
+.mobile-search-widget{
+
+    transition:.3s;
+}
+
+.mobile-search-widget:focus-within{
+
+    border-color:#22C55E;
+
+    box-shadow:0 0 0 4px rgba(34,197,94,.12);
+
+}
+
+/* Input */
+
+.widget-input{
+
+    font-size:15px;
+
+    color:#111827;
+}
+
+.widget-input::placeholder{
+
+    color:#94A3B8;
+}
+
+/* Category Cards */
+
+.pill-tag{
+
+    transition:.25s;
+}
+
+.pill-tag:active{
+
+    transform:scale(.95);
+}
+
+.pill-tag:hover{
+
+    box-shadow:0 8px 18px rgba(34,197,94,.18);
+
+}
+
+/* Better Scroll */
+
+.scrollable-tags-row{
+
+    scroll-snap-type:x proximity;
+}
+
+.pill-tag{
+
+    scroll-snap-align:start;
+}
+
+/* Hero Glow */
+
+.hero-feature-card::before{
+
+    content:"";
+
+    position:absolute;
+
+    width:220px;
+
+    height:220px;
+
+    border-radius:50%;
+
+    background:rgba(255,255,255,.08);
+
+    top:-80px;
+
+    right:-80px;
+
+}
+
+.hero-feature-card::after{
+
+    content:"";
+
+    position:absolute;
+
+    width:120px;
+
+    height:120px;
+
+    border-radius:50%;
+
+    background:rgba(255,255,255,.05);
+
+    bottom:-50px;
+
+    left:-40px;
+
+}
+
+/* iPhone Safe Area */
+
+@supports (padding:max(0px)){
+
+.mobile-hero-container{
+
+padding-left:max(16px,env(safe-area-inset-left));
+
+padding-right:max(16px,env(safe-area-inset-right));
+
+padding-bottom:max(28px,env(safe-area-inset-bottom));
+
+}
+
+}
+
+/* Tiny Phones */
+
+@media (max-width:340px){
+
+.feature-title{
+
+font-size:1.5rem;
+
+}
+
+.feature-description{
+
+font-size:13px;
+
+}
+
+.action-cta-btn{
+
+height:46px;
+
+font-size:13px;
+
+}
+
+.section-widget-title{
+
+font-size:16px;
+
+}
+
+.pill-tag{
+
+font-size:11px;
+
+padding:9px 14px;
+
+}
+
+}
+
+/* Phones 360-430 */
+
+@media (min-width:360px) and (max-width:430px){
+
+.hero-feature-card{
+
+padding:26px 22px;
+
+}
+
+.feature-title{
+
+font-size:2rem;
+
+}
+
+}
+
+/* Large Phones */
+
+@media (min-width:431px) and (max-width:768px){
+
+.mobile-hero-container{
+
+max-width:440px;
+
+margin:auto;
+
+}
+
+}
+
+/* Remove tap highlight */
+
+button,
+input{
+
+-webkit-tap-highlight-color:transparent;
+
+}
+
+/* Better touch */
+
+button{
+
+touch-action:manipulation;
+
+}
+
+
+}
+
