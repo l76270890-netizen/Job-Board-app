@@ -10,7 +10,7 @@ import {
   Building2,
   CheckCircle2,
 } from "lucide-react";
-import { useNavigate, useLocation } from "react-router-dom"; // ADD useLocation
+import { useNavigate, useLocation } from "react-router-dom";
 
 function JobDetail() {
   const navigate = useNavigate();
@@ -23,19 +23,18 @@ function JobDetail() {
         <button className="detailBackBtn" onClick={() => navigate(-1)}>
           <ArrowLeft size={20} /> Back
         </button>
-        <p style={{textAlign: 'center', marginTop: '40px'}}>Job not found. Please go back to <span style={{color: '#2563eb', cursor: 'pointer'}} onClick={() => navigate('/jobs')}>Jobs</span></p>
+        <p style={{textAlign: 'center', marginTop: '40px'}}>
+          Job not found. Please go back to 
+          <span style={{color: '#2563eb', cursor: 'pointer'}} onClick={() => navigate('/all-jobs')}> Jobs</span>
+        </p>
       </section>
     )
   }
 
-  const responsibilities = [
-    "Build responsive web applications",
-    "Collaborate with designers and backend teams",
-    "Optimize applications for speed",
-    "Write reusable clean components",
-  ];
-
-  const skills = ["React", "JavaScript", "TypeScript", "CSS", "Git", "REST API"];
+  // USE DATA FROM THE JOB OBJECT INSTEAD OF HARDCODED
+  const responsibilities = job.responsibilities || [];
+  const skills = job.skills || [];
+  const benefits = job.benefits || [];
 
   return (
     <section className="jobDetail">
@@ -79,21 +78,21 @@ function JobDetail() {
         <div className="detailCard">
           <h2>Responsibilities</h2>
           <div className="responsibilityList">
-            {responsibilities.map((item, index) => (
+            {responsibilities.length > 0 ? responsibilities.map((item, index) => (
               <div className="responsibilityItem" key={index}>
                 <CheckCircle2 size={18} />
                 <span>{item}</span>
               </div>
-            ))}
+            )) : <p>No responsibilities listed</p>}
           </div>
         </div>
 
         <div className="detailCard">
           <h2>Required Skills</h2>
           <div className="skillsWrap">
-            {skills.map((skill, index) => (
+            {skills.length > 0 ? skills.map((skill, index) => (
               <span key={index}>{skill}</span>
-            ))}
+            )) : <p>No skills listed</p>}
           </div>
         </div>
       </div>
@@ -108,7 +107,7 @@ function JobDetail() {
           </div>
           <div className="overviewItem">
             <Users size={18} />
-            <div><span>Experience</span><p>{job.experience} Level</p></div>
+            <div><span>Experience</span><p>{job.experience}</p></div>
           </div>
           <div className="overviewItem">
             <Building2 size={18} />
@@ -119,10 +118,9 @@ function JobDetail() {
         <div className="sideCard">
           <h3>Company Benefits</h3>
           <ul>
-            <li>Remote Work</li>
-            <li>Health Insurance</li>
-            <li>Flexible Hours</li>
-            <li>Learning Budget</li>
+            {benefits.length > 0 ? benefits.map((benefit, index) => (
+              <li key={index}>{benefit}</li>
+            )) : <li>No benefits listed</li>}
           </ul>
         </div>
       </div>

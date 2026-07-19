@@ -85,6 +85,133 @@
   cursor: pointer;
 }
 
+
+/* MOBILE TOP BAR + DRAWER - HIDDEN ON DESKTOP */
+.mobile-top-bar, .mobile-drawer, .mobile-drawer-overlay { display: none; }
+
+/* MOBILE ONLY */
+@media (max-width: 767px) {
+  .desktop-navbar { display: none; }
+
+  body { padding-top: 56px; padding-bottom: 68px; } /* prevent content hiding under navs */
+
+  /* TOP BAR */
+  .mobile-top-bar {
+    display: flex;
+    position: fixed; /* fixed to top */
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 56px;
+    background: #fff;
+    border-bottom: 1px solid #e2e8f0;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0 16px;
+    z-index: 1001;
+  }
+
+  .mobile-menu-icon {
+    background: none;
+    border: none;
+    cursor: pointer;
+    color: #1e293b;
+  }
+
+  .mobile-logo {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 18px;
+    font-weight: 700;
+    color: #2563eb;
+  }
+  .logo-dot { width: 8px; height: 8px; background: #2563eb; border-radius: 50%; }
+
+  /* TOP DRAWER */
+  .mobile-drawer-overlay {
+    display: block;
+    position: fixed;
+    top: 56px; /* starts below top bar */
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(0,0,0,0.4);
+    opacity: 0;
+    visibility: hidden;
+    transition: all 0.3s ease;
+    z-index: 1000;
+  }
+  .mobile-drawer-overlay.show {
+    opacity: 1;
+    visibility: visible;
+  }
+
+  .mobile-drawer {
+    display: block;
+    position: fixed;
+    top: 56px; /* drops down from under top bar */
+    left: 0;
+    right: 0;
+    background: #fff;
+    transform: translateY(-100%); /* hidden above */
+    transition: transform 0.3s ease;
+    z-index: 1000;
+    border-bottom: 1px solid #e2e8f0;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+  }
+  .mobile-drawer.open {
+    transform: translateY(0); /* slide down */
+  }
+
+  .drawer-links { padding: 8px 0; }
+  .drawer-item {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 14px 20px;
+    color: #334155;
+    text-decoration: none;
+    font-size: 15px;
+    font-weight: 500;
+  }
+  .drawer-item:active { background: #f1f5f9; }
+  .drawer-divider { height: 1px; background: #e2e8f0; margin: 8px 0; }
+  .logout-btn { background: none; border: none; width: 100%; text-align: left; }
+
+  /* BOTTOM NAV */
+  .mobile-bottom-nav {
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    height: 68px;
+    background: #fff;
+    border-top: 1px solid #e2e8f0;
+    display: flex;
+    justify-content: space-around;
+    align-items: center;
+    z-index: 999;
+  }
+  .mobile-nav-item {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 4px;
+    color: #64748b;
+    text-decoration: none;
+    font-size: 11px;
+  }
+  .mobile-nav-item.active-tab { color: #2563eb; font-weight: 600; }
+}
+
+/* DESKTOP ONLY */
+@media (min-width: 768px) {
+  .mobile-top-bar, .mobile-bottom-nav, .mobile-drawer, .mobile-drawer-overlay {
+    display: none;
+  }
+}
+
 /* ========================================== */
 /* 2. UPGRADED PREMIUM MOBILE BOTTOM VIEW     */
 /* ========================================== */

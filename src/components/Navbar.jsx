@@ -3,24 +3,23 @@ import {
   Search,
   Bell,
   Bookmark,
-  User,
   Menu,
   Home,
   Briefcase,
   Building2,
   Settings,
   X,
-  LogOut
+  LogOut,
+  Newspaper
 } from "lucide-react";
 import { useState } from "react";
 import { Link, useLocation } from "react-router-dom";
 
 function Navbar() {
-  const [menuOpen, setMenuOpen] = useState(false); // Controls desktop responsive fallback if any
-  const [mobileMenuOpen, setMobileMenuOpen] = useState(false); // Controls modern mobile bottom sheet drawer
+  const [menuOpen, setMenuOpen] = useState(false);
+  const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const location = useLocation();
 
-  // Helper function to dynamically add active styling classes
   const isActive = (path) => location.pathname === path ? "active-tab" : "";
 
   const toggleMobileMenu = () => {
@@ -30,13 +29,12 @@ function Navbar() {
   return (
     <>
       {/* ========================================== */}
-      {/* 1. DESKTOP NAVBAR (Maintained Exactly)     */}
+      {/* 1. DESKTOP NAVBAR - UNTOUCHED */}
       {/* ========================================== */}
       <header className="navbar desktop-navbar">
         <div className="logo">
           <span className="logo-dot"></span>
           NijaJobs
-           
         </div>
 
         <nav className={menuOpen ? "nav active" : "nav"}>
@@ -44,7 +42,7 @@ function Navbar() {
           <Link to="/jobs">Jobs</Link>
           <Link to="/saved">Saved</Link>
           <Link to="/companies">Companies</Link>
-          <Link to="/settings">Settings</Link>
+          <Link to="/Article">Article</Link>
         </nav>
 
         <div className="navbar-right">
@@ -54,45 +52,61 @@ function Navbar() {
           <button className="login-btn">Login</button>
         </div>
 
-        <button
-          className="menu-btn"
-          onClick={() => setMenuOpen(!menuOpen)}
-        >
+        <button className="menu-btn" onClick={() => setMenuOpen(!menuOpen)}>
           <Menu />
         </button>
       </header>
 
       {/* ========================================== */}
-      {/* MOBILE SHEET MENU OVERLAY & TRAY           */}
+      {/* 2. MOBILE TOP BAR WITH HAMBURGER LEFT */}
+      {/* ========================================== */}
+      <header className="mobile-top-bar">
+        <button className="mobile-menu-icon" onClick={toggleMobileMenu} aria-label="Open menu">
+          {mobileMenuOpen ? <X size={24} /> : <Menu size={24} />} {/* Changes to X when open */}
+        </button>
+        <div className="mobile-logo">
+          <span className="logo-dot"></span>
+          NijaJobs
+        </div>
+        <Search size={22} /> {/* right icon */}
+      </header>
+
+      {/* ========================================== */}
+      {/* 3. MOBILE TOP DRAWER MENU - SLIDES FROM TOP */}
       {/* ========================================== */}
       <div 
-        className={`mobile-menu-overlay ${mobileMenuOpen ? "show" : ""}`} 
+        className={`mobile-drawer-overlay ${mobileMenuOpen ? "show" : ""}`} 
         onClick={toggleMobileMenu} 
       />
       
-      <div className={`mobile-menu-sheet ${mobileMenuOpen ? "open" : ""}`}>
-        <div className="sheet-header">
-          <h3>More Options</h3>
-          <button className="sheet-close-btn" onClick={toggleMobileMenu} aria-label="Close menu">
-            <X size={20} />
-          </button>
-        </div>
-        
-        <div className="sheet-links">
-          <Link to="/search" className="sheet-item" onClick={toggleMobileMenu}>
-            <Search size={18} />
-            <span>Search Jobs</span>
+      <div className={`mobile-drawer ${mobileMenuOpen ? "open" : ""}`}>
+        <div className="drawer-links">
+          <Link to="/" className="drawer-item" onClick={toggleMobileMenu}>
+            <Home size={18} />
+            <span>Home</span>
           </Link>
-          <Link to="/notifications" className="sheet-item" onClick={toggleMobileMenu}>
-            <Bell size={18} />
-            <span>Notifications</span>
+          <Link to="/jobs" className="drawer-item" onClick={toggleMobileMenu}>
+            <Briefcase size={18} />
+            <span>Jobs</span>
           </Link>
-          <Link to="/settings" className="sheet-item" onClick={toggleMobileMenu}>
+          <Link to="/Articles" className="drawer-item" onClick={toggleMobileMenu}>
+            <Newspaper size={18} />
+            <span>Articles</span>
+          </Link>
+          <Link to="/companies" className="drawer-item" onClick={toggleMobileMenu}>
+            <Building2 size={18} />
+            <span>Companies</span>
+          </Link>
+          <Link to="/saved" className="drawer-item" onClick={toggleMobileMenu}>
+            <Bookmark size={18} />
+            <span>Saved</span>
+          </Link>
+          <div className="drawer-divider"></div>
+          <Link to="/settings" className="drawer-item" onClick={toggleMobileMenu}>
             <Settings size={18} />
-            <span>Settings & Account</span>
+            <span>Settings</span>
           </Link>
-          <div className="sheet-divider"></div>
-          <button className="sheet-item logout-btn" onClick={toggleMobileMenu}>
+          <button className="drawer-item logout-btn" onClick={toggleMobileMenu}>
             <LogOut size={18} />
             <span>Login / Logout</span>
           </button>
@@ -100,39 +114,36 @@ function Navbar() {
       </div>
 
       {/* ========================================== */}
-      {/* 2. PREMIUM MOBILE BOTTOM NAVBAR            */}
+      {/* 4. MOBILE BOTTOM NAVBAR - 5 TABS */}
       {/* ========================================== */}
-      <nav className="mobile-bottom-nav">
-        <Link to="/" className={`mobile-nav-item ${isActive("/")}`} onClick={() => setMobileMenuOpen(false)}>
-          <Home size={22} />
-          <span>Home</span>
-        </Link>
-        
-        <Link to="/jobs" className={`mobile-nav-item ${isActive("/jobs")}`} onClick={() => setMobileMenuOpen(false)}>
-          <Briefcase size={22} />
-          <span>Jobs</span>
-        </Link>
-        
-        <Link to="/saved" className={`mobile-nav-item ${isActive("/saved")}`} onClick={() => setMobileMenuOpen(false)}>
-          <Bookmark size={22} />
-          <span>Saved</span>
-        </Link>
-        
-        <Link to="/companies" className={`mobile-nav-item ${isActive("/companies")}`} onClick={() => setMobileMenuOpen(false)}>
-          <Building2 size={22} />
-          <span>Companies</span>
-        </Link>
-        
-        {/* Swapped standard Settings tab out for full Hamburger Control */}
-        <button 
-          className={`mobile-nav-item menu-toggle-btn ${mobileMenuOpen ? "active-tab" : ""}`} 
-          onClick={toggleMobileMenu}
-          aria-expanded={mobileMenuOpen}
-        >
-          <Menu size={22} />
-          <span>More</span>
-        </button>
-      </nav>
+     <nav className="mobile-bottom-nav">
+  <Link to="/" className={`mobile-nav-item ${isActive("/")}`}>
+    <Home size={22} />
+    <span>Home</span>
+  </Link>
+  
+  <Link to="/jobs" className={`mobile-nav-item ${isActive("/jobs")}`}>
+    <Briefcase size={22} />
+    <span>Jobs</span>
+  </Link>
+
+  <Link to="/saved" className={`mobile-nav-item ${isActive("/saved")}`}>
+    <Bookmark size={22} />
+    <span>Saved</span>
+  </Link>
+
+  {/* CHANGED THIS LINE */}
+  <Link to="/articles" className={`mobile-nav-item ${isActive("/articles")}`}>
+    <Newspaper size={22} />
+    <span>Article</span>
+  </Link>
+  
+  <Link to="/companies" className={`mobile-nav-item ${isActive("/companies")}`}>
+    <Building2 size={22} />
+    <span>Companies</span>
+  </Link>
+
+</nav>
     </>
   );
 }

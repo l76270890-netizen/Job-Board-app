@@ -6,6 +6,8 @@ import JobDetail from "./pages/JobDetail";
 import CompaniesPages from "./pages/CompaniesPages";
 import CompanyDetail from "./pages/CompanyDetail";
 import SettingPage from "./pages/SettingPage";
+import ArticleDetail from "./pages/ArticleDetail";
+import ArticleCard from "./components/ArticleCard";
 
 function App() {
   return (
@@ -15,16 +17,17 @@ function App() {
         {/* Home */}
         <Route path="/" element={<Home />} />
 
-        {/* Jobs */}
+        {/* Jobs - FIXED */}
         <Route path="/jobs" element={<AllJobs />} />
         <Route path="/jobs/:id" element={<JobDetail />} />
 
+        {/* Articles - FIXED */}
+        <Route path="/articles" element={<ArticleCard />} />
+        <Route path="/articles/:id" element={<ArticleDetail />} />
+
         {/* Companies */}
         <Route path="/companies" element={<CompaniesPages />} />
-        <Route
-          path="/company/:companyName"
-          element={<CompanyDetail />}
-        />
+        <Route path="/company/:companyName" element={<CompanyDetail />} />
 
         {/* Settings */}
         <Route path="/settings" element={<SettingPage />} />

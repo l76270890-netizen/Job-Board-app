@@ -3,7 +3,7 @@
 .appLayout {
   background: #f8fafc;
   min-height: 100vh;
-  padding-bottom: 68px; /* space for bottom nav on mobile */
+  padding-bottom: 68px; /* space for bottom nav */
 }
 
 .pageContent {
@@ -27,7 +27,7 @@
 .topNav h3 { font-size: 16px; font-weight: 600; }
 .topNav button { background: none; border: none; cursor: pointer; }
 
-/* BOTTOM NAV - MOBILE ONLY */
+/* BOTTOM NAV */
 .bottomNav {
   position: fixed;
   bottom: 0;
@@ -36,7 +36,7 @@
   height: 68px;
   background: #fff;
   border-top: 1px solid #e2e8f0;
-  display: flex; /* show by default */
+  display: flex;
   justify-content: space-around;
   align-items: center;
   z-index: 999;
@@ -55,25 +55,3 @@
   cursor: pointer;
 }
 .navItem.active { color: #2563eb; }
-
-/* DESKTOP: 768px and up */
-@media (min-width: 768px) {
-  .bottomNav {
-    display: none; /* HIDE bottom nav on desktop */
-  }
-
-  .appLayout {
-    padding-bottom: 0; /* remove bottom padding */
-  }
-
-  .pageContent {
-    min-height: calc(100vh - 56px); /* only minus top nav */
-    max-width: 1200px;
-    margin: 0 auto; /* center content on desktop */
-    padding: 24px;
-  }
-
-  .topNav {
-    padding: 0 24px;
-  }
-}

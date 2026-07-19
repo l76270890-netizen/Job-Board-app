@@ -141,7 +141,7 @@
 /* Action Button */
 .view-jobs-btn {
   background-color: #22C55E; /* Clean blue */
-  color: #ffffff;
+  color: #ba2b2b;
   border: none;
   padding: 0.5rem 1rem;
   font-size: 0.85rem;
@@ -222,7 +222,7 @@ cursor: pointer;
   padding: 10px;
   position: relative;
   left: 120px;
-  width: 40%;
+  width: 50%;
   border-radius:8px;
   border: 1px  #16a34a solid;
   top: 20px;

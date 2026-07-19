@@ -55,6 +55,7 @@ function CompaniesHiring  () {
   };
   
   return (
+    
     <section className="companies-section">
       <div className="companies-header">
         <h2 className="companies-title">Companies hiring now</h2>
@@ -107,7 +108,7 @@ function CompaniesHiring  () {
       </div>
 
       <div className="View-button" onClick={() => navigate('/companies')}>
-        View more
+        View all
       </div>
     </section>
   );

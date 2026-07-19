@@ -41,7 +41,7 @@ export const jobs = [
     title: "Frontend Engineer", 
     company: "Fuzu Ltd", 
     logo: "https://logo.clearbit.com/fuzu.com",
-    location: "Remote", 
+    location: "Remote, Nigeria", 
     type: "Contract", 
     salary: 1800, 
     category: "Engineering",
@@ -98,6 +98,239 @@ export const jobs = [
     ],
     skills: ["Node.js", "Express", "PostgreSQL", "Docker", "AWS", "Redis"],
     benefits: ["Health Insurance", "Remote Work", "Stock Options", "Gym Membership"]
+  },
+
+  // 11 NEW JOBS ADDED
+  { 
+    id: 5, 
+    title: "Product Manager", 
+    company: "Fuzu Ltd", 
+    logo: "https://logo.clearbit.com/fuzu.com",
+    location: "Abuja, Nigeria", 
+    type: "Full-time", 
+    salary: 3500, 
+    category: "Product",
+    experience: "Senior",
+    postedDate: "2026-09-27",
+    description: "Lead product vision and strategy for Fuzu's career platform serving 2M+ users in Africa. Work directly with C-level to define roadmap and KPIs. 5+ years PM experience in tech required.",
+    responsibilities: [
+      "Define product roadmap and prioritize features",
+      "Conduct market research and user interviews",
+      "Work with engineering and design to ship products",
+      "Track metrics and drive product growth"
+    ],
+    skills: ["Product Strategy", "Agile", "Data Analysis", "User Research", "Roadmapping"],
+    benefits: ["Health Insurance", "Equity", "Remote Work", "Conference Budget"]
+  },
+  { 
+    id: 6, 
+    title: "UI/UX Designer", 
+    company: "TechNova Ltd", 
+    logo: "https://logo.clearbit.com/technova.com",
+    location: "Remote, Nigeria", 
+    type: "Full-time", 
+    salary: 1500, 
+    category: "Design",
+    experience: "Mid-Level",
+    postedDate: "2026-09-26",
+    description: "Design beautiful and intuitive interfaces for TechNova's mobile and web apps. You'll work on our design system and collaborate with product teams. Portfolio required.",
+    responsibilities: [
+      "Create wireframes, prototypes and high-fidelity designs",
+      "Maintain and expand our design system",
+      "Run usability tests and iterate designs",
+      "Collaborate with developers for implementation"
+    ],
+    skills: ["Figma", "Adobe XD", "User Flows", "Wireframing", "Mobile Design"],
+    benefits: ["Remote Work", "Learning Budget", "Health Insurance"]
+  },
+  { 
+    id: 7, 
+    title: "Sales Executive", 
+    company: "Oriental Mills Ltd", 
+    logo: "https://logo.clearbit.com/orientalmills.com",
+    location: "Port Harcourt, Nigeria", 
+    type: "Full-time", 
+    salary: 1200, 
+    category: "Sales",
+    experience: "Entry-Level",
+    postedDate: "2026-09-24",
+    description: "Drive B2B sales for Oriental Mills food products across South-South Nigeria. Target: distributors, retailers, and supermarkets. Commission + base salary.",
+    responsibilities: [
+      "Identify and onboard new distributors",
+      "Meet monthly sales targets",
+      "Build relationships with key accounts",
+      "Prepare sales reports and forecasts"
+    ],
+    skills: ["B2B Sales", "Negotiation", "CRM", "Communication", "FMCG"],
+    benefits: ["Commission", "Transport Allowance", "Health Insurance"]
+  },
+  { 
+    id: 8, 
+    title: "Data Analyst", 
+    company: "Microsoft", 
+    logo: "https://logo.clearbit.com/microsoft.com",
+    location: "Lagos, Nigeria", 
+    type: "Full-time", 
+    salary: 4000, 
+    category: "Data",
+    experience: "Mid-Level",
+    postedDate: "2026-09-29",
+    description: "Analyze user behavior and business metrics for Microsoft Nigeria. Build dashboards in PowerBI and provide insights to leadership. SQL + Python required.",
+    responsibilities: [
+      "Build dashboards and reports in PowerBI",
+      "Analyze user data and business KPIs",
+      "Write SQL queries for data extraction",
+      "Present insights to stakeholders"
+    ],
+    skills: ["SQL", "Python", "PowerBI", "Excel", "Data Visualization"],
+    benefits: ["Health Insurance", "Stock Options", "Remote Work", "Learning Stipend"]
+  },
+  { 
+    id: 9, 
+    title: "HR Manager", 
+    company: "GIZ KE", 
+    logo: "https://logo.clearbit.com/giz.de",
+    location: "Kano, Nigeria", 
+    type: "Full-time", 
+    salary: 2800, 
+    category: "Human Resources",
+    experience: "Senior",
+    postedDate: "2026-09-22",
+    description: "Manage HR operations for GIZ Nigeria North region. Handle recruitment, employee relations, and policy implementation for 200+ staff.",
+    responsibilities: [
+      "Lead recruitment and onboarding",
+      "Manage employee relations and grievances",
+      "Implement HR policies and compliance",
+      "Coordinate training and development"
+    ],
+    skills: ["HR Management", "Recruitment", "Labor Law", "Employee Relations", "HRIS"],
+    benefits: ["Health Insurance", "Housing Allowance", "Paid Leave"]
+  },
+  { 
+    id: 10, 
+    title: "Mobile App Developer", 
+    company: "TechNova Ltd", 
+    logo: "https://logo.clearbit.com/technova.com",
+    location: "Ibadan, Nigeria", 
+    type: "Full-time", 
+    salary: 3200, 
+    category: "Engineering",
+    experience: "Mid-Level",
+    postedDate: "2026-09-28",
+    description: "Build TechNova's Flutter mobile app for iOS and Android. 3+ years mobile dev experience. Must have published apps on Play Store/App Store.",
+    responsibilities: [
+      "Develop cross-platform mobile applications",
+      "Integrate with REST APIs and third-party SDKs",
+      "Fix bugs and improve app performance",
+      "Publish updates to app stores"
+    ],
+    skills: ["Flutter", "Dart", "Firebase", "REST API", "Git"],
+    benefits: ["Health Insurance", "Remote Work", "Device Allowance"]
+  },
+  { 
+    id: 11, 
+    title: "Content Writer", 
+    company: "Fuzu Ltd", 
+    logo: "https://logo.clearbit.com/fuzu.com",
+    location: "Remote, Nigeria", 
+    type: "Part-time", 
+    salary: 800, 
+    category: "Writing",
+    experience: "Entry-Level",
+    postedDate: "2026-09-23",
+    description: "Write career advice articles, CV templates, and job descriptions for Fuzu blog. 2 posts per week. SEO experience is a plus.",
+    responsibilities: [
+      "Write SEO-optimized blog articles",
+      "Create job descriptions and career guides",
+      "Research trending career topics",
+      "Edit and proofread content"
+    ],
+    skills: ["Content Writing", "SEO", "Research", "Grammar", "WordPress"],
+    benefits: ["Flexible Hours", "Remote Work", "Byline Credit"]
+  },
+  { 
+    id: 12, 
+    title: "Finance Officer", 
+    company: "GIZ KE", 
+    logo: "https://logo.clearbit.com/giz.de",
+    location: "Abuja, Nigeria", 
+    type: "Full-time", 
+    salary: 2500, 
+    category: "Finance",
+    experience: "Mid-Level",
+    postedDate: "2026-09-21",
+    description: "Manage budgeting, donor reporting, and financial compliance for GIZ projects. ACCA/CPA preferred. 3+ years NGO finance experience.",
+    responsibilities: [
+      "Prepare monthly financial reports",
+      "Manage donor fund disbursements",
+      "Ensure compliance with financial policies",
+      "Support audit processes"
+    ],
+    skills: ["Accounting", "Excel", "Budgeting", "SAP", "NGO Finance"],
+    benefits: ["Health Insurance", "Pension", "Paid Leave"]
+  },
+  { 
+    id: 13, 
+    title: "DevOps Engineer", 
+    company: "Google", 
+    logo: "https://logo.clearbit.com/google.com",
+    location: "Remote, Nigeria", 
+    type: "Full-time", 
+    salary: 5000, 
+    category: "Engineering",
+    experience: "Senior",
+    postedDate: "2026-09-29",
+    description: "Manage GCP infrastructure for Google products in Africa. Focus on CI/CD, monitoring, and reliability. Terraform + Kubernetes required.",
+    responsibilities: [
+      "Manage Kubernetes clusters on GCP",
+      "Build and maintain CI/CD pipelines",
+      "Monitor system performance and uptime",
+      "Automate infrastructure with Terraform"
+    ],
+    skills: ["GCP", "Kubernetes", "Docker", "Terraform", "Jenkins", "Linux"],
+    benefits: ["Health Insurance", "Stock Options", "Remote Work", "Wellness Budget"]
+  },
+  { 
+    id: 14, 
+    title: "Customer Support Lead", 
+    company: "TechNova Ltd", 
+    logo: "https://logo.clearbit.com/technova.com",
+    location: "Lagos, Nigeria", 
+    type: "Full-time", 
+    salary: 1400, 
+    category: "Customer Service",
+    experience: "Mid-Level",
+    postedDate: "2026-09-26",
+    description: "Lead a team of 8 support agents for TechNova. Handle escalations and improve CSAT. Experience with Zendesk required.",
+    responsibilities: [
+      "Manage and train support team",
+      "Handle customer escalations",
+      "Improve support processes and CSAT",
+      "Report on support metrics weekly"
+    ],
+    skills: ["Customer Support", "Zendesk", "Team Leadership", "Communication", "Problem Solving"],
+    benefits: ["Health Insurance", "Performance Bonus", "Training"]
+  },
+  { 
+    id: 15, 
+    title: "Supply Chain Manager", 
+    company: "Oriental Mills Ltd", 
+    logo: "https://logo.clearbit.com/orientalmills.com",
+    location: "Kaduna, Nigeria", 
+    type: "Full-time", 
+    salary: 3000, 
+    category: "Operations",
+    experience: "Senior",
+    postedDate: "2026-09-25",
+    description: "Oversee end-to-end supply chain for Oriental Mills. Manage vendors, logistics, and inventory across 10+ states.",
+    responsibilities: [
+      "Manage procurement and vendor relationships",
+      "Optimize logistics and distribution",
+      "Control inventory levels and costs",
+      "Ensure on-time delivery to customers"
+    ],
+    skills: ["Supply Chain", "Logistics", "Procurement", "ERP", "Negotiation"],
+    benefits: ["Health Insurance", "Car Allowance", "Housing Allowance"]
   },
 ];
 
@@ -182,6 +415,10 @@ export default function AllJobs() {
   }, [searchTitle, searchLocation, filters, sortBy]);
 
   const activeFiltersCount = filters.category.length + filters.type.length + filters.experience.length + filters.salary.length;
+  
+
+
+
 
   return (
     <section className="allJobs">
@@ -366,3 +603,17 @@ export default function AllJobs() {
     </section>
   );
 }
+
+
+
+
+
+
+
+
+
+
+
+
+
+

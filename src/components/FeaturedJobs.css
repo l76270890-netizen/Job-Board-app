@@ -307,8 +307,11 @@
 .featured-header a{
     text-decoration:none;
     color:#22C55E;
+    border-radius: 5px;
+    padding: 4px 7px;
+    border: 1px #DCFCE7 solid;
     font-size:14px;
-    font-weight:600;
+    font-weight:lighter
 }
 
 /* ===========================
