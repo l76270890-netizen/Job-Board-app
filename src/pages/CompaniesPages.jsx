@@ -75,21 +75,21 @@ function CompaniesPages() {
   
 
   return (
-    <section className="companies-section">
+    <section className="companiesPage-section">
 <button className="backBtn" onClick={() => navigate(-1)}>
             <ArrowLeft size={22} />
             <span></span>
           </button>
-      <div className="companies-header">
-        <h2 className="companies-title">Companies Hiring Now</h2>
-        <span className="companies-subtitle">
+      <div className="companiesPage-header">
+        <h2 className="companiesPage-title">Companies Hiring Now</h2>
+        <span className="companiesPage-subtitle">
           Explore opportunities at top workplaces
         </span>
       </div>
 
       {/* Search */}
 
-      <div className="search-wrapper">
+      <div className="searchPage-wrapper">
 
         <Search size={18} />
 
@@ -112,7 +112,7 @@ function CompaniesPages() {
 
       {/* Companies */}
 
-      <div className="companies-grid">
+      <div className="companiesPage-grid">
 
         {filteredCompanies.length > 0 ? (
 
@@ -120,13 +120,13 @@ function CompaniesPages() {
 
             <article
               key={company.id}
-              className="company-card"
+              className="companyPage-card"
               onClick={() => handleViewJobs(company.name)}
             >
 
-              <div className="company-card-top">
+              <div className="companyPage-card-top">
 
-                <div className="logo-wrapper">
+                <div className="logoPage-wrapper">
                   <img
                     src={company.logo}
                     alt={company.name}
@@ -138,12 +138,12 @@ function CompaniesPages() {
                   />
                 </div>
 
-                <div className="company-meta">
-                  <h3 className="company-name">
+                <div className="companyPage-meta">
+                  <h3 className="companyPage-name">
                     {company.name}
                   </h3>
 
-                  <span className="company-tag">
+                  <span className="companyPage-tag">
                     <Briefcase size={12} />
                     {company.industry}
                   </span>
@@ -151,15 +151,15 @@ function CompaniesPages() {
 
               </div>
 
-              <div className="company-card-bottom">
+              <div className="companyPage-card-bottom">
 
-                <div className="company-location">
+                <div className="companyPage-location">
                   <MapPin size={14} />
                   <span>{company.location}</span>
                 </div>
 
                 <button
-                  className="view-jobs-btn"
+                  className="view-jobs-btn-Page"
                   onClick={(e) => {
                     e.stopPropagation();
                     handleViewJobs(company.name);
@@ -176,7 +176,7 @@ function CompaniesPages() {
 
         ) : (
 
-          <div className="no-results">
+          <div className="no-results-Page">
             No companies found.
           </div>
 

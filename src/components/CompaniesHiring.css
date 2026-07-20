@@ -141,7 +141,7 @@
 /* Action Button */
 .view-jobs-btn {
   background-color: #22C55E; /* Clean blue */
-  color: #ba2b2b;
+  color: #fff;
   border: none;
   padding: 0.5rem 1rem;
   font-size: 0.85rem;
@@ -193,11 +193,29 @@ cursor: pointer;
   font-size: 0.85rem;
   min-width: 0;
   position: relative;
-  left: 87px;
+  left: 83px;
   top: -50px;
 }
 
 .company-location span {
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+
+.company-tag  {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  align-self: flex-start;
+  padding: 0.25rem 0.65rem;
+  background-color: #f0fdf4; /* Soft green tint */
+  color: #166534; /* Deep forest green */
+  font-size: 0.75rem;
+  font-weight: 600;
+  border-radius: 20px;
+  max-width: 100%;
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;

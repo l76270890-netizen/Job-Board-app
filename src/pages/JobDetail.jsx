@@ -11,6 +11,7 @@ import {
   CheckCircle2,
 } from "lucide-react";
 import { useNavigate, useLocation } from "react-router-dom";
+import { jobs } from "./AllJobs"; // IMPORT YOUR JOBS ARRAY
 
 function JobDetail() {
   const navigate = useNavigate();
@@ -35,6 +36,11 @@ function JobDetail() {
   const responsibilities = job.responsibilities || [];
   const skills = job.skills || [];
   const benefits = job.benefits || [];
+
+  // 1. GET RELATED JOBS: same category OR same company, exclude current job
+  const relatedJobs = jobs
+    .filter(j => j.id !== job.id && (j.category === job.category || j.company === job.company))
+    .slice(0, 4); // show max 4
 
   return (
     <section className="jobDetail">
@@ -95,6 +101,37 @@ function JobDetail() {
             )) : <p>No skills listed</p>}
           </div>
         </div>
+
+        {/* 2. RELATED JOBS SECTION */}
+        {relatedJobs.length > 0 && (
+          <div className="relatedJobsSection">
+            <h2>Related Jobs</h2>
+            <p>More {job.category} jobs you might be interested in</p>
+
+            <div className="relatedJobsGrid">
+              {relatedJobs.map(rJob => (
+                <div 
+                  className="relatedCard" 
+                  key={rJob.id} 
+                  onClick={() => navigate(`/jobs/${rJob.id}`, { state: rJob })}
+                >
+                  <div className="relatedCardTop">
+                    <img src={rJob.logo} alt={rJob.company} />
+                    <div>
+                      <h4>{rJob.title}</h4>
+                      <p>{rJob.company}</p>
+                    </div>
+                  </div>
+                  <div className="relatedCardMeta">
+                    <span><MapPin size={14} /> {rJob.location}</span>
+                    <span className="salary">${rJob.salary.toLocaleString()}/mo</span>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
+        )}
+
       </div>
 
       {/* RIGHT PANEL */}

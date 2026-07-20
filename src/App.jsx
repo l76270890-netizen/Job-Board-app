@@ -7,7 +7,7 @@ import CompaniesPages from "./pages/CompaniesPages";
 import CompanyDetail from "./pages/CompanyDetail";
 import SettingPage from "./pages/SettingPage";
 import ArticleDetail from "./pages/ArticleDetail";
-import ArticleCard from "./components/ArticleCard";
+import ArticlePage from "./pages/ArticlePage";
 
 function App() {
   return (
@@ -22,7 +22,7 @@ function App() {
         <Route path="/jobs/:id" element={<JobDetail />} />
 
         {/* Articles - FIXED */}
-        <Route path="/articles" element={<ArticleCard />} />
+        <Route path="/articles" element={<ArticlePage />} />
         <Route path="/articles/:id" element={<ArticleDetail />} />
 
         {/* Companies */}

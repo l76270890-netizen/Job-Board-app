@@ -1,7 +1,14 @@
 
 import { Eye, MessageSquare } from "lucide-react"; 
 import { useNavigate } from "react-router-dom"; // 1. ADDED
-import "./ArticleCard.css";
+import {
+  MapPin,
+  Briefcase,
+  Search,
+  X,
+   ArrowLeft,
+} from "lucide-react";
+import "./ArticlePage.css";
 
 const articles = [
   {
@@ -54,6 +61,40 @@ const articles = [
     category: "Workplace",
     readTime: "6 min read",
     coverImage: "6.jpg"
+  },
+   {
+    id: 2,
+    image: "6.jpg",
+    tags: ["Technology", "AI"],
+    title: "How Generative AI is Reshaping Tech Recruitment in Emerging Markets",
+    excerpt: "AI is screening CVs and doing first interviews. Here is what it means for job seekers.",
+    content: `Generative AI is changing how recruiters hire...\n\nFull article content goes here.`,
+    date: "June 02, 2026",
+    publishedDate: "2026-06-02",
+    views: 1420,
+    comments: 12,
+    author: "David Okoro",
+    authorImg: "https://i.pravatar.cc/100?img=6",
+    category: "Technology",
+    readTime: "7 min read",
+    coverImage: "6.jpg"
+  },
+  {
+    id: 3,
+    image: "6.jpg",
+    tags: ["Workplace", "Remote"],
+    title: "The Silent Shift Back to the Office: Balancing Autonomy and Corporate Culture",
+    excerpt: "Hybrid is the new default. But companies are getting stricter with office days.",
+    content: `After 3 years of remote work, companies want people back...\n\nFull article content goes here.`,
+    date: "June 14, 2026",
+    publishedDate: "2026-06-14",
+    views: 2844,
+    comments: 19,
+    author: "Fatima Yusuf",
+    authorImg: "https://i.pravatar.cc/100?img=7",
+    category: "Workplace",
+    readTime: "6 min read",
+    coverImage: "6.jpg"
   }
 ];
 
@@ -65,38 +106,42 @@ function ArticleCard() {
   }
 
   return (
-    <section className="article-section">
-      <div className="article-header">
-        <h2 className="section-title">Latest Articles & Insights</h2>
-        <p className="section-subtitle">Stay updated with deep dives into corporate trends and job developments</p>
+    <section className="articlePage-section">
+      <div className="articlePage-header">
+        <button className="backBtn" onClick={() => navigate(-1)}>
+            <ArrowLeft size={22} />
+            <span></span>
+          </button>
+        <h2 className="sectionPage-title">Latest Articles & Insights</h2>
+        <p className="sectionPage-subtitle">Stay updated with deep dives into corporate trends and job developments</p>
       </div>
 
-      <div className="article-grid">
+      <div className="articlePage-grid">
         {articles.map((article) => (
           <article 
             key={article.id} 
-            className="article-card"
+            className="articlePage-card"
             onClick={() => handleClick(article)} // 4. MAKE CARD CLICKABLE
           >
-            <div className="article-image-wrapper">
+            <div className="articlePage-image-wrapper">
               <img src={article.image} alt={article.title} />
             </div>
 
-            <div className="article-content">
-              <div className="article-tags">
+            <div className="articlePage-content">
+              <div className="articlePage-tags">
                 {article.tags.map((tag) => (
                   <span key={tag} className="tag">{tag}</span>
                 ))}
               </div>
 
-              <h3 className="article-title">
+              <h3 className="articlePage-title">
                 {article.title} {/* removed <a> tag */}
               </h3>
 
-              <div className="article-footer">
-                <span className="article-date">{article.date}</span>
+              <div className="articlePage-footer">
+                <span className="articlePage-date">{article.date}</span>
                 
-                <div className="article-stats">
+                <div className="articlePage-stats">
                   <div className="stat">
                     <Eye size={14} />
                     <span>{article.views}</span>
@@ -112,7 +157,7 @@ function ArticleCard() {
         ))}
       </div>
 
-      <div className="action-wrapper">
+      <div className="actionPage-wrapper">
         <button className="view-all-btn" onClick={() => navigate('/articles')}>View all articles</button>
       </div>
     </section>

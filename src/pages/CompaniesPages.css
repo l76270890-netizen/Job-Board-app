@@ -1,17 +1,17 @@
 /* Base Section Styling */
-.companies-section {
+.companiesPage-section {
   max-width: 1200px;
   margin: 0 auto;
   padding: 2.5rem 1.5rem;
   font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
 }
 
-.companies-header {
+.companiesPage-header {
   margin-bottom: 2rem;
   
 }
 
-.companies-title {
+.companiesPage-title {
   font-size: 2.4rem;
   color: #111827;
   text-align: center;
@@ -20,7 +20,7 @@
   letter-spacing: -0.02em;
 }
 
-.companies-subtitle {
+.companiesPage-subtitle {
   font-size: 0.95rem;
   color: #6b7280;
    position: relative;
@@ -28,16 +28,16 @@
 }
 
 /* Grid Layout */
-.companies-grid {
+.companiesPage-grid {
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
   gap: 1.5rem;
 }
 
 /* Card Container */
-.company-card {
+.companyPage-card {
   background-color: #ffffff;
-  border: 1px solid #dcfce7 ;
+  border: 1px solid #e5e7eb ;
   border-radius: 16px;
   padding: 1.5rem;
   display: flex;
@@ -48,20 +48,20 @@
   transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
-.company-card:hover {
+.companyPage-card:hover {
   transform: translateY(-4px);
   box-shadow: 0 12px 20px -8px rgba(0, 0, 0, 0.08);
-  border-color: #cbd5e1;
+  border-color: #dcfce7;
 }
 
 /* Top Section (Logo + Name/Tag) */
-.company-card-top {
+.companyPage-card-top {
   display: flex;
   align-items: flex-start;
   gap: 1rem;
 }
 
-.logo-wrapper {
+.logoPage-wrapper {
   flex-shrink: 0;
   border: 1px solid #f1f5f9;
   border-radius: 12px;
@@ -70,21 +70,21 @@
   background-color: #ffffff;
 }
 
-.logo-wrapper img {
+.logoPage-wrapper img {
   width: 52px;
   height: 52px;
   object-fit: contain;
   border-radius: 10px;
 }
 
-.company-meta {
+.companyPage-meta {
   display: flex;
   flex-direction: column;
   gap: 0.35rem;
   min-width: 0; /* Ensures truncation works safely */
 }
 
-.company-name {
+.companyPage-name {
   margin: 0;
   font-size: 1.15rem;
   font-weight: 600;
@@ -95,7 +95,7 @@
 }
 
 /* Industry Tag */
-.company-tag span {
+.companyPage-tag span {
   display: inline-flex;
   align-items: center;
   gap: 0.35rem;
@@ -113,7 +113,7 @@
 }
 
 /* Bottom Section (Location + Button) */
-.company-card-bottom {
+.companyPage-card-bottom {
   display: flex;
   align-items: center;
   justify-content: space-between;
@@ -122,7 +122,7 @@
   border-top: 1px dashed #dcfce7;
 }
 
-.company-location {
+.companyPage-location {
   display: flex;
   align-items: center;
   gap: 0.35rem;
@@ -131,7 +131,7 @@
   min-width: 0;
 }
 
-.company-location span {
+.companyPage-location span {
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
@@ -139,7 +139,7 @@
 
 
 /* Action Button */
-.view-jobs-btn {
+.view-jobs-btn-Page {
   background-color: #22C55E; /* Clean blue */
   color: #ffffff;
   border: none;
@@ -152,40 +152,42 @@
   transition: background-color 0.2s ease;
 }
 
-.view-jobs-btn:hover {
-  background-color: #16a34a; /* Darker blue on hover */
-}
 
 
-.View-button{
-  color: #16a34a;
-  text-align: center;
-  padding: 6px;
-  border-radius:8px;
-  position: relative;
-  bottom: 550px;
-  text-align: end;
-cursor: pointer;
-}
 
 
 /* Mobile Responsiveness Fine-Tuning */
 @media (max-width: 480px) {
-  .companies-grid {
+.companiesPage-section {
+  max-width: 1200px;
+  height: 150vh;
+  position: relative;
+  bottom: 57px;
+  margin: 0 auto;
+  background-color: #f8fafc;
+  padding: 2rem 1.2rem;
+  font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+}
+
+body{
+  height: 10vh;
+}
+
+  .companiesPage-grid {
     grid-template-columns: 1fr;
   }
-  .company-card-bottom {
+  .companyPage-card-bottom {
     flex-direction: column;
     align-items: flex-start;
     gap: 0.75rem;
   }
-  .view-jobs-btn {
+  .view-jobs-btn-Page {
     width: 100%;
     display: none;
     text-align: center;
   }
 
-  .company-location {
+  .companyPage-location {
   display: flex;
   align-items: center;
   gap: 0.35rem;
@@ -193,21 +195,38 @@ cursor: pointer;
   font-size: 0.85rem;
   min-width: 0;
   position: relative;
-  left: 87px;
-  top: -50px;
+  left: 83px;
+  top: -40px;
 }
 
-.company-location span {
+.companyPage-location span {
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
 }
 
-.company-card{
+.companyPage-tag {
+  display: flex;
+  align-items: center;
+  gap: 0.35rem;
+  align-self: flex-start;
+  padding: 0.25rem 0.65rem;
+  background-color: #f0fdf4; /* Soft green tint */
+  color: #166534; /* Deep forest green */
+  font-size: 0.75rem;
+  font-weight: 600;
+  border-radius: 20px;
+  max-width: 100%;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.companyPage-card{
     height: 160px;
 }
 
-.companies-subtitle {
+.companiesPage-subtitle {
   font-size: 0.95rem;
   color: #6b7280;
    position: relative;
@@ -229,13 +248,13 @@ cursor: pointer;
 }
 
 
-.companies-title {
+.companiesPage-title {
  font-size:1.8rem;
   color: #111827;
   text-align: center;
   font-family: serif;
   font-weight: 700;
-  margin: 0 0 0.35rem 0;
+  margin-top: 28px;
   letter-spacing: -0.02em;
 }
 
@@ -247,14 +266,15 @@ cursor: pointer;
    SEARCH BAR
 =========================== */
 
-.search-wrapper{
-    max-width:700px;
+.searchPage-wrapper{
+    max-width:350px;
     margin:30px auto 40px;
 
     display:flex;
     align-items:center;
     gap:14px;
-
+     position: relative;
+     left: 21px;
     background:#FFFFFF;
 
     border:1px solid #E5E7EB;
@@ -267,17 +287,16 @@ cursor: pointer;
     transition:.3s ease;
 }
 
-.search-wrapper:focus-within{
-    border-color:#22C55E;
-    box-shadow:0 0 0 4px rgba(34,197,94,.12);
+.searchPage-wrapper:focus-within{
+    border-color:#dcfce7;
 }
 
-.search-wrapper svg{
+.searchPage-wrapper svg{
     color:#94A3B8;
     flex-shrink:0;
 }
 
-.search-wrapper input{
+.searchPage-wrapper input{
     flex:1;
     border:none;
     outline:none;
@@ -287,7 +306,7 @@ cursor: pointer;
     color:#111827;
 }
 
-.search-wrapper input::placeholder{
+.searchPage-wrapper input::placeholder{
     color:#94A3B8;
 }
 
@@ -308,7 +327,7 @@ cursor: pointer;
 
 @media (max-width:768px){
 
-.search-wrapper{
+.searchPage-wrapper{
 
     width:100%;
     margin:24px 0 30px;
@@ -318,12 +337,12 @@ cursor: pointer;
     border-radius:16px;
 }
 
-.search-wrapper input{
+.searchPage-wrapper input{
 
     font-size:14px;
 }
 
-.search-wrapper svg{
+.searchPage-wrapper svg{
 
     width:18px;
     height:18px;
@@ -337,7 +356,7 @@ cursor: pointer;
 
 @media (max-width:480px){
 
-.search-wrapper{
+.searchPage-wrapper{
 
     padding:12px 14px;
 
@@ -346,12 +365,12 @@ cursor: pointer;
     border-radius:14px;
 }
 
-.search-wrapper input{
+.searchPage-wrapper input{
 
     font-size:13px;
 }
 
-.search-wrapper svg{
+.searchPage-wrapper svg{
 
     width:16px;
     height:16px;

@@ -42,7 +42,7 @@ function Navbar() {
           <Link to="/jobs">Jobs</Link>
           <Link to="/saved">Saved</Link>
           <Link to="/companies">Companies</Link>
-          <Link to="/Article">Article</Link>
+          <Link to="/articles">Article</Link>
         </nav>
 
         <div className="navbar-right">
@@ -89,6 +89,10 @@ function Navbar() {
             <Briefcase size={18} />
             <span>Jobs</span>
           </Link>
+           <Link to="/saved" className="drawer-item" onClick={toggleMobileMenu}>
+            <Bookmark size={18} />
+            <span>Saved</span>
+          </Link>
           <Link to="/Articles" className="drawer-item" onClick={toggleMobileMenu}>
             <Newspaper size={18} />
             <span>Articles</span>
@@ -97,15 +101,12 @@ function Navbar() {
             <Building2 size={18} />
             <span>Companies</span>
           </Link>
-          <Link to="/saved" className="drawer-item" onClick={toggleMobileMenu}>
-            <Bookmark size={18} />
-            <span>Saved</span>
-          </Link>
           <div className="drawer-divider"></div>
           <Link to="/settings" className="drawer-item" onClick={toggleMobileMenu}>
             <Settings size={18} />
             <span>Settings</span>
           </Link>
+          
           <button className="drawer-item logout-btn" onClick={toggleMobileMenu}>
             <LogOut size={18} />
             <span>Login / Logout</span>

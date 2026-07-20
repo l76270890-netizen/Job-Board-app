@@ -1,4 +1,3 @@
-
 import "./ArticleDetail.css";
 import {
   ArrowLeft,
@@ -134,15 +133,25 @@ function ArticleDetail() {
           </div>
         </div>
 
-        <div className="sideCard">
-          <h4>Related Articles</h4>
-          {articles.filter(a => a.id !== article.id).slice(0,3).map(rel => (
-            <div key={rel.id} className="relatedItem" onClick={() => navigate(`/articles/${rel.id}`, {state: rel})}>
-              <img src={rel.coverImage} alt={rel.title} />
-              <p>{rel.title}</p>
-            </div>
-          ))}
+       <div className="sideCard">
+  <h4>Related Articles</h4>
+  {articles
+    .filter(a => a.id !== article.id) // exclude current article
+    .slice(0,3) // show only 3
+    .map(rel => (
+      <div 
+        key={rel.id} 
+        className="relatedItem" 
+        onClick={() => navigate(`/articles/${rel.id}`, {state: rel})}
+      >
+        <img src={rel.coverImage} alt={rel.title} />
+        <div className="relatedInfo">
+          <p>{rel.title}</p>
+          <span>{new Date(rel.publishedAt).toDateString()}</span>
         </div>
+      </div>
+  ))}
+</div>
       </aside>
     </section>
   );

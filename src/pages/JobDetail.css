@@ -250,6 +250,102 @@
   color:#475569;
 }
 
+
+
+
+/* RELATED JOBS SECTION */
+.relatedJobsSection {
+  background: white;
+  border-radius: 16px;
+  padding: 24px;
+  margin-top: 20px;
+  box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+}
+
+.relatedJobsSection h2 {
+  font-size: 20px;
+  margin: 0 0 5px;
+  color: #0f172a;
+}
+
+.relatedJobsSection > p {
+  color: #64748b;
+  font-size: 14px;
+  margin-bottom: 20px;
+}
+
+.relatedJobsGrid {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 12px;
+}
+
+.relatedCard {
+  border: 1px solid #e2e8f0;
+  border-radius: 12px;
+  padding: 16px;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.relatedCard:hover {
+  border-color: #2563eb;
+  background: #f8fafc;
+  transform: translateY(-2px);
+}
+
+.relatedCardTop {
+  display: flex;
+  gap: 12px;
+  align-items: center;
+  margin-bottom: 10px;
+}
+
+.relatedCardTop img {
+  width: 40px;
+  height: 40px;
+  border-radius: 8px;
+  object-fit: contain;
+}
+
+.relatedCardTop h4 {
+  margin: 0;
+  font-size: 15px;
+  color: #0f172a;
+}
+
+.relatedCardTop p {
+  margin: 0;
+  font-size: 13px;
+  color: #64748b;
+}
+
+.relatedCardMeta {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-size: 13px;
+  color: #475569;
+}
+
+.relatedCardMeta span {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.relatedCardMeta .salary {
+  font-weight: 600;
+  color: #2563eb;
+}
+
+/* For desktop 2 columns */
+@media (min-width: 768px) {
+  .relatedJobsGrid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
 /* =========================
    TABLET
 ========================= */
@@ -280,6 +376,8 @@
   padding:20px 16px 40px;
   gap:20px;
   background-color: #f8fafc;
+  position: relative;
+  bottom: 56px;
 }
 
 .jobHeroCard,
