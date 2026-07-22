@@ -90,11 +90,11 @@
   margin-bottom: 0.75rem;
 }
 
-.tag {
+.tagPage {
   font-size: 0.75rem;
   font-weight: 600;
-  color: #2563eb;
-  background-color: #eff6ff;
+  color: #166534;
+  background-color: #DCFCE7;
   padding: 0.2rem 0.6rem;
   border-radius: 6px;
   text-transform: uppercase;

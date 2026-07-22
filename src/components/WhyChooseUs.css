@@ -42,7 +42,7 @@
 
 .why-card{
     background:#fff;
-    border:1px solid #dcfce7;
+    border:1px solid #E5E7EB;
     border-radius:20px;
     padding:35px 25px;
     text-align:center;
@@ -53,7 +53,7 @@
 .why-card:hover{
     transform:translateY(-8px);
     box-shadow:0 18px 35px rgba(0,0,0,.08);
-    border: color #BBF7D0;
+    border: color #E5E7EB;
 }
 
 .why-icon{
@@ -124,7 +124,7 @@ gap:18px;
 
 .why-card{
 padding:28px 20px;
-border-color: #BBF7D0;
+border-color: #E5E7EB;
 }
 
 .why-icon{

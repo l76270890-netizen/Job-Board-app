@@ -357,7 +357,16 @@ border-radius: 10px;
 .pageDots { min-width: 40px; height: 40px; display: flex; align-items: center; justify-content: center; color: #64748b; }
 
 
-
+.companyFallbackLogo {
+  width: 40px;
+  height: 40px;
+  border-radius: 8px;
+  background: #f1f5f9;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #64748b;
+}
 
 /* ====== RESPONSIVE BREAKPOINTS ====== */
 /* Tablet: 1 column for jobs */
@@ -419,6 +428,17 @@ border-radius: 10px;
     bottom: 60px;
 }
 
+.companyFallbackLogo {
+  width: 40px;
+  height: 40px;
+  border-radius: 8px;
+  background: #f1f5f9;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #64748b;
+}
+
 .pagination,.mobilePagination {
   display: flex;
   justify-content: center;
@@ -464,6 +484,7 @@ border-radius: 10px;
 
 
 /* multiple pages */
+
 .jobsTabs {
   display: flex;
   gap: 32px;
@@ -471,7 +492,7 @@ border-radius: 10px;
   margin: 2px  16px;
   overflow-x: auto;
   position: relative;
-  bottom: 10px;
+  bottom: 22px;
 }
 .tabBtn {
   background: none;
@@ -484,7 +505,7 @@ border-radius: 10px;
   position: relative;
   white-space: nowrap;
 }
-.tabBtn.active { color: #2563eb; }
+.tabBtn.active { color: #16A34A; }
 .tabBtn.active::after {
   content: '';
   position: absolute;
@@ -492,7 +513,7 @@ border-radius: 10px;
   left: 0;
   right: 0;
   height: 3px;
-  background: #2563eb;
+  background: #16A34A;
   border-radius: 2px;
 }
 .yellowSearchBtn {
@@ -542,8 +563,8 @@ border-radius: 10px;
 }
 
 .backBtn:hover{
-    background:#22C55E;
-    color:#fff;
+    background:transparent;
+    color:#000;
 }
 
 /* =========================
@@ -561,6 +582,8 @@ border-radius: 10px;
     background:#fff;
     border:1px solid #E5E7EB;
     border-radius:16px;
+    position: relative;
+    bottom: 14px;
     padding:14px 16px;
 }
 
@@ -639,14 +662,16 @@ border-radius: 10px;
     align-items:center;
     padding:12px 0;
     cursor:pointer;
-    border-bottom:1px solid #F3F4F6;
+    border-bottom:1px solid #e4e6eb;
 }
+
 
 .radioItem:last-child{
     border-bottom:none;
 }
 
 .radioItem span{
+
     display:flex;
     align-items:center;
     gap:10px;
@@ -683,6 +708,8 @@ border-radius: 10px;
     font-size:14px;
     color:#64748B;
     font-weight:600;
+     bottom:17px ;
+     position: relative;
 }
 
 /* =========================
@@ -696,6 +723,8 @@ border-radius: 10px;
     padding:18px;
     cursor:pointer;
     transition:.3s;
+    position: relative;
+    bottom: 20px;
     box-shadow:0 8px 20px rgba(15,23,42,.04);
 }
 

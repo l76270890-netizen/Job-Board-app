@@ -67,7 +67,7 @@ function ArticleDetail() {
     <section className="articleDetail">
       <div className="articleContainer">
         <button className="detailBackBtn" onClick={() => navigate(-1)}>
-          <ArrowLeft size={20} />
+          <ArrowLeft size={20} style={{color:"#166534"}} />
           Back to Articles
         </button>
 

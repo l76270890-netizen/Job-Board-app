@@ -162,7 +162,7 @@
   max-width: 1200px;
   height: 150vh;
   position: relative;
-  bottom: 57px;
+  bottom: 70px;
   margin: 0 auto;
   background-color: #f8fafc;
   padding: 2rem 1.2rem;
@@ -230,7 +230,8 @@ body{
   font-size: 0.95rem;
   color: #6b7280;
    position: relative;
-    left: 41px;
+    left: 58px;
+    bottom: 8px;
 }
 
 
@@ -255,6 +256,8 @@ body{
   font-family: serif;
   font-weight: 700;
   margin-top: 28px;
+  position: relative;
+   bottom: 10px;
   letter-spacing: -0.02em;
 }
 
@@ -357,12 +360,15 @@ body{
 @media (max-width:480px){
 
 .searchPage-wrapper{
-
-    padding:12px 14px;
-
-    gap:10px;
-
-    border-radius:14px;
+ display:flex;
+    align-items:center;
+    gap:12px;
+    background:#fff;
+    border:1px solid #E5E7EB;
+    border-radius:16px;
+    position: relative;
+    bottom: 14px;
+    padding:14px 16px;
 }
 
 .searchPage-wrapper input{
@@ -375,5 +381,6 @@ body{
     width:16px;
     height:16px;
 }
+
 
 }

@@ -1,68 +1,86 @@
 import "./JobDetail.css";
 import {
-  ArrowLeft,
-  MapPin,
-  Briefcase,
-  Clock3,
-  DollarSign,
-  Bookmark,
-  Users,
-  Building2,
-  CheckCircle2,
+  ArrowLeft, MapPin, Briefcase, Clock3, DollarSign, Bookmark,
+  Users, Building2, CheckCircle2,
 } from "lucide-react";
-import { useNavigate, useLocation } from "react-router-dom";
-import { jobs } from "./AllJobs"; // IMPORT YOUR JOBS ARRAY
+import { useNavigate, useParams } from "react-router-dom"; // 1. useParams not useLocation
+import { useEffect, useState } from "react";
+import { supabase } from "../supabase";
 
 function JobDetail() {
   const navigate = useNavigate();
-  const { state: job } = useLocation(); // GET JOB DATA FROM ALLJOBS
+  const { id } = useParams(); // 2. Get id from URL
+  const [job, setJob] = useState(null);
+  const [jobs, setJobs] = useState([]); // 3. Need all jobs for related
+  const [loading, setLoading] = useState(true);
 
-  // Fallback if user refreshes page
-  if (!job) {
-    return (
-      <section className="jobDetail">
-        <button className="detailBackBtn" onClick={() => navigate(-1)}>
-          <ArrowLeft size={20} /> Back
-        </button>
-        <p style={{textAlign: 'center', marginTop: '40px'}}>
-          Job not found. Please go back to 
-          <span style={{color: '#2563eb', cursor: 'pointer'}} onClick={() => navigate('/all-jobs')}> Jobs</span>
-        </p>
-      </section>
-    )
-  }
+  useEffect(() => {
+    const fetchData = async () => {
+      setLoading(true);
 
-  // USE DATA FROM THE JOB OBJECT INSTEAD OF HARDCODED
+      // Fetch this job
+      const { data: jobData } = await supabase
+       .from("jobboard-app")
+       .select("*")
+       .eq("id", id)
+       .single();
+
+      // Fetch all jobs for related
+      const { data: allJobs } = await supabase
+       .from("jobboard-app")
+       .select("*");
+
+      setJob(jobData);
+      setJobs(allJobs || []);
+      setLoading(false);
+    };
+    fetchData();
+  }, [id]);
+
+  if (loading) return <section className="jobDetail"><p>Loading...</p></section>;
+  if (!job) return (
+    <section className="jobDetail">
+      <button className="detailBackBtn" onClick={() => navigate(-1)}>
+        <ArrowLeft size={20} /> Back
+      </button>
+      <p style={{textAlign: 'center', marginTop: '40px'}}>
+        Job not found. Please go back to
+        <span style={{color: '#2563eb', cursor: 'pointer'}} onClick={() => navigate('/jobs')}> Jobs</span>
+      </p>
+    </section>
+  );
+
   const responsibilities = job.responsibilities || [];
   const skills = job.skills || [];
   const benefits = job.benefits || [];
 
-  // 1. GET RELATED JOBS: same category OR same company, exclude current job
+  // 4. FIX: use jobs state now
   const relatedJobs = jobs
-    .filter(j => j.id !== job.id && (j.category === job.category || j.company === job.company))
-    .slice(0, 4); // show max 4
+   .filter(j => j.id!== job.id && (j.category === job.category || j.company === job.company))
+   .slice(0, 4);
 
   return (
     <section className="jobDetail">
 
-      {/* LEFT CONTENT */}
       <div className="jobDetailLeft">
-
         <button className="detailBackBtn" onClick={() => navigate(-1)}>
-          <ArrowLeft size={20} />
-          Back
+          <ArrowLeft size={20} /> Back
         </button>
 
         <div className="jobHeroCard">
           <div className="jobHeroTop">
-            <img src={job.logo} alt={job.company} />
+            <img
+              src={`https://logo.clearbit.com/${job.company?.toLowerCase().replace(/\s/g,'')}.com`}
+              alt={job.company}
+              onError={(e) => e.target.src = "https://via.placeholder.com/40"}
+            />
             <div className="jobHeroInfo">
               <h1>{job.title}</h1>
               <h3>{job.company}</h3>
               <div className="heroMeta">
                 <span><MapPin size={15} />{job.location}</span>
                 <span><Briefcase size={15} />{job.type}</span>
-                <span><DollarSign size={15} />${job.salary.toLocaleString()}/mo</span>
+                <span><DollarSign size={15} />${job.salary?.toLocaleString()}/mo</span>
               </div>
             </div>
             <button className="saveBtn"><Bookmark size={20} /></button>
@@ -84,7 +102,7 @@ function JobDetail() {
         <div className="detailCard">
           <h2>Responsibilities</h2>
           <div className="responsibilityList">
-            {responsibilities.length > 0 ? responsibilities.map((item, index) => (
+            {responsibilities.length > 0? responsibilities.map((item, index) => (
               <div className="responsibilityItem" key={index}>
                 <CheckCircle2 size={18} />
                 <span>{item}</span>
@@ -96,27 +114,29 @@ function JobDetail() {
         <div className="detailCard">
           <h2>Required Skills</h2>
           <div className="skillsWrap">
-            {skills.length > 0 ? skills.map((skill, index) => (
+            {skills.length > 0? skills.map((skill, index) => (
               <span key={index}>{skill}</span>
             )) : <p>No skills listed</p>}
           </div>
         </div>
 
-        {/* 2. RELATED JOBS SECTION */}
         {relatedJobs.length > 0 && (
           <div className="relatedJobsSection">
             <h2>Related Jobs</h2>
             <p>More {job.category} jobs you might be interested in</p>
-
             <div className="relatedJobsGrid">
               {relatedJobs.map(rJob => (
-                <div 
-                  className="relatedCard" 
-                  key={rJob.id} 
-                  onClick={() => navigate(`/jobs/${rJob.id}`, { state: rJob })}
+                <div
+                  className="relatedCard"
+                  key={rJob.id}
+                  onClick={() => navigate(`/jobs/${rJob.id}`)} // 5. Navigate by ID only
                 >
                   <div className="relatedCardTop">
-                    <img src={rJob.logo} alt={rJob.company} />
+                    <img
+                      src={`https://logo.clearbit.com/${rJob.company?.toLowerCase().replace(/\s/g,'')}.com`}
+                      alt={rJob.company}
+                      onError={(e) => e.target.src = "https://via.placeholder.com/40"}
+                    />
                     <div>
                       <h4>{rJob.title}</h4>
                       <p>{rJob.company}</p>
@@ -124,23 +144,21 @@ function JobDetail() {
                   </div>
                   <div className="relatedCardMeta">
                     <span><MapPin size={14} /> {rJob.location}</span>
-                    <span className="salary">${rJob.salary.toLocaleString()}/mo</span>
+                    <span className="salary">${rJob.salary?.toLocaleString()}/mo</span>
                   </div>
                 </div>
               ))}
             </div>
           </div>
         )}
-
       </div>
 
-      {/* RIGHT PANEL */}
       <div className="jobDetailRight">
         <div className="sideCard">
           <h3>Job Overview</h3>
           <div className="overviewItem">
             <Clock3 size={18} />
-            <div><span>Posted</span><p>{new Date(job.postedDate).toDateString()}</p></div>
+            <div><span>Posted</span><p>{new Date(job.posted_date).toDateString()}</p></div> {/* 6. snake_case */}
           </div>
           <div className="overviewItem">
             <Users size={18} />
@@ -155,7 +173,7 @@ function JobDetail() {
         <div className="sideCard">
           <h3>Company Benefits</h3>
           <ul>
-            {benefits.length > 0 ? benefits.map((benefit, index) => (
+            {benefits.length > 0? benefits.map((benefit, index) => (
               <li key={index}>{benefit}</li>
             )) : <li>No benefits listed</li>}
           </ul>

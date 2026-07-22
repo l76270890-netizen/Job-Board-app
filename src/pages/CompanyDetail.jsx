@@ -3,7 +3,6 @@ import React, { useState } from 'react'; // 1. added useState
 import './CompanyDetail.css';
 import { ArrowLeft, MapPin, Briefcase, Users } from "lucide-react";
 import { useNavigate, useParams } from "react-router-dom";
-import { jobs } from "./AllJobs"; 
 
 const companies = [
   {

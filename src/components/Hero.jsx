@@ -17,7 +17,7 @@ function Hero() {
 
   // Function to go to AllPage with filters
   const goToAllJobs = (filters = {}) => {
-    navigate("/all-jobs", { state: filters }); 
+    navigate("/jobs", { state: filters }); 
   };
 
   // Handle main search button

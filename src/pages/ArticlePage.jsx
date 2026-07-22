@@ -130,7 +130,7 @@ function ArticleCard() {
             <div className="articlePage-content">
               <div className="articlePage-tags">
                 {article.tags.map((tag) => (
-                  <span key={tag} className="tag">{tag}</span>
+                  <span key={tag} className="tagPage">{tag}</span>
                 ))}
               </div>
 
