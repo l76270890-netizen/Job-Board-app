@@ -138,7 +138,7 @@
 .checkItem, .radioItem { display: flex; align-items: center; justify-content: space-between; gap: 8px; padding: 6px 0; cursor: pointer; font-size: 14px; }
 .dropdownActions { display: flex; gap: 8px; }
 .clearBtn { flex: 1; padding: 10px; border: 1px solid #e5e7eb; background: #fff; border-radius: 10px; cursor: pointer; }
-.applyBtn { flex: 2; padding: 10px; background: #2563eb; color: #fff; border: none; border-radius: 10px; font-weight: 600; cursor: pointer; }
+.applyBtn { flex: 2; padding: 10px; background: #16a34a; color: #fff; border: none; border-radius: 10px; font-weight: 600; cursor: pointer; }
 
 .filterChips { display: flex; gap: 8px; margin-top: 12px; flex-wrap: wrap; }
 .filterChips span { background: #dcfce7; color: #616161; padding: 6px 10px; border-radius: 20px; font-size: 12px; display: flex; align-items: center; gap: 4px; }
@@ -162,7 +162,7 @@
   height: fit-content;
   position: sticky;
   top: 20px;
-  border: 1px #e5e7eb;
+  border: 1px #e5e7eb sol;
 }
 .filterSidebar h2 { font-size: 18px; margin-bottom: 16px; }
 .filterGroup { margin-bottom: 20px; }
@@ -206,8 +206,8 @@ border-radius: 10px;
 .jobHeader img { width: 40px; height: 40px; object-fit: contain; border-radius: 8px; }
 .jobCard h2 { font-size: 16px; font-weight: 600; }
 .jobCard h4 { font-size: 14px; color: #6b7280; }
-.jobTags { display: flex; gap: 8px; }
-.jobTags span { background: #dcfce7; padding: 4px 10px; border-radius: 20px; font-size: 12px; }
+.jobTags { display: b; gap: 8px; }
+.jobTags span { background: #dcfce7; padding: 4px 10px; border-radius: 20px; font-size: 12px ; }
 .des { font-size: 13px; color: #4b5563; line-height: 1.5; }
 .salaryRow { display: flex; justify-content: space-between; align-items: center; margin-top: auto; }
 .salaryRow div { display: flex; align-items: center; gap: 4px; font-weight: 600; }
@@ -249,7 +249,7 @@ border-radius: 10px;
 .mobileDesc { font-size: 13px; color: #4b5563; margin-bottom: 12px; }
 .mobileBottom { display: flex; justify-content: space-between; align-items: center; }
 .salary { font-weight: 600; display: flex; align-items: center; gap: 4px; }
-.mobileBottom button { background: #2563eb; color: #fff; border: none; padding: 8px 14px; border-radius: 10px; font-weight: 600; cursor: pointer; }
+.mobileBottom button { background: #16a34a; color: #fff; border: none; padding: 8px 14px; border-radius: 10px; font-weight: 600; cursor: pointer; }
 
 .mobileDropdown {
   position: absolute;
@@ -269,6 +269,7 @@ border-radius: 10px;
   align-items: center;
   gap: 8px;
   margin: 30px 0 50px;
+  background-color: transparent;
   flex-wrap: wrap;
 }
 .pageBtn {
@@ -290,7 +291,7 @@ border-radius: 10px;
   color: #2563eb;
 }
 .pageBtn.active {
-  background: #2563eb;
+  background: #16a34a;
   color: white;
   border-color: #2563eb;
 }
@@ -324,7 +325,7 @@ border-radius: 10px;
   position: relative;
   white-space: nowrap;
 }
-.tabBtn.active { color: #2563eb; }
+.tabBtn.active { color: #16a34a; }
 .tabBtn.active::after {
   content: '';
   position: absolute;
@@ -332,19 +333,19 @@ border-radius: 10px;
   left: 0;
   right: 0;
   height: 3px;
-  background: #2563eb;
+  background: #16a34a;
   border-radius: 2px;
 }
 .yellowSearchBtn {
   width: 100%;
-  background: #FDE047;
+  background: #22C55E;
   color: #000;
   border: none;
   padding: 16px;
   border-radius: 12px;
   font-size: 16px;
   font-weight: 700;
-  display: flex;
+  display: none;
   align-items: center;
   justify-content: center;
   gap: 10px;
@@ -366,6 +367,12 @@ border-radius: 10px;
   align-items: center;
   justify-content: center;
   color: #64748b;
+}
+
+.Statement{
+  font-size: 20px;
+  text-align: center;
+  margin-top: 15rem;
 }
 
 /* ====== RESPONSIVE BREAKPOINTS ====== */
@@ -467,7 +474,7 @@ border-radius: 10px;
   color: #fff;
 }
 .pageBtn.active {
-  background: #2563eb;
+  background: #16a34a;
   color: white;
   border-color: #2563eb;
 }

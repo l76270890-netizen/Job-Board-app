@@ -1,34 +1,35 @@
-import { useState } from "react";
+import { useState, useMemo } from "react";
 import { useNavigate } from "react-router-dom";
 import {
   MapPin,
   Briefcase,
   Search,
   X,
-   ArrowLeft,
+  ArrowLeft,
 } from "lucide-react";
 import "./CompaniesPages.css";
+import { jobs as allJobs } from "./AllJobs"; // import jobs to count
 
 const companies = [
   {
     id: 1,
     name: "GIZ KE",
-    location: "Nairobi, Kenya",
-    industry: "Governmental",
+    location: "Abuja, Nigeria", // matched to AllJobs
+    industry: "NGO / Development",
     logo: "https://logo.clearbit.com/giz.de",
   },
   {
     id: 2,
     name: "Fuzu Ltd",
-    location: "Nairobi, Kenya",
-    industry: "Computers, software",
+    location: "Remote, Nigeria",
+    industry: "HR Tech",
     logo: "https://logo.clearbit.com/fuzu.com",
   },
   {
     id: 3,
     name: "Oriental Mills Ltd",
-    location: "India, India",
-    industry: "Manufacturing",
+    location: "Port Harcourt, Nigeria",
+    industry: "FMCG",
     logo: "https://logo.clearbit.com/orientalmills.com",
   },
   {
@@ -41,27 +42,33 @@ const companies = [
   {
     id: 5,
     name: "Google",
-    location: "California, USA",
-    industry: "Internet",
+    location: "Remote, Nigeria",
+    industry: "Technology",
     logo: "https://logo.clearbit.com/google.com",
   },
   {
     id: 6,
     name: "Microsoft",
-    location: "Washington, USA",
-    industry: "Software",
+    location: "Lagos, Nigeria",
+    industry: "Technology",
     logo: "https://logo.clearbit.com/microsoft.com",
   },
 ];
 
 function CompaniesPages() {
   const navigate = useNavigate();
-
   const [search, setSearch] = useState("");
 
-  const filteredCompanies = companies.filter((company) => {
-    const value = search.toLowerCase();
+  // Add job count to each company
+  const companiesWithJobs = useMemo(() => {
+    return companies.map(company => ({
+      ...company,
+      jobCount: allJobs.filter(job => job.company === company.name).length
+    }))
+  }, []);
 
+  const filteredCompanies = companiesWithJobs.filter((company) => {
+    const value = search.toLowerCase();
     return (
       company.name.toLowerCase().includes(value) ||
       company.location.toLowerCase().includes(value) ||
@@ -73,13 +80,13 @@ function CompaniesPages() {
     navigate(`/company/${encodeURIComponent(companyName)}`);
   };
   
-
   return (
     <section className="companiesPage-section">
-<button className="backBtn" onClick={() => navigate(-1)}>
+     <button className="backBtn" onClick={() => navigate(-1)}>
             <ArrowLeft size={22} />
             <span></span>
           </button>
+
       <div className="companiesPage-header">
         <h2 className="companiesPage-title">Companies Hiring Now</h2>
         <span className="companiesPage-subtitle">
@@ -88,44 +95,29 @@ function CompaniesPages() {
       </div>
 
       {/* Search */}
-
       <div className="searchPage-wrapper">
-
         <Search size={18} />
-
         <input
           type="text"
           placeholder="Search companies, location or industry..."
           value={search}
           onChange={(e) => setSearch(e.target.value)}
         />
-
         {search && (
-          <X
-            size={18}
-            className="clear-btn"
-            onClick={() => setSearch("")}
-          />
+          <X size={18} className="clear-btn" onClick={() => setSearch("")} />
         )}
-
       </div>
 
       {/* Companies */}
-
       <div className="companiesPage-grid">
-
         {filteredCompanies.length > 0 ? (
-
           filteredCompanies.map((company) => (
-
             <article
               key={company.id}
               className="companyPage-card"
               onClick={() => handleViewJobs(company.name)}
             >
-
               <div className="companyPage-card-top">
-
                 <div className="logoPage-wrapper">
                   <img
                     src={company.logo}
@@ -139,24 +131,24 @@ function CompaniesPages() {
                 </div>
 
                 <div className="companyPage-meta">
-                  <h3 className="companyPage-name">
-                    {company.name}
-                  </h3>
-
+                  <h3 className="companyPage-name">{company.name}</h3>
                   <span className="companyPage-tag">
                     <Briefcase size={12} />
                     {company.industry}
                   </span>
                 </div>
-
               </div>
 
               <div className="companyPage-card-bottom">
-
                 <div className="companyPage-location">
                   <MapPin size={14} />
                   <span>{company.location}</span>
                 </div>
+
+                {/* NEW: Job Count Badge */}
+                <span className="job-count-badge">
+                  {company.jobCount} {company.jobCount === 1 ? 'Job' : 'Jobs'}
+                </span>
 
                 <button
                   className="view-jobs-btn-Page"
@@ -167,24 +159,13 @@ function CompaniesPages() {
                 >
                   View Jobs
                 </button>
-
               </div>
-
             </article>
-
           ))
-
         ) : (
-
-          <div className="no-results-Page">
-            No companies found.
-          </div>
-
+          <div className="no-results-Page">No companies found.</div>
         )}
-
       </div>
-
-    
     </section>
   );
 }

@@ -157,9 +157,9 @@ function ArticleCard() {
         ))}
       </div>
 
-      <div className="actionPage-wrapper">
-        <button className="view-all-btn" onClick={() => navigate('/articles')}>View all articles</button>
-      </div>
+      
+
+     
     </section>
   );
 }

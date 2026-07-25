@@ -8,6 +8,11 @@ import CompanyDetail from "./pages/CompanyDetail";
 import SettingPage from "./pages/SettingPage";
 import ArticleDetail from "./pages/ArticleDetail";
 import ArticlePage from "./pages/ArticlePage";
+import SavedJobs from "./pages/SavedJobs";
+import MessagesPage from "./pages/MessagesPage";
+import LoginPage from "./pages/LoginPage";
+import SignUpPage from "./pages/SignUpPage";
+
 
 function App() {
   return (
@@ -31,8 +36,13 @@ function App() {
 
         {/* Settings */}
         <Route path="/settings" element={<SettingPage />} />
+         <Route path="/saved" element={<SavedJobs />} />
+          <Route path="/message" element={<MessagesPage />} />
 
-      </Routes>
+            <Route path="/login" element={<LoginPage />} />
+        <Route path="/signup" element={<SignUpPage />} />
+
+      </Routes> 
     </BrowserRouter>
   );
 }

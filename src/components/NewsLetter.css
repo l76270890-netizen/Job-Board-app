@@ -1,5 +1,5 @@
 .newsletter {
-  background: #2563eb;
+  background:linear-gradient(135deg,#22C55E,#15803D);
   color: white;
   text-align: center;
   padding: 60px 20px;
@@ -11,20 +11,22 @@
   border: none;
   width: 300px;
   max-width: 90%;
+  margin-top: 20px;
 }
 .newsletter button {
-  padding: 12px 20px;
-  background: #1e40af;
+  padding: 10.5px 20px;
+  background: transparent;
   color: white;
-  border: none;
+  border: 1.4px #fff solid;
   border-radius: 8px;
   margin-left: 8px;
   cursor: pointer;
+  margin-top: 20px;
 }
 
 @media (max-width:768px) {
     .newsletter {
-  background: #2563eb;
+  background:linear-gradient(135deg,#22C55E,#15803D);
   color: white;
   text-align: center;
   padding: 60px 20px;
@@ -39,9 +41,9 @@
 }
 .newsletter button {
   padding: 12px 20px;
-  background: #1e40af;
+  background: transparent;
   color: white;
-  border: none;
+  border: 1.4px #fff solid;
   border-radius: 8px;
   margin-left: 8px;
   cursor: pointer;

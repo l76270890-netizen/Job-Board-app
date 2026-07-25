@@ -116,7 +116,7 @@ function ArticleDetail() {
         <div className="articleCTA">
           <h3>Looking for your next role?</h3>
           <p>Browse thousands of jobs on our platform</p>
-          <button onClick={() => navigate('/all-jobs')}>View Open Jobs</button>
+          <button onClick={() => navigate('/jobs')}>View Open Jobs</button>
         </div>
       </div>
 

@@ -177,6 +177,45 @@ hr {
   margin: 0 auto;
 }
 
+.LinkList{
+  background-color: transparent;
+  padding: 0 20px;
+  max-width: 1200px;
+  margin: 0 auto;
+}
+
+.LinkList h2{
+  font-size: 21px;
+}
+.Links p{
+  margin-top: 12px;
+  color: #4b5563;
+}
+.Links { display: flex; gap: 16px; flex-wrap: wrap; }
+.Links a { display: flex; align-items: center; gap: 6px; padding: 8px 14px; border: 1px solid #e5e7eb; border-radius: 8px; text-decoration: none; color: #374151; }
+.Links a:hover { background: #f3f4f6; }
+.company-stats { display: none; gap: 24px; margin: 16px 0; }
+.company-stats div { text-align: center; }
+.company-stats strong { display: block; font-size: 20px; }
+
+
+.company-mini-card{
+   border: 1px solid #e5e7eb;
+  border-radius: 12px;
+  padding: 30px 20px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  transition: 0.2s;
+  cursor: pointer;
+}
+
+.company-mini-card:hover{
+  border-color: #2563eb;
+  box-shadow: 0 4px 12px rgba(37,99,235,0.08);
+}
+
+
 /* ===== DESKTOP ===== */
 @media (min-width: 768px) {
   .company-header { height: 240px; }
@@ -189,7 +228,48 @@ hr {
   }
   
 
+  
+.LinkList{
+  background-color: transparent;
+  padding: 0 20px;
+  max-width: 1200px;
+  margin: 0 auto;
+}
+
+.LinkList h2{
+  font-size: 21px;
+}
+.Links p{
+  margin-top: 12px;
+  color: #4b5563;
+}
+
+
+.company-mini-card{
+   border: 1px solid #e5e7eb;
+  border-radius: 12px;
+  padding: 30px 20px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  transition: 0.2s;
+  cursor: pointer;
+}
+
+.company-mini-card:hover{
+  border-color: #2563eb;
+  box-shadow: 0 4px 12px rgba(37,99,235,0.08);
+}
+
+
+
   .Related-jobs {
     padding: 0 40px;
   }
+  .Links { display: flex; gap: 16px; flex-wrap: wrap; }
+.Links a { display: flex; align-items: center; gap: 6px; padding: 8px 14px; border: 1px solid #e5e7eb; border-radius: 8px; text-decoration: none; color: #374151; }
+.Links a:hover { background: #f3f4f6; }
+.company-stats { display: flex; gap: 24px; margin: 16px 0; }
+.company-stats div { text-align: center; }
+.company-stats strong { display: block; font-size: 20px; }
 }

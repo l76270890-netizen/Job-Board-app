@@ -153,7 +153,25 @@
 }
 
 
+.job-count-badge {
+  background: #EFF6FF;
+  color: #2563eb;
+  padding: 4px 10px;
+  border-radius: 20px;
+  font-size: 12px;
+  font-weight: 600;
+  margin-left: auto;
+}
 
+.companyPage-card-bottom {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  justify-content: space-between;
+}
+
+.companyPage-card { cursor: pointer; transition: 0.2s; }
+.companyPage-card:hover { transform: translateY(-2px); box-shadow: 0 4px 12px rgba(0,0,0,0.08); }
 
 
 /* Mobile Responsiveness Fine-Tuning */
@@ -169,6 +187,28 @@
   font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
 }
 
+
+.job-count-badge {
+  background: #EFF6FF;
+  color: #2563eb;
+  padding: 4px 10px;
+  border-radius: 20px;
+  font-size: 12px;
+  font-weight: 600;
+  margin-left: auto;
+  position: relative;
+  bottom: 40px;
+}
+
+.companyPage-card-bottom {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  justify-content: space-between;
+}
+
+.companyPage-card { cursor: pointer; transition: 0.2s; }
+.companyPage-card:hover { transform: translateY(-2px); box-shadow: 0 4px 12px rgba(0,0,0,0.08); }
 body{
   height: 10vh;
 }
