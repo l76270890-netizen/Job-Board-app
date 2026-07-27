@@ -113,7 +113,7 @@ function ArticleCard() {
       </div>
 
       <div className="action-wrapper">
-        <button className="view-all-btn" onClick={() => navigate('/articles')}>View all articles</button>
+        <button className="view1-all-btn" onClick={() => navigate('/articles')}>View all articles</button>
       </div>
     </section>
   );

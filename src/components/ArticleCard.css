@@ -150,7 +150,7 @@
   justify-content: center;
 }
 
-.view-all-btn {
+.view1-all-btn {
  background-color: #fff;
   color: #16a34a;
   text-align: center;
@@ -237,7 +237,7 @@
 .stat { display: flex; align-items: center; gap: 4px; }
 
 .action-wrapper { text-align: center; }
-.view-all-btn {
+.view1-all-btn {
   background: #ffff;
   color: #16a34a;
   border: 1px #16a34a solid;
@@ -251,4 +251,17 @@
 @media (max-width: 1024px) {
   .article-section { padding: 20px; }
   .article-grid { grid-template-columns: 1fr; }
+
+
+  .view1-all-btn {
+ background-color: #fff;
+  color: #16a34a;
+  text-align: center;
+  padding: 13px;
+  width: 40%;
+  border-radius:8px;
+  border: 1px  #16a34a solid;
+  top: 20px;
+  font-size: 14px;
+}
 }

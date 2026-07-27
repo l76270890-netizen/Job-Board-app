@@ -10,9 +10,10 @@
   border-radius: 8px;
   border: none;
   width: 300px;
-  max-width: 90%;
+  width: 100%;
   margin-top: 20px;
 }
+
 .newsletter button {
   padding: 10.5px 20px;
   background: transparent;
@@ -24,12 +25,13 @@
   margin-top: 20px;
 }
 
+
 @media (max-width:768px) {
     .newsletter {
   background:linear-gradient(135deg,#22C55E,#15803D);
   color: white;
   text-align: center;
-  padding: 60px 20px;
+  padding: 20px 20px;
   margin: 60px 0;
 }
 .newsletter input {
@@ -37,7 +39,9 @@
   border-radius: 8px;
   border: none;
   width: 300px;
-  max-width: 90%;
+  position: relative;
+  left: 50px;
+  max-width: 100%;
 }
 .newsletter button {
   padding: 12px 20px;
@@ -45,12 +49,11 @@
   color: white;
   border: 1.4px #fff solid;
   border-radius: 8px;
-  margin-left: 8px;
+   position: relative;
+  left: 43px;
+  top: -15px;
+  width: 77%;
   cursor: pointer;
 }
 
-form{
-    display: flex;
-    margin-top: 10px;
-}
 }

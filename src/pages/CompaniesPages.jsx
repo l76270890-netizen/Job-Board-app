@@ -1,73 +1,34 @@
 import { useState, useMemo } from "react";
 import { useNavigate } from "react-router-dom";
-import {
-  MapPin,
-  Briefcase,
-  Search,
-  X,
-  ArrowLeft,
-} from "lucide-react";
+import { MapPin, Briefcase, Search, X, ArrowLeft } from "lucide-react";
 import "./CompaniesPages.css";
-import { jobs as allJobs } from "./AllJobs"; // import jobs to count
-
-const companies = [
-  {
-    id: 1,
-    name: "GIZ KE",
-    location: "Abuja, Nigeria", // matched to AllJobs
-    industry: "NGO / Development",
-    logo: "https://logo.clearbit.com/giz.de",
-  },
-  {
-    id: 2,
-    name: "Fuzu Ltd",
-    location: "Remote, Nigeria",
-    industry: "HR Tech",
-    logo: "https://logo.clearbit.com/fuzu.com",
-  },
-  {
-    id: 3,
-    name: "Oriental Mills Ltd",
-    location: "Port Harcourt, Nigeria",
-    industry: "FMCG",
-    logo: "https://logo.clearbit.com/orientalmills.com",
-  },
-  {
-    id: 4,
-    name: "TechNova Ltd",
-    location: "Lagos, Nigeria",
-    industry: "Technology",
-    logo: "https://logo.clearbit.com/technova.com",
-  },
-  {
-    id: 5,
-    name: "Google",
-    location: "Remote, Nigeria",
-    industry: "Technology",
-    logo: "https://logo.clearbit.com/google.com",
-  },
-  {
-    id: 6,
-    name: "Microsoft",
-    location: "Lagos, Nigeria",
-    industry: "Technology",
-    logo: "https://logo.clearbit.com/microsoft.com",
-  },
-];
+import { jobs as allJobs } from "./AllJobs";
 
 function CompaniesPages() {
   const navigate = useNavigate();
   const [search, setSearch] = useState("");
 
-  // Add job count to each company
-  const companiesWithJobs = useMemo(() => {
-    return companies.map(company => ({
-      ...company,
-      jobCount: allJobs.filter(job => job.company === company.name).length
-    }))
+  // GENERATE COMPANIES FROM JOBS ARRAY
+  const companiesFromJobs = useMemo(() => {
+    const companyMap = new Map();
+
+    allJobs.forEach(job => {
+      if (!companyMap.has(job.company)) {
+        companyMap.set(job.company, {
+          name: job.company,
+          logo: job.logo,
+          location: job.location,
+          industry: job.category,
+          jobCount: 0
+        });
+      }
+      companyMap.get(job.company).jobCount += 1;
+    });
+
+    return Array.from(companyMap.values());
   }, []);
 
-  const filteredCompanies = companiesWithJobs.filter((company) => {
+  const filteredCompanies = companiesFromJobs.filter((company) => {
     const value = search.toLowerCase();
     return (
       company.name.toLowerCase().includes(value) ||
@@ -79,7 +40,7 @@ function CompaniesPages() {
   const handleViewJobs = (companyName) => {
     navigate(`/company/${encodeURIComponent(companyName)}`);
   };
-  
+
   return (
     <section className="companiesPage-section">
      <button className="backBtn" onClick={() => navigate(-1)}>
@@ -90,11 +51,10 @@ function CompaniesPages() {
       <div className="companiesPage-header">
         <h2 className="companiesPage-title">Companies Hiring Now</h2>
         <span className="companiesPage-subtitle">
-          Explore opportunities at top workplaces
+          Explore {companiesFromJobs.length} companies with {allJobs.length} open jobs
         </span>
       </div>
 
-      {/* Search */}
       <div className="searchPage-wrapper">
         <Search size={18} />
         <input
@@ -103,17 +63,14 @@ function CompaniesPages() {
           value={search}
           onChange={(e) => setSearch(e.target.value)}
         />
-        {search && (
-          <X size={18} className="clear-btn" onClick={() => setSearch("")} />
-        )}
+        {search && <X size={18} className="clear-btn" onClick={() => setSearch("")} />}
       </div>
 
-      {/* Companies */}
       <div className="companiesPage-grid">
-        {filteredCompanies.length > 0 ? (
-          filteredCompanies.map((company) => (
+        {filteredCompanies.length > 0? (
+          filteredCompanies.sort((a, b) => b.jobCount - a.jobCount).map((company) => (
             <article
-              key={company.id}
+              key={company.name}
               className="companyPage-card"
               onClick={() => handleViewJobs(company.name)}
             >
@@ -123,13 +80,10 @@ function CompaniesPages() {
                     src={company.logo}
                     alt={company.name}
                     onError={(e) => {
-                      e.target.src = `https://ui-avatars.com/api/?name=${encodeURIComponent(
-                        company.name
-                      )}&background=22C55E&color=fff`;
+                      e.target.src = `https://ui-avatars.com/api/?name=${encodeURIComponent(company.name)}&background=22C55E&color=fff`;
                     }}
                   />
                 </div>
-
                 <div className="companyPage-meta">
                   <h3 className="companyPage-name">{company.name}</h3>
                   <span className="companyPage-tag">
@@ -144,19 +98,10 @@ function CompaniesPages() {
                   <MapPin size={14} />
                   <span>{company.location}</span>
                 </div>
-
-                {/* NEW: Job Count Badge */}
                 <span className="job-count-badge">
-                  {company.jobCount} {company.jobCount === 1 ? 'Job' : 'Jobs'}
+                  {company.jobCount} {company.jobCount === 1? 'Job' : 'Jobs'}
                 </span>
-
-                <button
-                  className="view-jobs-btn-Page"
-                  onClick={(e) => {
-                    e.stopPropagation();
-                    handleViewJobs(company.name);
-                  }}
-                >
+                <button className="view-jobs-btn-Page" onClick={(e) => { e.stopPropagation(); handleViewJobs(company.name); }}>
                   View Jobs
                 </button>
               </div>

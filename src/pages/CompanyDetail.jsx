@@ -1,167 +1,96 @@
-
-import React, { useState, useEffect } from 'react';
+import React, { useState, useMemo } from 'react';
 import './CompanyDetail.css';
-import {
-  ArrowLeft, MapPin, Briefcase, Users, Building2
-} from "lucide-react";
+import { ArrowLeft, MapPin, Briefcase, Users, Building2, CheckCircle } from "lucide-react";
 import { useNavigate, useParams } from "react-router-dom";
-import { jobs as allJobs } from "./AllJobs"; // 1. Use local jobs instead of supabase
+import { jobs as allJobs } from "./AllJobs";
 
-// 2. Added links + more details
-const companies = [
+const baseCompanies = [ // keep this for banner/about/links. Add more as needed
   {
-    id: 1,
-    name: "GIZ KE",
-    location: "Abuja, Nigeria",
-    industry: "NGO / Development",
-    logo: "https://logo.clearbit.com/giz.de",
-    banner: "https://images.unsplash.com/photo-1557804506-669a67965ba0?w=1200",
-    employees: "1000-5000",
-    about: "GIZ is a German development agency working worldwide for sustainable development. We support the Nigerian government in key sectors including energy, governance and economic development.",
-    links: { linkedin: "https://linkedin.com/company/giz", facebook: "https://facebook.com/giz", instagram: "https://instagram.com/giz", website: "https://giz.de" }
+    name: "GIZ KE", banner: "https://images.unsplash.com/photo-1557804506-669a67965ba0?w=1200",
+    employees: "1000-5000", about: "GIZ is a German development agency...",
+    links: { linkedin: "#", facebook: "#", instagram: "#", website: "#" }
   },
   {
-    id: 2,
-    name: "Fuzu Ltd",
-    location: "Remote, Nigeria",
-    industry: "HR Tech",
-    logo: "https://logo.clearbit.com/fuzu.com",
-    banner: "https://images.unsplash.com/photo-1522202176988-66273c2fd55f?w=1200",
-    employees: "51-200",
-    about: "Fuzu is Africa's leading career development, recruitment and talent platform. We help 2M+ professionals find jobs and grow their careers through AI-powered recommendations.",
-    links: { linkedin: "https://linkedin.com/company/fuzu", facebook: "https://facebook.com/fuzu", instagram: "https://instagram.com/fuzu", website: "https://fuzu.com" }
+    name: "Google", banner: "https://images.unsplash.com/photo-1497366216548-37526070297c?w=1200",
+    employees: "100000+", about: "Google's mission is to organize the world's information...",
+    links: { linkedin: "#", facebook: "#", instagram: "#", website: "#" }
   },
-  {
-    id: 3,
-    name: "Oriental Mills Ltd",
-    location: "Port Harcourt, Nigeria",
-    industry: "FMCG",
-    logo: "https://logo.clearbit.com/orientalmills.com",
-    banner: "https://images.unsplash.com/photo-1497366811353-6870744d04b2?w=1200",
-    employees: "201-500",
-    about: "Oriental Mills is a leading manufacturer of flour, pasta and noodles with operations across Nigeria and West Africa. Committed to feeding the nation.",
-    links: { linkedin: "https://linkedin.com/company/orientalmills", facebook: "https://facebook.com/orientalmills", instagram: "https://instagram.com/orientalmills", website: "https://orientalmills.com" }
-  },
-  {
-    id: 4,
-    name: "TechNova Ltd",
-    location: "Lagos, Nigeria",
-    industry: "Technology",
-    logo: "https://logo.clearbit.com/technova.com",
-    banner: "https://images.unsplash.com/photo-1552664730-d307ca884978?w=1200",
-    employees: "51-200",
-    about: "TechNova is a product-driven tech company building the future of work in Africa. We’re hiring top talent to help us scale our platform to millions of users.",
-    links: { linkedin: "https://linkedin.com/company/technova", facebook: "https://facebook.com/technova", instagram: "https://instagram.com/technova", website: "https://technova.com" }
-  },
-  {
-    id: 5,
-    name: "Google",
-    location: "Remote, Nigeria",
-    industry: "Technology",
-    logo: "https://logo.clearbit.com/google.com",
-    banner: "https://images.unsplash.com/photo-1497366216548-37526070297c?w=1200",
-    employees: "100000+",
-    about: "Google's mission is to organize the world's information and make it universally accessible and useful. We have teams across Africa building for the next billion users.",
-    links: { linkedin: "https://linkedin.com/company/google", facebook: "https://facebook.com/google", instagram: "https://instagram.com/google", website: "https://google.com" }
-  },
-  {
-    id: 6,
-    name: "Microsoft",
-    location: "Lagos, Nigeria",
-    industry: "Technology",
-    logo: "https://logo.clearbit.com/microsoft.com",
-    banner: "https://images.unsplash.com/photo-1553877522-43269d4ea984?w=1200",
-    employees: "200000+",
-    about: "Microsoft enables digital transformation for the era of an intelligent cloud and an intelligent edge. Empowering every person and organization to achieve more.",
-    links: { linkedin: "https://linkedin.com/company/microsoft", facebook: "https://facebook.com/microsoft", instagram: "https://instagram.com/microsoft", website: "https://microsoft.com" }
-  },
+  // Add more custom details here
 ];
 
-// Fallback logo component
 const CompanyLogo = ({ logo, name }) => (
-  <img
-    src={logo}
-    alt={name}
-    onError={(e) => {
-      e.target.style.display = 'none';
-      e.target.nextSibling.style.display = 'flex';
-    }}
-  />
+  <img src={logo} alt={name} onError={(e) => { e.target.style.display = 'none'; e.target.nextSibling.style.display = 'flex'; }} />
 );
 
 function CompanyDetail(){
   const navigate = useNavigate();
   const { companyName } = useParams();
   const [activeTab, setActiveTab] = useState('overview');
-  const [jobs, setJobs] = useState([]);
+  const decodedName = decodeURIComponent(companyName);
 
-  // 3. Load jobs from local array instead of supabase
-  useEffect(() => {
-    setJobs(allJobs);
-  }, []);
+  // 1. FIND COMPANY DATA FROM JOBS
+  const companyData = useMemo(() => {
+    const firstJob = allJobs.find(j => j.company.toLowerCase() === decodedName.toLowerCase());
+    if(!firstJob) return null;
 
-  const company = companies.find(
-    c => c.name.toLowerCase() === decodeURIComponent(companyName).toLowerCase()
-  );
+    const baseInfo = baseCompanies.find(c => c.name.toLowerCase() === decodedName.toLowerCase());
 
-  if (!company) {
-    return (
-      <div className="company-page">
-        <button className="detailBack" onClick={() => navigate(-1)}>
-          <ArrowLeft size={20} />
-        </button>
-        <div className="container"><h2>Company not found</h2></div>
-      </div>
-    )
+    return {
+      name: firstJob.company,
+      logo: firstJob.logo,
+      location: firstJob.location,
+      industry: firstJob.category,
+      banner: baseInfo?.banner || "https://images.unsplash.com/photo-1486406146926-c627a92ad1ab?w=1200",
+      employees: baseInfo?.employees || "51-200",
+      about: baseInfo?.about || `${firstJob.company} is hiring in ${firstJob.category}. Join our team and grow your career.`,
+      links: baseInfo?.links || { website: "#", linkedin: "#", facebook: "#", instagram: "#" }
+    }
+  }, [decodedName]);
+
+  if (!companyData) {
+    return <div className="company-page"><button className="detailBack" onClick={() => navigate(-1)}><ArrowLeft size={20} /></button><div className="container"><h2>Company not found</h2></div></div>
   }
 
-  // 4. Company Jobs
-  const companyJobs = jobs.filter(
-    job => job.company?.toLowerCase() === company?.name.toLowerCase()
-  );
+  // 2. FILTER JOBS FOR THIS COMPANY
+  const companyJobs = allJobs.filter(job => job.company.toLowerCase() === companyData.name.toLowerCase());
 
-  // 5. Related Jobs: same industry, exclude current company
-  const relatedJobs = jobs
-   .filter(j => j.company?.toLowerCase()!== company.name.toLowerCase() && j.category?.toLowerCase().includes(company.industry.toLowerCase().split(' ')[0]))
-   .slice(0,4);
+  // 3. RELATED JOBS: same category
+  const relatedJobs = allJobs
+  .filter(j => j.company!== companyData.name && j.category === companyData.industry)
+  .slice(0,4);
 
-  // 6. NEW: Related Companies: same industry
-  const relatedCompanies = companies
-   .filter(c => c.industry === company.industry && c.id!== company.id)
-   .slice(0,4);
+  // 4. RELATED COMPANIES: same industry
+  const allCompanies = Array.from(new Map(allJobs.map(j => [j.company, j])).values());
+  const relatedCompanies = allCompanies
+  .filter(c => c.category === companyData.industry && c.company!== companyData.name)
+  .slice(0,4)
+  .map(c => ({ name: c.company, logo: c.logo, industry: c.category }));
 
   return (
     <div className="company-page-fuzu">
-      <button className="detailBack" onClick={() => navigate(-1)}>
-        <ArrowLeft size={20} />
-      </button>
+      <button className="detailBack" onClick={() => navigate(-1)}><ArrowLeft size={20} /></button>
 
       <div className="company-banner">
-        <img src={company.banner} alt="banner" />
+        <img src={companyData.banner} alt="banner" />
         <div className="company-logo-badge">
-          <CompanyLogo logo={company.logo} name={company.name} />
-          <div className="companyFallbackLogoBig" style={{display: 'none'}}>
-            <Building2 size={30} />
-          </div>
+          <CompanyLogo logo={companyData.logo} name={companyData.name} />
+          <div className="companyFallbackLogoBig" style={{display: 'none'}}><Building2 size={30} /></div>
         </div>
       </div>
 
       <div className="container">
         <div className="company-header-info">
-          <h1 className="company-name">{company.name}</h1>
+          <h1 className="company-name">{companyData.name}</h1>
           <div className="company-meta">
-            <span><Briefcase size={14}/> {company.industry}</span>
-            <span><MapPin size={14}/> {company.location}</span>
-            <span><Users size={14}/> {company.employees} employees</span>
+            <span><Briefcase size={14}/> {companyData.industry}</span>
+            <span><MapPin size={14}/> {companyData.location}</span>
+            <span><Users size={14}/> {companyData.employees} employees</span>
           </div>
-
-          {/* UNIQUE FEATURE 1: Quick Stats */}
           <div className="company-stats">
             <div><strong>{companyJobs.length}</strong><span>Open Jobs</span></div>
-            <div><strong>{company.employees}</strong><span>Employees</span></div>
-            <div><strong>{company.industry}</strong><span>Industry</span></div>
+            <div><strong>{companyData.employees}</strong><span>Employees</span></div>
+            <div><strong>{companyData.industry}</strong><span>Industry</span></div>
           </div>
-
           <button className="view-jobs-main-btn" onClick={() => setActiveTab('jobs')}>
             View Jobs ({companyJobs.length})
           </button>
@@ -176,17 +105,17 @@ function CompanyDetail(){
         {activeTab === 'overview' && (
           <div className="OverView">
             <div className="about-card">
-              <h3>About {company.name}</h3>
-              <p>{company.about}</p>
+              <h3>About {companyData.name}</h3>
+              <p>{companyData.about}</p>
             </div>
           </div>
         )}
 
         {activeTab === 'jobs' && (
           <div className="jobs-section">
-            <h3>Open Jobs at {company.name} ({companyJobs.length})</h3>
+            <h3>Open Jobs at {companyData.name} ({companyJobs.length})</h3>
             {companyJobs.length === 0? (
-              <p style={{color: '#6b7280'}}>No open jobs at {company.name} right now.</p>
+              <p style={{color: '#6b7280'}}>No open jobs at {companyData.name} right now.</p>
             ) : (
               <div className="jobs-grid">
                 {companyJobs.map(job => (
@@ -204,11 +133,10 @@ function CompanyDetail(){
           </div>
         )}
 
-        {/* UNIQUE FEATURE 2: Culture Tab */}
         {activeTab === 'culture' && (
           <div className="culture-section">
             <div className="about-card">
-              <h3>Life at {company.name}</h3>
+              <h3>Life at {companyData.name}</h3>
               <div className="benefits-list">
                 {["Remote Friendly", "Health Insurance", "Learning Budget", "Flexible Hours"].map(b => (
                   <div key={b} className="benefit-item"><CheckCircle size={16} color="#22c55e"/>{b}</div>
@@ -219,37 +147,30 @@ function CompanyDetail(){
         )}
 
         <hr />
-
-        {/* RELATED JOBS SECTION */}
         <div className='Related-jobs'>
           <h2>Related Jobs</h2>
-          {relatedJobs.length === 0? (
-            <p style={{color: '#6b7280'}}>No other jobs available</p>
-          ) : (
-            <div className="jobs-grid">
-              {relatedJobs.map(job => (
-                <div className="job-card" key={job.id + 100} onClick={() => navigate(`/jobs/${job.id}`, { state: job })}>
-                  <div className="job-info">
-                    <h4>{job.title}</h4>
-                    <p className="company-name-small">{job.company}</p>
-                    <p><MapPin size={14}/> {job.location} • <span className="job-tag">{job.type}</span></p>
-                  </div>
-                  <button className="btn">View Job</button>
+          <div className="jobs-grid">
+            {relatedJobs.map(job => (
+              <div className="job-card" key={job.id + 100} onClick={() => navigate(`/jobs/${job.id}`, { state: job })}>
+                <div className="job-info">
+                  <h4>{job.title}</h4>
+                  <p className="company-name-small">{job.company}</p>
+                  <p><MapPin size={14}/> {job.location} • <span className="job-tag">{job.type}</span></p>
                 </div>
-              ))}
-            </div>
-          )}
+                <button className="btn">View Job</button>
+              </div>
+            ))}
+          </div>
         </div>
         <hr />
 
-        {/* UNIQUE FEATURE 3: Related Companies */}
         {relatedCompanies.length > 0 && (
           <>
           <div className='Related-jobs'>
             <h2>Similar Companies</h2>
             <div className="jobs-grid">
               {relatedCompanies.map(comp => (
-                <div className="company-mini-card" key={comp.id} onClick={() => navigate(`/company/${encodeURIComponent(comp.name)}`)}>
+                <div className="company-mini-card" key={comp.name} onClick={() => navigate(`/company/${encodeURIComponent(comp.name)}`)}>
                   <img src={comp.logo} alt={comp.name} />
                   <h4>{comp.name}</h4>
                   <p>{comp.industry}</p>
@@ -260,17 +181,6 @@ function CompanyDetail(){
           <hr />
           </>
         )}
-
-        {/* FIXED: Company Links */}
-        <div className="LinkList">
-          <h2>Connect with {company.name}</h2>
-          <div className="Links">
-            <a href={company.links.website} target="_blank" rel="noreferrer"> Website</a>
-            <a href={company.links.linkedin} target="_blank" rel="noreferrer"> LinkedIn</a>
-            <a href={company.links.facebook} target="_blank" rel="noreferrer"> Facebook</a>
-            <a href={company.links.instagram} target="_blank" rel="noreferrer"> Instagram</a>
-          </div>
-        </div>
       </div>
     </div>
   );

@@ -1,4 +1,6 @@
 import { BrowserRouter, Routes, Route } from "react-router-dom";
+import { AuthProvider } from "./context/AuthContext"; // 1. IMPORT
+import ProtectedRoute from "./components/ProtectedRoute"; // 2. IMPORT
 
 import Home from "./pages/Home";
 import AllJobs from "./pages/AllJobs";
@@ -13,37 +15,29 @@ import MessagesPage from "./pages/MessagesPage";
 import LoginPage from "./pages/LoginPage";
 import SignUpPage from "./pages/SignUpPage";
 
-
 function App() {
   return (
-    <BrowserRouter>
-      <Routes>
+    <AuthProvider> {/* 3. WRAP EVERYTHING */}
+      <BrowserRouter>
+        <Routes>
+          {/* Public */}
+          <Route path="/" element={<Home />} />
+          <Route path="/jobs" element={<AllJobs />} />
+          <Route path="/jobs/:id" element={<JobDetail />} />
+          <Route path="/articles" element={<ArticlePage />} />
+          <Route path="/articles/:id" element={<ArticleDetail />} />
+          <Route path="/companies" element={<CompaniesPages />} />
+          <Route path="/company/:companyName" element={<CompanyDetail />} />
+          <Route path="/login" element={<LoginPage />} />
+          <Route path="/signup" element={<SignUpPage />} />
 
-        {/* Home */}
-        <Route path="/" element={<Home />} />
-
-        {/* Jobs - FIXED */}
-        <Route path="/jobs" element={<AllJobs />} />
-        <Route path="/jobs/:id" element={<JobDetail />} />
-
-        {/* Articles - FIXED */}
-        <Route path="/articles" element={<ArticlePage />} />
-        <Route path="/articles/:id" element={<ArticleDetail />} />
-
-        {/* Companies */}
-        <Route path="/companies" element={<CompaniesPages />} />
-        <Route path="/company/:companyName" element={<CompanyDetail />} />
-
-        {/* Settings */}
-        <Route path="/settings" element={<SettingPage />} />
-         <Route path="/saved" element={<SavedJobs />} />
-          <Route path="/message" element={<MessagesPage />} />
-
-            <Route path="/login" element={<LoginPage />} />
-        <Route path="/signup" element={<SignUpPage />} />
-
-      </Routes> 
-    </BrowserRouter>
+          {/* Protected - Must Login */}
+          <Route path="/settings" element={<ProtectedRoute><SettingPage /></ProtectedRoute>} />
+          <Route path="/saved" element={<ProtectedRoute><SavedJobs /></ProtectedRoute>} />
+          <Route path="/message" element={<ProtectedRoute><MessagesPage /></ProtectedRoute>} />
+        </Routes>
+      </BrowserRouter>
+    </AuthProvider>
   );
 }
 

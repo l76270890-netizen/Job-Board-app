@@ -1,3 +1,4 @@
+
 import "./Categories.css";
 import {
   Monitor,
@@ -9,53 +10,62 @@ import {
   GraduationCap,
   Palette,
 } from "lucide-react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useLocation } from "react-router-dom"; 
+import { useAuth } from "../context/AuthContext"; 
+import { useMemo } from "react";
+import { jobs as allJobs } from "../pages/AllJobs"; // 1. IMPORT YOUR JOBS
 
-const categories = [
-  {
-    id: 1,
-    icon: <Monitor size={34} />,
-    title: "Technology",
-    jobs: "1,245 Jobs",
-  },
-  {
-    id: 2,
-    icon: <Megaphone size={34} />,
-    title: "Marketing",
-    jobs: "835 Jobs",
-  },
-  {
-    id: 3,
-    icon: <BriefcaseBusiness size={34} />,
-    title: "Business",
-    jobs: "650 Jobs",
-  },
-  {
-    id: 4,
-    icon: <Users size={34} />,
-    title: "Human Resources",
-    jobs: "512 Jobs",
-  },
-  {
-    id: 5,
-    icon: <HeartPulse size={34} />,
-    title: "Healthcare",
-    jobs: "903 Jobs",
-  },
-  {
-    id: 6,
-    icon: <Landmark size={34} />,
-    title: "Finance",
-    jobs: "721 Jobs",
-  },
-];
+const categoryIcons = { // 2. MAP ICONS TO TITLE
+  "Technology": <Monitor size={34} />,
+  "Marketing": <Megaphone size={34} />,
+  "Business": <BriefcaseBusiness size={34} />,
+  "Human Resources": <Users size={34} />,
+  "Healthcare": <HeartPulse size={34} />,
+  "Finance": <Landmark size={34} />,
+  "Education": <GraduationCap size={34} />,
+  "Design": <Palette size={34} />,
+};
 
 function Categories() {
   const navigate = useNavigate();
+  const location = useLocation(); 
+  const { currentUser } = useAuth(); 
+
+  // 3. COUNT JOBS PER CATEGORY AUTOMATICALLY
+  const categories = useMemo(() => {
+    const counts = {};
+    allJobs.forEach(job => {
+      counts[job.category] = (counts[job.category] || 0) + 1;
+    });
+
+    // Only show categories that have jobs
+    return Object.entries(counts)
+     .map(([title, count], index) => ({
+        id: index + 1,
+        icon: categoryIcons[title] || <BriefcaseBusiness size={34} />, // fallback icon
+        title: title,
+        jobs: `${count} ${count === 1? 'Job' : 'Jobs'}`, // "12 Jobs"
+        count: count
+      }))
+     .sort((a, b) => b.count - a.count) // most jobs first
+     .slice(0, 6); // show top 6. Remove this to show all
+  }, []);
 
   const handleCategoryClick = (categoryTitle) => {
     console.log("Category clicked:", categoryTitle);
-    // Go to jobs page and filter by category
+
+    // LOGIN CHECK
+    if (!currentUser) {
+      navigate("/login", { 
+        state: { 
+          from: location,
+          filters: { selectedCategory: categoryTitle } // remember what they clicked
+        } 
+      });
+      return;
+    }
+
+    // If logged in, go to jobs page and filter by category
     navigate(`/jobs?category=${encodeURIComponent(categoryTitle)}`);
   };
 
@@ -77,6 +87,7 @@ function Categories() {
             role="button"
             tabIndex={0}
             onKeyDown={(e) => e.key === 'Enter' && handleCategoryClick(category.title)}
+            style={{ cursor: 'pointer' }}
           >
             <div className="category-icon">
               {category.icon}
@@ -84,7 +95,7 @@ function Categories() {
 
             <h3>{category.title}</h3>
 
-            <p>{category.jobs}</p>
+            <p>{category.jobs}</p> {/* Now shows real count like "12 Jobs" */}
           </div>
         ))}
       </div>

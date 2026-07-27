@@ -524,11 +524,12 @@ border-radius: 10px;
   border-radius: 2px;
 }
 .yellowSearchBtn {
-  width: 100%;
-  background: #FDE047;
+  width: 90%;
+  background: #22C55E;
   color: #000;
   border: none;
-  padding: 16px;
+  margin-left: 21px;
+  padding: 12px;
   border-radius: 12px;
   font-size: 16px;
   font-weight: 700;
@@ -537,7 +538,6 @@ border-radius: 10px;
   justify-content: center;
   gap: 10px;
   cursor: pointer;
-  margin-bottom: 24px;
 }
 .pagination,.mobilePagination { display: flex; justify-content: center; align-items: center; gap: 6px; margin: 30px 0 50px; }
 .pageBtn { min-width: 40px; height: 40px; border: 1px solid #e2e8f0; background: white; border-radius: 8px; font-weight: 600; display: flex; align-items: center; justify-content: center; cursor: pointer; }

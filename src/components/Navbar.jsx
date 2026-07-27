@@ -14,19 +14,19 @@ import {
   Newspaper,
   UserPlus,
   LifeBuoy,
-  User // added
+  User
 } from "lucide-react";
 import { useState, useRef, useEffect } from "react";
 import { Link, useLocation, useNavigate } from "react-router-dom";
-import { useAuth } from "../context/AuthContext"; // make sure this path is correct
+import { useAuth } from "../context/AuthContext";
 
 function Navbar() {
   const [menuOpen, setMenuOpen] = useState(false);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
-  const [profileOpen, setProfileOpen] = useState(false); // for dropdown
+  const [profileOpen, setProfileOpen] = useState(false);
   const location = useLocation();
   const navigate = useNavigate();
-  const { currentUser, logout } = useAuth(); // get user
+  const { currentUser, logout } = useAuth();
   const profileRef = useRef(null);
 
   const isActive = (path) => location.pathname === path? "active-tab" : "";
@@ -35,7 +35,6 @@ function Navbar() {
     setMobileMenuOpen(!mobileMenuOpen);
   };
 
-  // close dropdown on click outside
   useEffect(() => {
     const handleClickOutside = (e) => {
       if (profileRef.current &&!profileRef.current.contains(e.target)) {
@@ -62,25 +61,28 @@ function Navbar() {
       {/* 1. DESKTOP NAVBAR */}
       {/* ========================================== */}
       <header className="navbar desktop-navbar">
-        <div className="logo">
-          <span className="logo-dot"></span>
-          NijaJobs
-        </div>
+       <div className="logo">
+  <img src="Logo.jpg" alt="NijaJobs logo" className="logo-img" />
+</div>
 
         <nav className={menuOpen? "nav active" : "nav"}>
           <Link to="/">Home</Link>
           <Link to="/jobs">Jobs</Link>
           <Link to="/saved">Saved</Link>
-          <Link to="/companies">Companies</Link>
+          {/* ONLY SHOW COMPANIES IF LOGGED IN */}
+          {currentUser && <Link to="/companies">Companies</Link>}
           <Link to="/articles">Article</Link>
         </nav>
 
         <div className="navbar-right">
-          <Search size={20} />
-          <Bell size={20} />
-          <Bookmark size={20} />
+            <Link to="/settings" className="icon-item1" onClick={toggleMobileMenu}>
+            <Bell size={20} />
+          </Link>
+            <Link to="/saved" className="icon-item2" onClick={toggleMobileMenu}>
+             <Bookmark size={20} />
+            </Link>
+         
 
-          {/* USER ICON / LOGIN BUTTON */}
           {currentUser? (
             <div className="user-menu" ref={profileRef}>
               <button className="user-avatar-btn" onClick={() => setProfileOpen(!profileOpen)}>
@@ -103,7 +105,7 @@ function Navbar() {
               )}
             </div>
           ) : (
-            <Link to="/login" className="login-btn">Login</Link>
+            <Link to="/login" className="login-btn">Join now</Link>
           )}
         </div>
 
@@ -113,28 +115,28 @@ function Navbar() {
       </header>
 
       {/* ========================================== */}
-      {/* 2. MOBILE TOP BAR WITH HAMBURGER LEFT */}
+      {/* 2. MOBILE TOP BAR */}
       {/* ========================================== */}
       <header className="mobile-top-bar">
         <button className="mobile-menu-icon" onClick={toggleMobileMenu} aria-label="Open menu">
           {mobileMenuOpen? <X size={24} /> : <Menu size={24} />}
         </button>
-        <div className="mobile-logo">
-          <span className="logo-dot"></span>
-          NijaJobs
-        </div>
+        <div className="logo">
+        <img src="Logo.jpg" alt="NijaJobs logo" className="logo-img" />
+           </div>
 
-        {/* USER ICON ON MOBILE TOP RIGHT */}
-        {currentUser? (
-          <button className="mobile-avatar-btn" onClick={() => navigate("/settings")}>
+        {!currentUser && (
+          <Link to="/login" className="mobile-login-btn">Join now</Link>
+        )}
+
+        {currentUser && (
+          <Link to="/settings" className="mobile-user-avatar">
             {userPhoto? (
-              <img src={userPhoto} alt="user" className="avatar-img-sm" />
+              <img src={userPhoto} alt="user" className="avatar-img" />
             ) : (
-              <div className="avatar-initial-sm">{userInitial}</div>
+              <div className="avatar-initial">{userInitial}</div>
             )}
-          </button>
-        ) : (
-          <Link to="/login"><User size={24} /></Link>
+          </Link>
         )}
       </header>
 
@@ -147,7 +149,6 @@ function Navbar() {
       />
 
       <div className={`mobile-drawer ${mobileMenuOpen? "open" : ""}`}>
-        {/* USER INFO AT TOP OF DRAWER */}
         {currentUser && (
           <div className="drawer-user">
             {userPhoto? (
@@ -179,10 +180,13 @@ function Navbar() {
             <Newspaper size={18} />
             <span>Articles</span>
           </Link>
-          <Link to="/companies" className="drawer-item" onClick={toggleMobileMenu}>
-            <Building2 size={18} />
-            <span>Companies</span>
-          </Link>
+          {/* ONLY SHOW COMPANIES IF LOGGED IN */}
+          {currentUser && (
+            <Link to="/companies" className="drawer-item" onClick={toggleMobileMenu}>
+              <Building2 size={18} />
+              <span>Companies</span>
+            </Link>
+          )}
 
           <div className="drawer-divider"></div>
 
@@ -232,10 +236,13 @@ function Navbar() {
           <span>Article</span>
         </Link>
 
-        <Link to="/companies" className={`mobile-nav-item ${isActive("/companies")}`}>
-          <Building2 size={22} />
-          <span>Companies</span>
-        </Link>
+        {/* ONLY SHOW COMPANIES IF LOGGED IN */}
+        {currentUser && (
+          <Link to="/companies" className={`mobile-nav-item ${isActive("/companies")}`}>
+            <Building2 size={22} />
+            <span>Companies</span>
+          </Link>
+        )}
       </nav>
     </>
   );

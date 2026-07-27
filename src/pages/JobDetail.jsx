@@ -1,54 +1,53 @@
 import "./JobDetail.css";
 import {
-  ArrowLeft,
-  MapPin,
-  Briefcase,
-  Clock3,
-  DollarSign,
-  Bookmark,
-  Users,
-  Building2,
-  CheckCircle2,
-  X,
-  Upload,
+  ArrowLeft, MapPin, Briefcase, Clock3, DollarSign, Bookmark, Users, Building2, CheckCircle2, X, Upload,
 } from "lucide-react";
 import { useNavigate, useLocation, useParams } from "react-router-dom";
 import { useEffect, useState } from "react";
-import { jobs as allJobs } from "./AllJobs"; // 1. IMPORT JOBS
-
-const CURRENT_USER_ID = 99; // change to real logged in user id
+import { jobs as allJobs } from "./AllJobs";
+import { useAuth } from "../context/AuthContext"; // 1. IMPORT
 
 function JobDetail() {
   const navigate = useNavigate();
   const { state } = useLocation();
-  const { id } = useParams(); // 2. GET ID FROM URL
+  const { id } = useParams();
+  const { currentUser } = useAuth(); // 2. GET USER
 
-  const [job, setJob] = useState(state || null); // use state if available
+  const [job, setJob] = useState(state || null);
+  const [relatedJobs, setRelatedJobs] = useState([]);
   const [isSaved, setIsSaved] = useState(false);
-  const [showApplyModal, setShowApplyModal] = useState(false); // NEW
-  const [applied, setApplied] = useState(false); // NEW
-  const [resume, setResume] = useState(null); // NEW
-  const [coverLetter, setCoverLetter] = useState(""); // NEW
+  const [showApplyModal, setShowApplyModal] = useState(false);
+  const [applied, setApplied] = useState(false);
+  const [resume, setResume] = useState(null);
+  const [coverLetter, setCoverLetter] = useState("");
 
-  // 3. FALLBACK: if user refreshes, find job by ID
   useEffect(() => {
-    if (!job) {
-      const foundJob = allJobs.find(j => j.id === Number(id));
-      setJob(foundJob || null);
-    }
-  }, [id, job]);
+    const foundJob = allJobs.find(j => j.id === Number(id));
+    setJob(foundJob || null);
+    window.scrollTo(0, 0);
+  }, [id]);
 
-  // 4. LOAD SAVE STATE + APPLIED STATE
   useEffect(() => {
-    if (job) {
-      const savedIds = JSON.parse(localStorage.getItem('savedJobs')) || [];
-      setIsSaved(savedIds.includes(job.id));
+    if (!job) return;
+    const savedIds = JSON.parse(localStorage.getItem('savedJobs')) || [];
+    setIsSaved(savedIds.includes(job.id));
 
-      const applications = JSON.parse(localStorage.getItem('applications')) || [];
-      const alreadyApplied = applications.some(app => app.job_id === job.id && app.user_id === CURRENT_USER_ID);
-      setApplied(alreadyApplied);
+    const applications = JSON.parse(localStorage.getItem('applications')) || [];
+    const alreadyApplied = applications.some(app => app.job_id === job.id && app.user_id === currentUser?.uid); // 3. USE FIREBASE UID
+    setApplied(alreadyApplied);
+
+    let filtered = allJobs.filter(j => j.id!== job.id);
+    let related = filtered.filter(j => j.category === job.category);
+    if (related.length < 5) {
+      const sameLocation = filtered.filter(j => j.location === job.location &&!related.find(r => r.id === j.id));
+      related = [...related,...sameLocation];
     }
-  }, [job]);
+    if (related.length < 5) {
+      const randomJobs = filtered.filter(j =>!related.find(r => r.id === j.id));
+      related = [...related,...randomJobs];
+    }
+    setRelatedJobs(related.slice(0, 5));
+  }, [job, currentUser]); // 4. ADD currentUser
 
   if (!job) {
     return (
@@ -57,8 +56,7 @@ function JobDetail() {
           <ArrowLeft size={20} /> Back
         </button>
         <p style={{textAlign: 'center', marginTop: '40px'}}>
-          Job not found. Please go back to
-          <span style={{color: '#2563eb', cursor: 'pointer'}} onClick={() => navigate('/jobs')}> Jobs</span>
+          Job not found. Please go back to <span style={{color: '#2563eb', cursor: 'pointer'}} onClick={() => navigate('/jobs')}> Jobs</span>
         </p>
       </section>
     )
@@ -68,75 +66,71 @@ function JobDetail() {
   const skills = job.skills || [];
   const benefits = job.benefits || [];
 
-  // 5. SAVE TOGGLE - same as AllJobs
+  // 5. NEW: LOGIN CHECK FUNCTION
+  const requireAuth = (action) => {
+    if (!currentUser) {
+      navigate("/login", { state: { from: location } });
+      return;
+    }
+    action(); // run the action if logged in
+  }
+
   const handleToggleSave = (e) => {
     e.stopPropagation();
-    const savedIds = JSON.parse(localStorage.getItem('savedJobs')) || [];
-    let newSavedIds;
-
-    if (savedIds.includes(job.id)) {
-      newSavedIds = savedIds.filter(id => id!== job.id);
-      setIsSaved(false);
-    } else {
-      newSavedIds = [...savedIds, job.id];
-      setIsSaved(true);
-    }
-    localStorage.setItem('savedJobs', JSON.stringify(newSavedIds));
+    requireAuth(() => { // WRAP WITH LOGIN CHECK
+      const savedIds = JSON.parse(localStorage.getItem('savedJobs')) || [];
+      let newSavedIds;
+      if (savedIds.includes(job.id)) {
+        newSavedIds = savedIds.filter(id => id!== job.id);
+        setIsSaved(false);
+      } else {
+        newSavedIds = [...savedIds, job.id];
+        setIsSaved(true);
+      }
+      localStorage.setItem('savedJobs', JSON.stringify(newSavedIds));
+    })
   };
 
-  // NEW: HANDLE APPLY SUBMIT
+  const handleApplyClick = () => { // 6. NEW FUNCTION FOR BUTTON
+    requireAuth(() => {
+      if (!applied) setShowApplyModal(true)
+    })
+  }
+
   const handleApplySubmit = () => {
     if (!resume) return;
-
     const application = {
       id: Date.now(),
       job_id: job.id,
       job_title: job.title,
       company: job.company,
-      user_id: CURRENT_USER_ID,
+      user_id: currentUser.uid, // 7. USE FIREBASE UID
       resume_name: resume.name,
       cover_letter: coverLetter,
       applied_at: new Date().toISOString(),
       status: "pending"
     };
-
     const applications = JSON.parse(localStorage.getItem("applications")) || [];
     localStorage.setItem("applications", JSON.stringify([...applications, application]));
-
     setApplied(true);
     setShowApplyModal(false);
     setResume(null);
     setCoverLetter("");
   };
 
-
   const handleMessageRecruiter = () =>{
-    navigate(`/message`, {
-      state: {
-        jobId: job.id,
-        jobTitle: job.title,
-        company: job.company,
-        recruiterId: job.recruiter_id ||
-        job.company, 
-        recruiterName: job.company
-      }
-    });
+    requireAuth(() => { // WRAP WITH LOGIN CHECK
+      navigate(`/message`, {
+        state: { jobId: job.id, jobTitle: job.title, company: job.company, recruiterId: job.recruiter_id || job.company, recruiterName: job.company }
+      });
+    })
   };
-
-  // 6. GET RELATED JOBS: same category OR same company, exclude current job
-  const relatedJobs = allJobs
-  .filter(j => j.id!== job.id && (j.category === job.category || j.company === job.company))
-  .slice(0, 4); // show max 4
 
   return (
     <section className="jobDetail">
-
-      {/* LEFT CONTENT */}
       <div className="jobDetailLeft">
-
         <button className="detailBackBtn" onClick={() => navigate(-1)}>
-          <ArrowLeft size={20} />
-          Back
+          <ArrowLeft size={20} /> Back
         </button>
 
         <div className="jobHeroCard">
@@ -151,17 +145,15 @@ function JobDetail() {
                 <span><DollarSign size={15} />${job.salary.toLocaleString()}/mo</span>
               </div>
             </div>
-            {/* 7. SAVE BUTTON WITH STATE */}
             <button className="saveBtn" onClick={handleToggleSave}>
               <Bookmark size={20} fill={isSaved? "#16a34a" : "none"} color={isSaved? "#16a34a" : "currentColor"} />
             </button>
           </div>
 
           <div className="heroActions">
-            {/* DESKTOP APPLY BUTTON */}
             <button
               className={`applyNowBtn ${applied? 'applied' : ''}`}
-              onClick={() =>!applied && setShowApplyModal(true)}
+              onClick={handleApplyClick} // 8. USE NEW FUNCTION
               disabled={applied}
             >
               {applied? <><CheckCircle2 size={18} /> Applied</> : "Apply Now"}
@@ -169,8 +161,7 @@ function JobDetail() {
             <button className="messageBtn" onClick={handleMessageRecruiter}>Message Recruiter</button>
           </div>
         </div>
-
-        <div className="detailCard">
+ <div className="detailCard">
           <h2>Job Description</h2>
           <p>{job.description}</p>
         </div>
@@ -196,18 +187,18 @@ function JobDetail() {
           </div>
         </div>
 
-        {/* 2. RELATED JOBS SECTION */}
+        {/* RELATED JOBS SECTION */}
         {relatedJobs.length > 0 && (
           <div className="relatedJobsSection">
             <h2>Related Jobs</h2>
-            <p>More {job.category} jobs you might be interested in</p>
+            <p>More jobs you might be interested in</p>
 
             <div className="relatedJobsGrid">
               {relatedJobs.map(rJob => (
                 <div
                   className="relatedCard"
                   key={rJob.id}
-                  onClick={() => navigate(`/jobs/${rJob.id}`, { state: rJob })}
+                  onClick={() => navigate(`/jobs/${rJob.id}`)} // FIX 3: just navigate by id
                 >
                   <div className="relatedCardTop">
                     <img src={rJob.logo} alt={rJob.company} />
@@ -228,7 +219,6 @@ function JobDetail() {
 
       </div>
 
-      {/* RIGHT PANEL */}
       <div className="jobDetailRight">
         <div className="sideCard">
           <h3>Job Overview</h3>
@@ -255,9 +245,6 @@ function JobDetail() {
           </ul>
         </div>
       </div>
-
-      {/* MOBILE STICKY APPLY BUTTON */}
-      
 
       {/* APPLY POPUP MODAL */}
       {showApplyModal && (

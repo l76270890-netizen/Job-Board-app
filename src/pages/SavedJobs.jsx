@@ -11,9 +11,10 @@ import {
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { jobs as allJobs } from "./AllJobs"; // import your jobs array
+import { useAuth } from "../context/AuthContext"; 
 
 export default function SavedJobs() {
-  const navigate = useNavigate();
+  const { currentUser } = useAuth();
   const [savedJobs, setSavedJobs] = useState([]);
 
   // Load saved jobs from localStorage
@@ -73,7 +74,11 @@ export default function SavedJobs() {
                   <p className="des">{job.description}</p>
                   <div className="salaryRow">
                     <div><DollarSign size={18} />${job.salary.toLocaleString()}/mo</div>
-                    <button onClick={(e) => { e.stopPropagation(); alert(`Applying for ${job.title}`); }}>Apply</button>
+                    <button onClick={(e) => {
+    e.stopPropagation();
+    if(!currentUser) navigate('/login', {state: {from: location}})
+    else alert(`Applying for ${job.title}`);
+  }}>Apply</button>
                   </div>
                 </div>
               ))
@@ -127,7 +132,11 @@ export default function SavedJobs() {
                 <p className="mobileDesc">{job.description}</p>
                 <div className="mobileBottom">
                   <div className="salary"><DollarSign size={16} />${job.salary.toLocaleString()}/mo</div>
-                  <button onClick={(e) => { e.stopPropagation(); alert(`Applying for ${job.title}`); }}>Apply</button>
+                   <button onClick={(e) => {
+    e.stopPropagation();
+    if(!currentUser) navigate('/login', {state: {from: location}})
+    else alert(`Applying for ${job.title}`);
+  }}>Apply</button>
                 </div>
               </div>
             ))

@@ -5,8 +5,10 @@ import {
   Clock3,
   Bookmark,
   Briefcase,
+  DollarSign // added for button
 } from "lucide-react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useLocation } from "react-router-dom"; // 1. ADD
+import { useAuth } from "../context/AuthContext"; // 2. ADD
 
 export const jobs = [
   { 
@@ -19,17 +21,12 @@ export const jobs = [
     salary: 2500, 
     category: "Design",
     experience: "Senior",
-    featured: true, // <-- ADDED
+    featured: true,
     postedDate: "2026-09-28",
     description: "We are looking for a Senior Product Designer to lead the design of our flagship SaaS product. You will own the end-to-end design process from user research to high-fidelity prototypes.",
-    responsibilities: [
-      "Lead product design from concept to launch",
-      "Conduct user research and usability testing",
-      "Create design systems and component libraries in Figma",
-      "Collaborate with PMs and Engineers to ship features"
-    ],
-    skills: ["Figma", "UI/UX", "Design Systems", "User Research", "Prototyping"],
-    benefits: ["Health Insurance", "Remote Work", "Learning Budget", "Paid Time Off"]
+    responsibilities: ["Lead product design", "Conduct user research", "Create design systems", "Collaborate with PMs"],
+    skills: ["Figma", "UI/UX", "Design Systems"],
+    benefits: ["Health Insurance", "Remote Work"]
   },
   { 
     id: 3, 
@@ -41,17 +38,12 @@ export const jobs = [
     salary: 1800, 
     category: "Engineering",
     experience: "Mid-Level",
-    featured: true, // <-- ADDED
+    featured: true,
     postedDate: "2026-09-25",
-    description: "Join Fuzu as a Frontend Engineer to build scalable React applications. You will work on our job search platform and company pages.",
-    responsibilities: [
-      "Build responsive web applications using React",
-      "Collaborate with designers and backend teams",
-      "Optimize applications for speed and scalability",
-      "Write reusable and clean components"
-    ],
-    skills: ["React", "JavaScript", "TypeScript", "Tailwind CSS", "Git", "REST API"],
-    benefits: ["Remote Work", "Flexible Hours", "Contract Bonus"]
+    description: "Join Fuzu as a Frontend Engineer to build scalable React applications.",
+    responsibilities: ["Build React apps", "Collaborate with teams"],
+    skills: ["React", "JavaScript", "Tailwind"],
+    benefits: ["Remote Work"]
   },
   {
     id: 4,
@@ -63,17 +55,12 @@ export const jobs = [
     salary: 3000,
     category: "Operations",
     experience: "Senior",
-    featured: true, // <-- ADDED
+    featured: true,
     postedDate: "2026-09-25",
-    description: "Oversee end-to-end supply chain for Oriental Mills. Manage vendors, logistics, and inventory across 10+ states.",
-    responsibilities: [
-      "Manage procurement and vendor relationships",
-      "Optimize logistics and distribution",
-      "Control inventory levels and costs",
-      "Ensure on-time delivery to customers"
-    ],
-    skills: ["Supply Chain", "Logistics", "Procurement", "ERP", "Negotiation"],
-    benefits: ["Health Insurance", "Car Allowance", "Housing Allowance"]
+    description: "Oversee end-to-end supply chain for Oriental Mills.",
+    responsibilities: ["Manage procurement", "Optimize logistics"],
+    skills: ["Supply Chain", "Logistics"],
+    benefits: ["Health Insurance"]
   },
   {
     id: 6,
@@ -85,12 +72,12 @@ export const jobs = [
     salary: 2200,
     category: "Marketing",
     experience: "Mid-Level",
-    featured: true, // <-- ADDED
+    featured: true,
     postedDate: "2026-09-26",
-    description: "Drive growth through SEO, content, and paid ads. Manage campaigns across Google, Meta, and LinkedIn.",
-    responsibilities: ["Run paid campaigns", "Manage social media", "Analyze marketing data", "Create content strategy"],
-    skills: ["SEO", "Google Ads", "Meta Ads", "Content Marketing", "Analytics"],
-    benefits: ["Health Insurance", "Remote Work", "Training Budget"]
+    description: "Drive growth through SEO, content, and paid ads.",
+    responsibilities: ["Run paid campaigns"],
+    skills: ["SEO", "Google Ads"],
+    benefits: ["Health Insurance"]
   },
   {
     id: 10,
@@ -102,37 +89,55 @@ export const jobs = [
     salary: 1800,
     category: "HR",
     experience: "Senior",
-    featured: true, // <-- ADDED
+    featured: true,
     postedDate: "2026-09-21",
-    description: "Lead HR operations and talent acquisition for Nigeria's top job platform.",
-    responsibilities: ["Recruitment", "Employee relations", "Policy development", "Performance management"],
-    skills: ["Recruitment", "HR Policies", "Employee Engagement", "Onboarding"],
-    benefits: ["Health Insurance", "Paid Time Off"]
+    description: "Lead HR operations and talent acquisition.",
+    responsibilities: ["Recruitment", "Employee relations"],
+    skills: ["Recruitment", "HR Policies"],
+    benefits: ["Health Insurance"]
   },
 ];
 
 function FeaturedJobs() {
   const navigate = useNavigate();
-  const [savedIds, setSavedIds] = useState([]); // 1. Track saved jobs
+  const location = useLocation(); // 3. ADD
+  const { currentUser } = useAuth(); // 4. ADD
+  const [savedIds, setSavedIds] = useState([]);
 
-  // 2. Load saved jobs from localStorage
   useEffect(() => {
     const saved = JSON.parse(localStorage.getItem('savedJobs')) || [];
     setSavedIds(saved);
   }, []);
 
-  // 3. Toggle save function
+  // 5. LOGIN CHECK WRAPPER
+  const requireAuth = (action) => {
+    if (!currentUser) {
+      navigate("/login", { state: { from: location } });
+      return;
+    }
+    action();
+  }
+
   const toggleSave = (e, jobId) => {
     e.stopPropagation();
-    let newSavedIds;
-    if (savedIds.includes(jobId)) {
-      newSavedIds = savedIds.filter(id => id !== jobId);
-    } else {
-      newSavedIds = [...savedIds, jobId];
-    }
-    setSavedIds(newSavedIds);
-    localStorage.setItem('savedJobs', JSON.stringify(newSavedIds));
+    requireAuth(() => { // 6. WRAP
+      let newSavedIds;
+      if (savedIds.includes(jobId)) {
+        newSavedIds = savedIds.filter(id => id !== jobId);
+      } else {
+        newSavedIds = [...savedIds, jobId];
+      }
+      setSavedIds(newSavedIds);
+      localStorage.setItem('savedJobs', JSON.stringify(newSavedIds));
+    })
   };
+
+  const handleApplyClick = (e, job) => { // 7. NEW
+    e.stopPropagation();
+    requireAuth(() => {
+      navigate(`/jobs/${job.id}`, { state: job }); // send to detail to apply
+    })
+  }
 
   const handleCategoryClick = (categoryTitle) => {
     navigate(`/jobs?category=${encodeURIComponent(categoryTitle)}`);
@@ -140,10 +145,6 @@ function FeaturedJobs() {
 
   return (
     <section className="featured">
-      
-      {/* ========================================== */}
-      {/* 1. DESKTOP VIEW */}
-      {/* ========================================== */}
       <div className="desktop-view">
         <div className="featured-header">
           <h2>Featured Jobs</h2>
@@ -169,11 +170,10 @@ function FeaturedJobs() {
                 <Clock3 size={14}/>
                 {new Date(job.postedDate).toLocaleDateString()}
               </span>
-              {/* 4. SAVE BUTTON ADDED */}
               <Bookmark 
                 className="bookmark"
-                fill={savedIds.includes(job.id) ? "#2563eb" : "none"}
-                color={savedIds.includes(job.id) ? "#2563eb" : "currentColor"}
+                fill={savedIds.includes(job.id) ? "#22C55E" : "none"}
+                color={savedIds.includes(job.id) ? "#22C55E" : "currentColor"}
                 onClick={(e) => toggleSave(e, job.id)}
               />
             </div>
@@ -181,15 +181,7 @@ function FeaturedJobs() {
         ))}
       </div>
 
-      {/* ========================================== */}
-      {/* 2. MOBILE VIEW - FIXED: removed duplicate map */}
-      {/* ========================================== */}
-      <div className="mobileJobList1"
-        style={{
-          position:"relative",
-          top:"-410px",
-          height:"77vh"
-        }}>
+      <div className="mobileJobList1" style={{ position:"relative", top:"-410px", height:"77vh" }}>
         <hr />
         <div className="featured-header">
           <h2>Featured Jobs</h2>
@@ -197,18 +189,13 @@ function FeaturedJobs() {
         </div>
 
         {jobs.map((job) => (
-          <div
-            className="mobileCard1"
-            key={job.id}
-            onClick={() => navigate(`/jobs/${job.id}`, { state: job })}
-          >
+          <div className="mobileCard1" key={job.id} onClick={() => navigate(`/jobs/${job.id}`, { state: job })}>
             <div className="mobileTop1">
               <img src={job.logo} alt={job.company} />
-              {/* 5. SAVE BUTTON ADDED FOR MOBILE */}
               <Bookmark
                 size={18}
-                fill={savedIds.includes(job.id) ? "#2563eb" : "none"}
-                color={savedIds.includes(job.id) ? "#2563eb" : "currentColor"}
+                fill={savedIds.includes(job.id) ? "#22C55E" : "none"}
+                color={savedIds.includes(job.id) ? "#22C55E" : "currentColor"}
                 onClick={(e) => toggleSave(e, job.id)}
               />
             </div>
@@ -225,14 +212,7 @@ function FeaturedJobs() {
 
             <div className="mobileBottom1">
               <div className="salary1">${job.salary.toLocaleString()}/mo</div>
-              <button
-                onClick={(e) => {
-                  e.stopPropagation();
-                  alert(`Applying for ${job.title}`);
-                }}
-              >
-                Apply
-              </button>
+              <button onClick={(e) => handleApplyClick(e, job)}>Apply</button> {/* 8. UPDATED */}
             </div>
           </div>
         ))}
