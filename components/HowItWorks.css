@@ -1,0 +1,72 @@
+.how-section {
+  padding: 80px 20px;
+  background: #fff;
+}
+.how-container {
+  max-width: 1200px;
+  margin: 0 auto;
+}
+.how-header {
+  text-align: center;
+  margin-bottom: 50px;
+}
+.how-header h2 {
+  font-size: 32px;
+  font-weight: 700;
+  color: #1e293b;
+  margin-bottom: 8px;
+}
+.how-header p {
+  color: #64748b;
+  font-size: 16px;
+}
+
+.how-steps {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 40px;
+}
+.how-step {
+  text-align: center;
+  position: relative;
+}
+.step-badge {
+  font-size: 12px;
+  font-weight: 700;
+ background: #DCFCE7;
+  color:#166534 ;
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin: 0 auto 16px;
+}
+.step-icon {
+  display: inline-flex;
+  padding: 16px;
+ background: #DCFCE7;
+  color:#166534 ;
+  border-radius: 16px;
+  margin-bottom: 16px;
+}
+.how-step h3 {
+  font-size: 18px;
+  font-weight: 600;
+  color: #1e293b;
+  margin-bottom: 8px;
+}
+.how-step p {
+  color: #64748b;
+  font-size: 14px;
+  line-height: 1.6;
+}
+
+/* Mobile */
+@media (max-width: 768px) {
+  .how-steps {
+    grid-template-columns: 1fr;
+    gap: 30px;
+  }
+}
