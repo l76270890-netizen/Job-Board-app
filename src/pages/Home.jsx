@@ -5,26 +5,34 @@ import Categories from "../components/Categories";
 import WhyChooseUs from "../components/WhyChooseUs";
 import StatsSection from "../components/StatsSection"
 import HowItWorks from "../components/HowItWorks"
-import NewsLetter from "../components/NewsLetter"
+import FinalCTA from "../components/FinalCTA.jsx"
 import CompaniesHiring from "../components/CompaniesHiring";
 import ArticleCard from "../components/ArticleCard";
 import Testimonials from "../components/Testimonials";
 import Footer from "../components/Footer";
+import { useAuth } from "../context/AuthContext"; // 1. ADD
 
 function Home() {
+  const { userData } = useAuth(); // 2. ADD
+  const isEmployer = userData?.role === 'employer'; // 3. ADD
+
   return (
     <>
-       <Navbar />
+      <Navbar />
       <Hero />
       <FeaturedJobs />
-      <Categories />
+      
+      {!isEmployer && <Categories />} {/* 4. HIDE FOR EMPLOYERS */}
+
       <CompaniesHiring />
       <WhyChooseUs />
-      <StatsSection />      {/* ADD HERE */}
-      <HowItWorks />        {/* ADD HERE */}
+      <StatsSection />      
+      {!isEmployer && <HowItWorks />} {/* 5. HIDE FOR EMPLOYERS */}
+      
       <Testimonials />
-      <ArticleCard />
-      <NewsLetter />
+      {!isEmployer && <ArticleCard />} {/* 6. HIDE FOR EMPLOYERS */}
+      
+      <FinalCTA />
       <Footer />
     </>
   );

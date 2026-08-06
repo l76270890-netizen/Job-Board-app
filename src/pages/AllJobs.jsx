@@ -6,70 +6,12 @@ import {
 import { useState, useMemo, useEffect } from "react";
 import { useNavigate, useSearchParams, useLocation } from "react-router-dom";
 import { useAuth } from "../context/AuthContext";
+import { collection, query, where, getDocs, orderBy } from "firebase/firestore"; // ADDED
+import { db } from "../firebase"; // ADDED
 
 export const jobs = [
   // TEACHING - 7
-  { id: 1, title: "Mathematics Teacher", company: "Greenspring School", logo: "https://logo.clearbit.com/greenspringschool.com", location: "Lagos, Nigeria", type: "Full-time", salary: 3500, category: "Teaching", experience: "Mid-Level", postedDate: "2026-09-29", description: "Teach Mathematics to SS1-SS3 students. Prepare students for WAEC and JAMB.", responsibilities: ["Teach classes", "Prepare lesson plans", "Grade assignments"], skills: ["Teaching", "Mathematics", "Curriculum"], benefits: ["Health Insurance", "Housing Allowance"] },
-  { id: 2, title: "English Tutor", company: "LearnHub", logo: "https://logo.clearbit.com/learnhub.com", location: "Remote, Nigeria", type: "Part-time", salary: 1500, category: "Teaching", experience: "Junior", postedDate: "2026-09-28", description: "Teach English online to secondary school students.", responsibilities: ["Online classes", "Create notes"], skills: ["English", "Communication"], benefits: ["Flexible Hours"] },
-  { id: 3, title: "Computer Science Lecturer", company: "UNILAG", logo: "https://logo.clearbit.com/unilag.edu.ng", location: "Lagos, Nigeria", type: "Full-time", salary: 5000, category: "Teaching", experience: "Senior", postedDate: "2026-09-27", description: "Lecture Computer Science courses.", responsibilities: ["Teach", "Research", "Supervise projects"], skills: ["Computer Science", "Research"], benefits: ["Health Insurance"] },
-  { id: 4, title: "Primary School Head Teacher", company: "Bright Minds", logo: "https://logo.clearbit.com/brightminds.com", location: "Abuja, Nigeria", type: "Full-time", salary: 4000, category: "Teaching", experience: "Senior", postedDate: "2026-09-26", description: "Manage primary school operations.", responsibilities: ["Manage staff", "Curriculum oversight"], skills: ["Leadership", "Education"], benefits: ["Housing Allowance"] },
-  { id: 5, title: "Physics Teacher", company: "Kings College", logo: "https://logo.clearbit.com/kingscollege.com", location: "Port Harcourt, Nigeria", type: "Full-time", salary: 3200, category: "Teaching", experience: "Mid-Level", postedDate: "2026-09-25", description: "Teach Physics to senior students.", responsibilities: ["Teach", "Lab management"], skills: ["Physics", "Lab"], benefits: ["Health Insurance"] },
-  { id: 6, title: "Special Education Teacher", company: "Hope Center", logo: "https://logo.clearbit.com/hopecenter.com", location: "Kano, Nigeria", type: "Full-time", salary: 2800, category: "Teaching", experience: "Mid-Level", postedDate: "2026-09-24", description: "Teach children with special needs.", responsibilities: ["IEP", "Therapy support"], skills: ["Special Education"], benefits: ["Health Insurance"] },
-  { id: 7, title: "Curriculum Developer", company: "EduTech", logo: "https://logo.clearbit.com/edutech.com", location: "Kaduna, Nigeria", type: "Contract", salary: 2500, category: "Teaching", experience: "Senior", postedDate: "2026-09-23", description: "Develop curriculum for schools.", responsibilities: ["Write curriculum", "Train teachers"], skills: ["Curriculum", "Training"], benefits: ["Remote Work"] },
-
-  // BUSINESS - 7
-  { id: 8, title: "Business Development Manager", company: "Dangote Group", logo: "https://logo.clearbit.com/dangote.com", location: "Abuja, Nigeria", type: "Full-time", salary: 8000, category: "Business", experience: "Senior", postedDate: "2026-09-22", description: "Lead B2B sales and partnerships.", responsibilities: ["Sales", "Partnerships"], skills: ["Sales", "Negotiation"], benefits: ["Car Allowance"] },
-  { id: 9, title: "Sales Executive", company: "Nestle", logo: "https://logo.clearbit.com/nestle.com", location: "Lagos, Nigeria", type: "Full-time", salary: 3000, category: "Business", experience: "Mid-Level", postedDate: "2026-09-21", description: "Sell FMCG products to retailers.", responsibilities: ["Sales", "Client visits"], skills: ["Sales", "CRM"], benefits: ["Commission"] },
-  { id: 10, title: "Operations Manager", company: "BUA Group", logo: "https://logo.clearbit.com/buagroup.com", location: "Kano, Nigeria", type: "Full-time", salary: 7000, category: "Business", experience: "Senior", postedDate: "2026-09-20", description: "Oversee daily operations.", responsibilities: ["Operations", "Team management"], skills: ["Operations", "Leadership"], benefits: ["Housing Allowance"] },
-  { id: 11, title: "Account Manager", company: "MTN", logo: "https://logo.clearbit.com.mtn.ng", location: "Port Harcourt, Nigeria", type: "Contract", salary: 4000, category: "Business", experience: "Mid-Level", postedDate: "2026-09-19", description: "Manage key accounts.", responsibilities: ["Client management"], skills: ["Account Management"], benefits: ["Commission"] },
-  { id: 12, title: "Business Analyst", company: "Access Bank", logo: "https://logo.clearbit.com.accessbank.com", location: "Cross Rivers, Nigeria", type: "Full-time", salary: 5000, category: "Business", experience: "Mid-Level", postedDate: "2026-09-18", description: "Analyze business processes.", responsibilities: ["Data analysis"], skills: ["Analysis", "SQL"], benefits: ["Health Insurance"] },
-  { id: 13, title: "Retail Manager", company: "Shoprite", logo: "https://logo.clearbit.com.shoprite.com", location: "Kaduna, Nigeria", type: "Part-time", salary: 2000, category: "Business", experience: "Junior", postedDate: "2026-09-17", description: "Manage retail store.", responsibilities: ["Inventory", "Staff"], skills: ["Retail"], benefits: ["Staff Discount"] },
-  { id: 14, title: "Customer Success Manager", company: "Kuda", logo: "https://logo.clearbit.com.kudabank.com", location: "Remote, Nigeria", type: "Full-time", salary: 4500, category: "Business", experience: "Mid-Level", postedDate: "2026-09-16", description: "Ensure customer satisfaction.", responsibilities: ["Support", "Onboarding"], skills: ["Customer Success"], benefits: ["Remote Work"] },
-
-  // IT - 7
-  { id: 15, title: "Frontend Engineer", company: "Paystack", logo: "https://logo.clearbit.com.paystack.com", location: "Lagos, Nigeria", type: "Full-time", salary: 6000, category: "IT", experience: "Mid-Level", postedDate: "2026-09-15", description: "Build React apps.", responsibilities: ["React", "UI"], skills: ["React", "JS"], benefits: ["Equity"] },
-  { id: 16, title: "DevOps Engineer", company: "Flutterwave", logo: "https://logo.clearbit.com.flutterwave.com", location: "Remote, Nigeria", type: "Contract", salary: 15000, category: "IT", experience: "Senior", postedDate: "2026-09-14", description: "Manage AWS infra.", responsibilities: ["AWS", "CI/CD"], skills: ["AWS", "Docker"], benefits: ["Remote Work"] },
-  { id: 17, title: "Backend Engineer", company: "Interswitch", logo: "https://logo.clearbit.com.interswitchgroup.com", location: "Abuja, Nigeria", type: "Full-time", salary: 8000, category: "IT", experience: "Senior", postedDate: "2026-09-13", description: "Build APIs.", responsibilities: ["API", "DB"], skills: ["Node.js", "Postgres"], benefits: ["Health Insurance"] },
-  { id: 18, title: "Mobile Developer", company: "Opay", logo: "https://logo.clearbit.com.opay.com", location: "Port Harcourt, Nigeria", type: "Full-time", salary: 7000, category: "IT", experience: "Mid-Level", postedDate: "2026-09-12", description: "Build mobile apps.", responsibilities: ["React Native"], skills: ["React Native"], benefits: ["Health Insurance"] },
-  { id: 19, title: "QA Engineer", company: "Andela", logo: "https://logo.clearbit.com.andela.com", location: "Remote, Nigeria", type: "Contract", salary: 4000, category: "IT", experience: "Mid-Level", postedDate: "2026-09-11", description: "Test applications.", responsibilities: ["Testing"], skills: ["QA", "Cypress"], benefits: ["Flexible Hours"] },
-  { id: 20, title: "System Admin", company: "Airtel", logo: "https://logo.clearbit.com.airtel.com", location: "Kano, Nigeria", type: "Full-time", salary: 3500, category: "IT", experience: "Mid-Level", postedDate: "2026-09-10", description: "Manage servers.", responsibilities: ["Servers"], skills: ["Linux"], benefits: ["Health Insurance"] },
-  { id: 21, title: "IT Support", company: "UNICAL", logo: "https://logo.clearbit.com.unical.edu.ng", location: "Cross Rivers, Nigeria", type: "Part-time", salary: 1500, category: "IT", experience: "Junior", postedDate: "2026-09-09", description: "Support staff.", responsibilities: ["Support"], skills: ["Troubleshooting"], benefits: [] },
-
-  // FINANCE - 7
-  { id: 22, title: "Financial Analyst", company: "GTBank", logo: "https://logo.clearbit.com.gtbank.com", location: "Lagos, Nigeria", type: "Full-time", salary: 4500, category: "Finance", experience: "Mid-Level", postedDate: "2026-09-08", description: "Analyze financial data.", responsibilities: ["Analysis"], skills: ["Excel", "SQL"], benefits: ["Health Insurance"] },
-  { id: 23, title: "Accountant", company: "MTN", logo: "https://logo.clearbit.com.mtn.ng", location: "Lagos, Nigeria", type: "Full-time", salary: 3800, category: "Finance", experience: "Mid-Level", postedDate: "2026-09-07", description: "Manage accounts.", responsibilities: ["Accounting"], skills: ["Accounting"], benefits: ["Pension"] },
-  { id: 24, title: "Investment Banker", company: "Stanbic", logo: "https://logo.clearbit.com.stanbicibtc.com", location: "Abuja, Nigeria", type: "Full-time", salary: 12000, category: "Finance", experience: "Senior", postedDate: "2026-09-06", description: "M&A deals.", responsibilities: ["Deals"], skills: ["Investment"], benefits: ["Bonus"] },
-  { id: 25, title: "Risk Manager", company: "Zenith", logo: "https://logo.clearbit.com.zenithbank.com", location: "Port Harcourt, Nigeria", type: "Full-time", salary: 9000, category: "Finance", experience: "Senior", postedDate: "2026-09-05", description: "Manage risk.", responsibilities: ["Risk"], skills: ["Risk"], benefits: ["Health Insurance"] },
-  { id: 26, title: "Tax Consultant", company: "KPMG", logo: "https://logo.clearbit.com.kpmg.com", location: "Remote, Nigeria", type: "Contract", salary: 6000, category: "Finance", experience: "Senior", postedDate: "2026-09-04", description: "Tax advisory.", responsibilities: ["Tax"], skills: ["Tax"], benefits: ["Remote Work"] },
-  { id: 27, title: "Credit Officer", company: "First Bank", logo: "https://logo.clearbit.com.firstbanknigeria.com", location: "Kaduna, Nigeria", type: "Full-time", salary: 3500, category: "Finance", experience: "Mid-Level", postedDate: "2026-09-03", description: "Loan assessment.", responsibilities: ["Credit"], skills: ["Credit"], benefits: ["Health Insurance"] },
-  { id: 28, title: "Payroll Specialist", company: "Shell", logo: "https://logo.clearbit.com.shell.com", location: "Cross Rivers, Nigeria", type: "Part-time", salary: 2500, category: "Finance", experience: "Junior", postedDate: "2026-09-02", description: "Manage payroll.", responsibilities: ["Payroll"], skills: ["Payroll"], benefits: [] },
-
-  // HEALTHCARE - 7
-  { id: 29, title: "Registered Nurse", company: "LUTH", logo: "https://logo.clearbit.com.luthnigeria.org", location: "Lagos, Nigeria", type: "Full-time", salary: 3000, category: "Healthcare", experience: "Mid-Level", postedDate: "2026-09-01", description: "Patient care.", responsibilities: ["Nursing"], skills: ["Nursing"], benefits: ["Health Insurance"] },
-  { id: 30, title: "Telehealth Doctor", company: "Reliance Health", logo: "https://logo.clearbit.com.reliancehealth.com", location: "Remote, Nigeria", type: "Contract", salary: 8000, category: "Healthcare", experience: "Senior", postedDate: "2026-08-30", description: "Online consultations.", responsibilities: ["Consultations"], skills: ["Medicine"], benefits: ["Remote Work"] },
-  { id: 31, title: "Pharmacist", company: "Emzor", logo: "https://logo.clearbit.com.emzor.com", location: "Abuja, Nigeria", type: "Full-time", salary: 4000, category: "Healthcare", experience: "Mid-Level", postedDate: "2026-08-29", description: "Dispense drugs.", responsibilities: ["Pharmacy"], skills: ["Pharmacy"], benefits: ["Health Insurance"] },
-  { id: 32, title: "Lab Scientist", company: "Reddington", logo: "https://logo.clearbit.com.reddingtonhospital.com", location: "Port Harcourt, Nigeria", type: "Full-time", salary: 3500, category: "Healthcare", experience: "Mid-Level", postedDate: "2026-08-28", description: "Lab tests.", responsibilities: ["Lab"], skills: ["Lab"], benefits: ["Health Insurance"] },
-  { id: 33, title: "Public Health Officer", company: "WHO", logo: "https://logo.clearbit.com.who.int", location: "Kaduna, Nigeria", type: "Contract", salary: 4500, category: "Healthcare", experience: "Senior", postedDate: "2026-08-27", description: "Public health programs.", responsibilities: ["Programs"], skills: ["Public Health"], benefits: ["Allowance"] },
-  { id: 34, title: "Dental Surgeon", company: "AKTH", logo: "https://logo.clearbit.com.akth.gov.ng", location: "Kano, Nigeria", type: "Full-time", salary: 6000, category: "Healthcare", experience: "Senior", postedDate: "2026-08-26", description: "Dental care.", responsibilities: ["Dental"], skills: ["Dentistry"], benefits: ["Health Insurance"] },
-  { id: 35, title: "Healthcare Assistant", company: "UCTH", logo: "https://logo.clearbit.com.ucth.gov.ng", location: "Cross Rivers, Nigeria", type: "Part-time", salary: 1200, category: "Healthcare", experience: "Junior", postedDate: "2026-08-25", description: "Assist patients.", responsibilities: ["Assistance"], skills: ["Care"], benefits: [] },
-
-  // MARKETING - 7
-  { id: 36, title: "Digital Marketing Manager", company: "Jumia", logo: "https://logo.clearbit.com.jumia.com", location: "Abuja, Nigeria", type: "Full-time", salary: 5500, category: "Marketing", experience: "Senior", postedDate: "2026-08-24", description: "Run ads.", responsibilities: ["Ads"], skills: ["SEO", "Ads"], benefits: ["Health Insurance"] },
-  { id: 37, title: "Social Media Manager", company: "Coca Cola", logo: "https://logo.clearbit.com.coca-cola.com", location: "Lagos, Nigeria", type: "Full-time", salary: 4000, category: "Marketing", experience: "Mid-Level", postedDate: "2026-08-23", description: "Manage socials.", responsibilities: ["Social"], skills: ["Social Media"], benefits: ["Health Insurance"] },
-  { id: 38, title: "Brand Manager", company: "Unilever", logo: "https://logo.clearbit.com.unilever.com", location: "Port Harcourt, Nigeria", type: "Full-time", salary: 7000, category: "Marketing", experience: "Senior", postedDate: "2026-08-22", description: "Brand strategy.", responsibilities: ["Brand"], skills: ["Branding"], benefits: ["Health Insurance"] },
-  { id: 39, title: "Content Writer", company: "TechCabal", logo: "https://logo.clearbit.com.techcabal.com", location: "Remote, Nigeria", type: "Contract", salary: 1800, category: "Marketing", experience: "Junior", postedDate: "2026-08-21", description: "Write articles.", responsibilities: ["Writing"], skills: ["Writing"], benefits: ["Flexible Hours"] },
-  { id: 40, title: "SEO Specialist", company: "Jobberman", logo: "https://logo.clearbit.com.jobberman.com", location: "Kaduna, Nigeria", type: "Part-time", salary: 1500, category: "Marketing", experience: "Mid-Level", postedDate: "2026-08-20", description: "SEO.", responsibilities: ["SEO"], skills: ["SEO"], benefits: [] },
-  { id: 41, title: "Marketing Coordinator", company: "Kano Mills", logo: "https://logo.clearbit.com.kanomills.com", location: "Kano, Nigeria", type: "Full-time", salary: 2000, category: "Marketing", experience: "Junior", postedDate: "2026-08-19", description: "Marketing support.", responsibilities: ["Support"], skills: ["Marketing"], benefits: ["Health Insurance"] },
-  { id: 42, title: "PR Manager", company: "Cross River Govt", logo: "https://logo.clearbit.com.crossriver.gov.ng", location: "Cross Rivers, Nigeria", type: "Full-time", salary: 5000, category: "Marketing", experience: "Senior", postedDate: "2026-08-18", description: "PR.", responsibilities: ["PR"], skills: ["PR"], benefits: ["Housing Allowance"] },
-
-  // TECHNOLOGY - 7
-  { id: 43, title: "Product Manager", company: "Andela", logo: "https://logo.clearbit.com.andela.com", location: "Port Harcourt, Nigeria", type: "Full-time", salary: 10000, category: "Technology", experience: "Senior", postedDate: "2026-08-17", description: "Own product.", responsibilities: ["Product"], skills: ["Product"], benefits: ["Equity"] },
-  { id: 44, title: "UI/UX Designer", company: "TechCabal", logo: "https://logo.clearbit.com.techcabal.com", location: "Kaduna, Nigeria", type: "Part-time", salary: 2500, category: "Technology", experience: "Mid-Level", postedDate: "2026-08-16", description: "Design UI.", responsibilities: ["Design"], skills: ["Figma"], benefits: [] },
-  { id: 45, title: "Data Scientist", company: "Google", logo: "https://logo.clearbit.com.google.com", location: "Lagos, Nigeria", type: "Full-time", salary: 15000, category: "Technology", experience: "Senior", postedDate: "2026-08-15", description: "Build ML models.", responsibilities: ["ML"], skills: ["Python", "ML"], benefits: ["Equity"] },
-  { id: 46, title: "Cloud Engineer", company: "Microsoft", logo: "https://logo.clearbit.com.microsoft.com", location: "Remote, Nigeria", type: "Contract", salary: 20000, category: "Technology", experience: "Senior", postedDate: "2026-08-14", description: "AWS/Azure.", responsibilities: ["Cloud"], skills: ["AWS"], benefits: ["Remote Work"] },
-  { id: 47, title: "Blockchain Developer", company: "Yellow Card", logo: "https://logo.clearbit.com.yellowcard.io", location: "Abuja, Nigeria", type: "Full-time", salary: 12000, category: "Technology", experience: "Senior", postedDate: "2026-08-13", description: "Web3.", responsibilities: ["Blockchain"], skills: ["Solidity"], benefits: ["Crypto"] },
-  { id: 48, title: "AI Engineer", company: "Ubenwa", logo: "https://logo.clearbit.com.ubenwa.ai", location: "Kano, Nigeria", type: "Full-time", salary: 9000, category: "Technology", experience: "Senior", postedDate: "2026-08-12", description: "AI models.", responsibilities: ["AI"], skills: ["Python", "AI"], benefits: ["Research Budget"] },
-  { id: 49, title: "Technical Writer", company: "GitHub", logo: "https://logo.clearbit.com.github.com", location: "Cross Rivers, Nigeria", type: "Contract", salary: 3000, category: "Technology", experience: "Mid-Level", postedDate: "2026-08-11", description: "Write docs.", responsibilities: ["Docs"], skills: ["Writing"], benefits: ["Flexible Hours"] },
+ 
 ];
 
 const DESKTOP_JOBS_PER_PAGE = 9;
@@ -100,17 +42,64 @@ export default function AllJobs() {
   const [searchLocation, setSearchLocation] = useState("");
   const [sortBy, setSortBy] = useState("Newest");
   const [currentPage, setCurrentPage] = useState(1);
-  const [jobsList, setJobsList] = useState([]);
+  const [jobsList, setJobsList] = useState([]); // CHANGED: start empty
   const [filters, setFilters] = useState({ category: [], type: [], experience: [], salary: [] });
+  const [loading, setLoading] = useState(true); // ADDED
 
   const sortOptions = ["Newest", "Oldest", "A-Z", "Z-A", "Salary: High-Low", "Salary: Low-High"];
   const allCategories = ["Teaching", "Business", "IT", "Finance", "Healthcare", "Marketing", "Technology"];
 
-  useEffect(() => {
-    const savedIds = JSON.parse(localStorage.getItem('savedJobs')) || [];
-    const jobsWithSaved = jobs.map(job => ({...job, is_saved: savedIds.includes(job.id) }));
-    setJobsList(jobsWithSaved);
-  }, []);
+ // ADDED: Fetch Firestore jobs and merge with static jobs
+useEffect(() => {
+  const fetchJobs = async () => {
+    setLoading(true);
+    try {
+      // 1. Get jobs from Firestore - REMOVE the status filter for now
+      const q = query(
+        collection(db, "jobs"),
+        orderBy("createdAt", "desc")
+      );
+      const snapshot = await getDocs(q);
+      const firestoreJobs = snapshot.docs.map(doc => {
+        const data = doc.data();
+        return {
+          id: doc.id,
+          title: data.title || "No Title",
+          company: data.companyName || "Unknown Company",
+          logo: "https://via.placeholder.com/40",
+          location: data.location || "Remote",
+          type: data.jobType || "Full-time",
+          salary: data.salaryMax || data.salaryMin || 50000, // use ₦50k default
+          category: data.category || "Other",
+          experience: data.experience || "Mid-Level",
+          postedDate: data.createdAt?.toDate().toISOString().split('T')[0] || "2026-01-01",
+          description: data.description || "",
+          responsibilities: [],
+          skills: data.requirements || [],
+          benefits: data.benefits || [],
+          isFirestore: true
+        }
+      });
+
+      // 2. Get saved jobs from localStorage
+      const savedIds = JSON.parse(localStorage.getItem('savedJobs')) || [];
+
+      // 3. Merge static + firestore jobs
+      const allJobs = [...jobs,...firestoreJobs].map(job => ({
+       ...job,
+        is_saved: savedIds.includes(job.id)
+      }));
+
+      console.log("Jobs loaded:", allJobs.length); // debug
+      setJobsList(allJobs);
+    } catch (error) {
+      console.error("Error fetching jobs:", error);
+      setJobsList(jobs); // fallback to static
+    }
+    setLoading(false);
+  };
+  fetchJobs();
+}, []);
 
   // READ FILTERS FROM HERO
   useEffect(() => {
@@ -176,7 +165,6 @@ export default function AllJobs() {
   const filteredJobs = useMemo(() => {
     let result = [...jobsList];
 
-    // 1. SEARCH FILTER: title, company, description, skills, category
     if (searchTitle) {
       const query = searchTitle.toLowerCase();
       result = result.filter(j =>
@@ -188,13 +176,11 @@ export default function AllJobs() {
       );
     }
 
-    // 2. LOCATION SEARCH
     if (searchLocation) {
       const locQuery = searchLocation.toLowerCase();
       result = result.filter(j => j.location.toLowerCase().includes(locQuery));
     }
 
-    // 3. OTHER FILTERS
     if (filters.category.length) result = result.filter(j => filters.category.includes(j.category));
     if (filters.type.length) result = result.filter(j => filters.type.includes(j.type));
     if (filters.experience.length) result = result.filter(j => filters.experience.includes(j.experience));
@@ -207,7 +193,6 @@ export default function AllJobs() {
       }))
     }
 
-    // 4. SORT
     if (sortBy === "Newest") result.sort((a, b) => new Date(b.postedDate) - new Date(a.postedDate));
     if (sortBy === "Oldest") result.sort((a, b) => new Date(a.postedDate) - new Date(b.postedDate));
     if (sortBy === "A-Z") result.sort((a, b) => a.title.localeCompare(b.title));
@@ -277,20 +262,20 @@ export default function AllJobs() {
           </aside>
 
         <div className="jobsGrid">
-            {currentJobs.length > 0? (
+            {loading? <p>Loading jobs...</p> : currentJobs.length > 0? (
               currentJobs.map((job) => (
                 <div className="jobCard" key={job.id} onClick={() => navigate(`/jobs/${job.id}`, { state: job })}>
                   <div className="jobHeader">
                     <img src={job.logo} alt={job.company} />
-                    <Bookmark size={20} onClick={(e) => handleToggleSave(e, job.id)} fill={job.is_saved? "#16a34a" : "none"} color={job.is_saved? "#16a34a" : "currentColor"} style={{ cursor: 'pointer' }} />
+                    <Bookmark size={25} onClick={(e) => handleToggleSave(e, job.id)} fill={job.is_saved? "#16a34a" : "none"} color={job.is_saved? "#16a34a" : "currentColor"} style={{ cursor: 'pointer', position:"relative", left:"22rem" }} />
                   </div>
                   <h2>{job.title}</h2>
                   <h4>{job.company}</h4>
                   <div className="jobTags"><span>{job.category}</span><span>{job.type}</span><span>{job.location}</span></div>
                   <p className="des">{job.description}</p>
                   <div className="salaryRow">
-                    <div><DollarSign size={18} />${job.salary.toLocaleString()}/mo</div>
-                    <button onClick={(e) => handleApplyClick(e, job)}>Apply</button> {/* 8. UPDATED */}
+                    <div>₦{job.salary.toLocaleString()}/mo</div> {/* CHANGED: $ to ₦ */}
+                    <button onClick={(e) => handleApplyClick(e, job)}>Apply</button>
                   </div>
                 </div>
               ))
@@ -306,22 +291,22 @@ export default function AllJobs() {
        <div className="mobileSearch">
   <div className="mobileSearchBox">
     <Search size={18} />
-    <input 
-      type="text" 
-      placeholder="Job title, skills, company" 
-      value={searchTitle} 
-      onChange={e => setSearchTitle(e.target.value)} 
+    <input
+      type="text"
+      placeholder="Job title, skills, company"
+      value={searchTitle}
+      onChange={e => setSearchTitle(e.target.value)}
     />
     <SlidersHorizontal size={18} className="mobile-search-options" onClick={() => setShowDropdown(!showDropdown)} />
   </div>
 
   <div className="mobileSearchBox" style={{marginTop: "10px"}}>
     <MapPin size={18} />
-    <input 
-      type="text" 
-      placeholder="Location" 
-      value={searchLocation} 
-      onChange={e => setSearchLocation(e.target.value)} 
+    <input
+      type="text"
+      placeholder="Location"
+      value={searchLocation}
+      onChange={e => setSearchLocation(e.target.value)}
     />
   </div>
 
@@ -349,20 +334,20 @@ export default function AllJobs() {
         <button className="yellowSearchBtn" onClick={() => setShowDropdown(true)}><Search size={20} />Click to search jobs</button>
         <div className="mobileJobList">
           <p className="resultsCount">{displayedJobs.length} jobs found</p>
-          {currentMobileJobs.length > 0? (
+          {loading? <p>Loading jobs...</p> : currentMobileJobs.length > 0? (
             currentMobileJobs.map((job) => (
               <div className="mobileCard" key={job.id} onClick={() => navigate(`/jobs/${job.id}`, { state: job })}>
                 <div className="mobileTop">
                   <img src={job.logo} alt={job.company} />
-                  <Bookmark size={18} onClick={(e) => handleToggleSave(e, job.id)} fill={job.is_saved? "#16a34a" : "none"} color={job.is_saved? "#16a34a" : "currentColor"} style={{ cursor: 'pointer' }} />
+                  <Bookmark size={18} onClick={(e) => handleToggleSave(e, job.id)} fill={job.is_saved? "#16a34a" : "none"} color={job.is_saved? "#16a34a" : "currentColor"} style={{ cursor: 'pointer', position:"relative", left:"19.5rem" }} />
                 </div>
                 <h3>{job.title}</h3>
                 <p className="companyName">{job.company}</p>
                 <div className="mobileInfo"><span><MapPin size={14} />{job.location}</span><span><Briefcase size={14} />{job.type}</span><span>{job.category}</span></div>
                 <p className="mobileDesc">{job.description}</p>
                 <div className="mobileBottom">
-                  <div className="salary"><DollarSign size={16} />${job.salary.toLocaleString()}/mo</div>
-                  <button onClick={(e) => handleApplyClick(e, job)}>Apply</button> {/* 9. UPDATED */}
+                  <div className="salary">₦{job.salary.toLocaleString()}/mo</div> {/* CHANGED: $ to ₦ */}
+                  <button onClick={(e) => handleApplyClick(e, job)}>Apply</button>
                 </div>
               </div>
             ))

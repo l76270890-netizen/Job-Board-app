@@ -1,8 +1,9 @@
-import { Briefcase, Building2, Users, CheckCircle } from "lucide-react";
+import { Briefcase, Building2, Users, CheckCircle, FileText, Eye, TrendingUp } from "lucide-react";
 import { useEffect, useState, useRef } from "react";
 import "./StatsSection.css";
+import { useAuth } from "../context/AuthContext"; // 1. ADD
 
-const stats = [
+const jobseekerStats = [ // 2. RENAME
   {
     icon: Briefcase,
     target: 50000,
@@ -26,6 +27,34 @@ const stats = [
     target: 85,
     suffix: "%",
     label: "Hiring Success Rate",
+  },
+];
+
+// 3. NEW: EMPLOYER STATS
+const employerStats = [
+  {
+    icon: FileText,
+    target: 1200,
+    suffix: "+",
+    label: "Jobs Posted This Month",
+  },
+  {
+    icon: Eye,
+    target: 450000,
+    suffix: "+",
+    label: "Profile Views",
+  },
+  {
+    icon: Users,
+    target: 15000,
+    suffix: "+",
+    label: "Applicants Received",
+  },
+  {
+    icon: TrendingUp,
+    target: 14,
+    suffix: " days",
+    label: "Avg. Time to Hire",
   },
 ];
 
@@ -67,10 +96,20 @@ function useCountUp(target, duration = 2000) {
 const formatNumber = (num) => num.toLocaleString();
 
 export default function StatsSection() {
+  const { userData } = useAuth(); // 4. ADD
+  const isEmployer = userData?.role === 'employer'; // 5. ADD
+
+  const statsToShow = isEmployer? employerStats : jobseekerStats; // 6. ADD
+
   return (
-    <section className="stats-section">
+    <section className={`stats-section ${isEmployer? 'employer-stats' : ''}`}> {/* 7. ADD CLASS */}
+      <div className="stats-header">
+        <h2>{isEmployer? 'Your Hiring Impact' : 'Trusted by Thousands'}</h2>
+        <p>{isEmployer? 'See how JobConnect helps you hire faster' : 'Join the community finding jobs and talent'}</p>
+      </div>
+
       <div className="stats-container">
-        {stats.map(({ icon: Icon, target, suffix, label }) => {
+        {statsToShow.map(({ icon: Icon, target, suffix, label }) => {
           const [count, ref] = useCountUp(target);
           return (
             <div key={label} className="stat-card" ref={ref}>

@@ -1,51 +1,228 @@
 
-import { useState, useMemo } from "react";
-import { MapPin, Briefcase, Search, X } from "lucide-react"; 
+import { useState, useMemo, useEffect } from "react";
+import { MapPin, Briefcase, Users, Edit, Plus, TrendingUp, Eye } from "lucide-react"; // Added Eye
 import "./CompaniesHiring.css";
 import { useNavigate } from "react-router-dom";
-import { jobs as allJobs } from "../pages/AllJobs"; // import your jobs
+import { useAuth } from "../context/AuthContext";
+import { jobs as staticJobs } from "../pages/AllJobs";
+import { db } from "../firebase";
+import { collection, query, where, getDocs, onSnapshot } from "firebase/firestore";
 
 function CompaniesHiring() {
   const navigate = useNavigate();
+  const { currentUser, userData } = useAuth();
   const [search, setSearch] = useState("");
+  const [myCompanyStats, setMyCompanyStats] = useState({ jobCount: 0, applicantCount: 0, profileViews: 0 });
+  const [firestoreJobs, setFirestoreJobs] = useState([]);
+  const [loading, setLoading] = useState(true);
 
-  // 1. GENERATE COMPANIES FROM JOBS + ADD JOB COUNT
+  const isEmployer = userData?.role === 'employer';
+
+  useEffect(() => {
+    fetchAllJobs();
+  }, []);
+
+  // LIVE STATS FOR EMPLOYER - NOW REALTIME
+  useEffect(() => {
+    if (!isEmployer ||!currentUser ||!userData?.companyName) return;
+
+    const jobsRef = collection(db, "jobs");
+    const jobsQ = query(jobsRef, where("companyName", "==", userData.companyName));
+
+    const unsubJobs = onSnapshot(jobsQ, (snapshot) => {
+      const jobs = snapshot.docs.map(doc => ({ id: doc.id,...doc.data() }));
+      const jobCount = jobs.filter(j => j.status!== 'closed').length; // only count active
+
+      setMyCompanyStats(prev => ({
+       ...prev,
+        jobCount,
+        profileViews: userData.profileViews || 0 // from user doc
+      }));
+    });
+
+    // LIVE APPLICANT COUNT
+    const appsRef = collection(db, "applications");
+    const appsQ = query(appsRef, where("companyName", "==", userData.companyName));
+    const unsubApps = onSnapshot(appsQ, (snapshot) => {
+      setMyCompanyStats(prev => ({
+       ...prev,
+        applicantCount: snapshot.size
+      }));
+      setLoading(false);
+    });
+
+    return () => { unsubJobs(); unsubApps(); }
+  }, [isEmployer, currentUser, userData]);
+
+  const fetchAllJobs = async () => {
+    try {
+      const snapshot = await getDocs(collection(db, "jobs"));
+      const jobs = snapshot.docs.map(doc => ({ id: doc.id,...doc.data() }));
+      setFirestoreJobs(jobs);
+    } catch (error) {
+      console.error("Error fetching jobs:", error);
+    }
+    setLoading(false);
+  };
+
+  const allJobs = useMemo(() => [...staticJobs,...firestoreJobs], [firestoreJobs]);
+
+  // GENERATE ALL COMPANIES FROM JOBS - MERGED
   const companies = useMemo(() => {
     const companyMap = new Map();
 
     allJobs.forEach(job => {
-      if (!companyMap.has(job.company)) {
-        companyMap.set(job.company, {
-          name: job.company,
+      const companyName = job.company || job.companyName;
+      if (!companyName) return;
+
+      if (!companyMap.has(companyName)) {
+        companyMap.set(companyName, {
+          name: companyName,
           location: job.location,
-          industry: job.category,
-          logo: job.logo,
+          industry: job.category || job.industry,
+          logo: job.logo || `https://ui-avatars.com/api/?name=${encodeURIComponent(companyName)}&background=22C55E&color=fff`,
           jobCount: 0
         });
       }
-      companyMap.get(job.company).jobCount += 1;
+      const company = companyMap.get(companyName);
+      if(job.status!== 'closed') company.jobCount += 1; // only count active jobs
+      if (job.logo) company.logo = job.logo;
+      if (job.location) company.location = job.location;
     });
-
     return Array.from(companyMap.values());
-  }, []);
+  }, [allJobs]);
 
-  // 2. FILTER COMPANIES
+  // 1. GET SIMILAR COMPANIES FOR EMPLOYER
+  const similarCompanies = useMemo(() => {
+    if (!isEmployer ||!userData?.industry) return [];
+    return companies
+    .filter(c => c.industry === userData.industry && c.name!== userData.companyName)
+    .sort((a, b) => b.jobCount - a.jobCount)
+    .slice(0, 3);
+  }, [companies, isEmployer, userData]);
+
   const filteredCompanies = companies.filter((company) => {
     const value = search.toLowerCase();
     return (
       company.name.toLowerCase().includes(value) ||
-      company.location.toLowerCase().includes(value) ||
-      company.industry.toLowerCase().includes(value)
+      company.location?.toLowerCase().includes(value) ||
+      company.industry?.toLowerCase().includes(value)
     );
-  }).sort((a, b) => b.jobCount - a.jobCount); // most jobs first
+  }).sort((a, b) => b.jobCount - a.jobCount);
 
-  // Show only first 6 on homepage. Remove .slice(0,6) if you want all
   const companiesToShow = filteredCompanies.slice(0, 6);
 
   const handleViewJobs = (companyName) => {
-    navigate(`/company/${encodeURIComponent(companyName)}`); // goes to company detail page
+    navigate(`/company/${encodeURIComponent(companyName)}`);
   };
-  
+
+  if (loading) return <p style={{textAlign: 'center', padding: '40px'}}>Loading...</p>
+
+  // 2. EMPLOYER VIEW - UPDATED WITH 3 REAL STATS
+  if (isEmployer) {
+    const myCompany = {
+      name: userData.companyName,
+      logo: userData.companyLogo || `https://ui-avatars.com/api/?name=${encodeURIComponent(userData.companyName)}&background=22C55E&color=fff`,
+      location: userData.companyLocation || "Nigeria",
+      industry: userData.industry || "Company"
+    }
+
+    return (
+      <section className="companies-section">
+        <div className="companies-header">
+          <h2 className="companies-title">Your Company Profile</h2>
+          <button className="view-jobs-btn" onClick={() => navigate('/employer/profile')}>
+            <Edit size={14} /> Edit Profile
+          </button>
+        </div>
+
+        <div className="companies-grid1">
+          <article className="company-card employer-card">
+            <div className="company-card-top">
+              <div className="logo-wrapper">
+                <img
+                  src={myCompany.logo}
+                  alt={myCompany.name}
+                  onError={(e) => e.target.src = `https://ui-avatars.com/api/?name=${encodeURIComponent(myCompany.name)}&background=22C55E&color=fff`}
+                />
+              </div>
+              <div className="company-meta">
+                <h3 className="company-name">{myCompany.name}</h3>
+                <span className="company-tag">
+                  <Briefcase size={12} />
+                  {myCompany.industry}
+                </span>
+              </div>
+            </div>
+
+            <div className="company-stats-row">
+              <div className="stat-item">
+                <Briefcase size={16} />
+                <div>
+                  <h4>{myCompanyStats.jobCount}</h4>
+                  <p>Active Jobs</p>
+                </div>
+              </div>
+              <div className="stat-item">
+                <Users size={16} />
+                <div>
+                  <h4>{myCompanyStats.applicantCount}</h4>
+                  <p>Applicants</p>
+                </div>
+              </div>
+              <div className="stat-item">
+                <Eye size={16} /> {/* CHANGED ICON */}
+                <div>
+                  <h4>{myCompanyStats.profileViews}</h4>
+                  <p>Views</p>
+                </div>
+              </div>
+            </div>
+
+            <div className="company-card-bottom">
+              <div className="company-location">
+                <MapPin size={14} />
+                <span>{myCompany.location}</span>
+              </div>
+              <div style={{display: 'flex', gap: '8px'}}>
+                <button className="view-jobs-btn secondary" onClick={() => navigate('/employer/jobs')}>
+                  Manage Jobs
+                </button>
+                <button className="view-jobs-btn" onClick={() => navigate('/employer/post-job')}>
+                  <Plus size={14} /> Post Job
+                </button>
+              </div>
+            </div>
+          </article>
+        </div>
+
+        {/* 3. SIMILAR COMPANIES SECTION - NOW LIVE */}
+        {similarCompanies.length > 0 && (
+          <>
+            <div className="companies-header" style={{marginTop: '40px'}}>
+              <h2 className="companies-title">
+                <TrendingUp size={20} style={{verticalAlign: 'middle', marginRight: '8px'}} />
+                Companies similar to you
+              </h2>
+              <span className="companies-subtitle">See what others in {myCompany.industry} are hiring for</span>
+            </div>
+
+            <div className="companies-grid">
+              {similarCompanies.map((company) => (
+                <CompanyCardWithLiveCount
+                  key={company.name}
+                  company={company}
+                  onClick={() => handleViewJobs(company.name)}
+                />
+              ))}
+            </div>
+          </>
+        )}
+      </section>
+    );
+  }
+
+  // 4. JOBSEEKER VIEW - UNTOUCHED
   return (
     <section className="companies-section">
       <div className="companies-header">
@@ -53,23 +230,18 @@ function CompaniesHiring() {
         <span className="companies-subtitle">Explore opportunities at top workplaces</span>
       </div>
 
-     
       <div className="View1-button" onClick={() => navigate('/companies')}>
         View all ({companies.length})
       </div>
       <div className="companies-grid">
-        {companiesToShow.length > 0 ? (
+        {companiesToShow.length > 0? (
           companiesToShow.map((company) => (
-            <article 
-              key={company.name} 
-              className="company-card"
-              onClick={() => handleViewJobs(company.name)} // whole card clickable
-            >
+            <article key={company.name} className="company-card" onClick={() => handleViewJobs(company.name)}>
               <div className="company-card-top">
                 <div className="logo-wrapper">
-                  <img 
-                    src={company.logo} 
-                    alt={company.name} 
+                  <img
+                    src={company.logo}
+                    alt={company.name}
                     onError={(e) => e.target.src = `https://ui-avatars.com/api/?name=${encodeURIComponent(company.name)}&background=22C55E&color=fff`}
                   />
                 </div>
@@ -81,23 +253,18 @@ function CompaniesHiring() {
                   </span>
                 </div>
               </div>
-              
+
               <div className="company-card-bottom">
                 <div className="company-location">
                   <MapPin size={14} />
                   <span>{company.location}</span>
                 </div>
-
                 <span className="job-count-badge">
-                  {company.jobCount} {company.jobCount === 1 ? 'Job' : 'Jobs'}
+                  {company.jobCount} {company.jobCount === 1? 'Job' : 'Jobs'}
                 </span>
-
-                <button 
-                  className="view-jobs-btn" 
-                  onClick={(e) => {
-                    e.stopPropagation(); // stop card click when button is clicked
-                    handleViewJobs(company.name)
-                  }}
+                <button
+                  className="view-jobs-btn"
+                  onClick={(e) => { e.stopPropagation(); handleViewJobs(company.name) }}
                 >
                   View Jobs
                 </button>
@@ -108,10 +275,53 @@ function CompaniesHiring() {
           <div className="no-results">No companies found</div>
         )}
       </div>
-
-    
     </section>
   );
 };
+
+// NEW: Component for live job count on similar companies
+function CompanyCardWithLiveCount({ company, onClick }) {
+  const [jobCount, setJobCount] = useState(company.jobCount);
+
+  useEffect(() => {
+    const q = query(collection(db, "jobs"), where("companyName", "==", company.name));
+    const unsubscribe = onSnapshot(q, (snapshot) => {
+      const activeJobs = snapshot.docs.filter(d => d.data().status!== 'closed').length;
+      setJobCount(activeJobs);
+    });
+    return () => unsubscribe();
+  }, [company.name]);
+
+  return (
+    <article className="company-card" onClick={onClick}>
+      <div className="company-card-top">
+        <div className="logo-wrapper">
+          <img
+            src={company.logo}
+            alt={company.name}
+            onError={(e) => e.target.src = `https://ui-avatars.com/api/?name=${encodeURIComponent(company.name)}&background=22C55E&color=fff`}
+          />
+        </div>
+        <div className="company-meta">
+          <h3 className="company-name">{company.name}</h3>
+          <span className="company-tag">
+            <Briefcase size={12} />
+            {company.industry}
+          </span>
+        </div>
+      </div>
+
+      <div className="company-card-bottom">
+        <div className="company-location">
+          <MapPin size={14} />
+          <span>{company.location}</span>
+        </div>
+        <span className="job-count-badge">
+          {jobCount} {jobCount === 1? 'Job' : 'Jobs'}
+        </span>
+      </div>
+    </article>
+  );
+}
 
 export default CompaniesHiring;

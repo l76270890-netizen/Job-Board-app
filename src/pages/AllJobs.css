@@ -206,7 +206,7 @@ border-radius: 10px;
 .jobHeader img { width: 40px; height: 40px; object-fit: contain; border-radius: 8px; }
 .jobCard h2 { font-size: 16px; font-weight: 600; }
 .jobCard h4 { font-size: 14px; color: #6b7280; }
-.jobTags { display: b; gap: 8px; }
+.jobTags { display: flex; gap: 8px; }
 .jobTags span { background: #dcfce7; padding: 4px 10px; border-radius: 20px; font-size: 12px ; }
 .des { font-size: 13px; color: #4b5563; line-height: 1.5; }
 .salaryRow { display: flex; justify-content: space-between; align-items: center; margin-top: auto; }

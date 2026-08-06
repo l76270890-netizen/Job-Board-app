@@ -1,17 +1,19 @@
 import "./JobDetail.css";
 import {
-  ArrowLeft, MapPin, Briefcase, Clock3, DollarSign, Bookmark, Users, Building2, CheckCircle2, X, Upload,
+  ArrowLeft, MapPin, Briefcase, Clock3, Bookmark, Users, Building2, CheckCircle2, X, Upload,
 } from "lucide-react";
 import { useNavigate, useLocation, useParams } from "react-router-dom";
 import { useEffect, useState } from "react";
 import { jobs as allJobs } from "./AllJobs";
-import { useAuth } from "../context/AuthContext"; // 1. IMPORT
+import { useAuth } from "../context/AuthContext";
+import { doc, getDoc, collection, addDoc, serverTimestamp, query, where, getDocs } from "firebase/firestore";
+import { db } from "../firebase";
 
 function JobDetail() {
   const navigate = useNavigate();
   const { state } = useLocation();
   const { id } = useParams();
-  const { currentUser } = useAuth(); // 2. GET USER
+  const { currentUser, userData } = useAuth(); // ADDED userData
 
   const [job, setJob] = useState(state || null);
   const [relatedJobs, setRelatedJobs] = useState([]);
@@ -20,35 +22,80 @@ function JobDetail() {
   const [applied, setApplied] = useState(false);
   const [resume, setResume] = useState(null);
   const [coverLetter, setCoverLetter] = useState("");
+  const [loading, setLoading] = useState(!state);
+  const [submitting, setSubmitting] = useState(false);
 
+  // 1. CREATE NOTIFICATION FUNCTION - ADDED
+  const createNotification = async (employerId, jobTitle, applicantName, jobId) => {
+    if (!employerId) return;
+    await addDoc(collection(db, "notifications"), {
+      userId: employerId, // Who receives it
+      title: "New Application",
+      message: `${applicantName} applied for ${jobTitle}`,
+      link: `/employer/applicants/${jobId}`, // Where clicking takes them
+      read: false,
+      type: "application",
+      createdAt: serverTimestamp(),
+    });
+  };
+
+  // 1. FETCH JOB: check static first, then Firestore
   useEffect(() => {
-    const foundJob = allJobs.find(j => j.id === Number(id));
-    setJob(foundJob || null);
-    window.scrollTo(0, 0);
+    const fetchJob = async () => {
+      let foundJob = allJobs.find(j => String(j.id) === String(id));
+
+      if (!foundJob) {
+        setLoading(true);
+        const docRef = doc(db, "jobs", id);
+        const docSnap = await getDoc(docRef);
+        if (docSnap.exists()) {
+          const data = docSnap.data();
+          foundJob = {
+            id: docSnap.id,
+            title: data.title,
+            company: data.companyName,
+            logo: "https://via.placeholder.com/40",
+            location: data.location || "Remote",
+            type: data.jobType,
+            salary: data.salaryMax || data.salaryMin || 50000,
+            category: data.category,
+            experience: data.experience || "Mid-Level",
+            postedDate: data.createdAt?.toDate().toISOString() || new Date().toISOString(),
+            description: data.description,
+            responsibilities: [],
+            skills: data.requirements || [],
+            benefits: data.benefits || [],
+            companyId: data.companyId || data.employerId // IMPORTANT for notifications
+          }
+        }
+        setLoading(false);
+      }
+
+      setJob(foundJob || null);
+      window.scrollTo(0, 0);
+    };
+    fetchJob();
   }, [id]);
 
   useEffect(() => {
-    if (!job) return;
-    const savedIds = JSON.parse(localStorage.getItem('savedJobs')) || [];
-    setIsSaved(savedIds.includes(job.id));
+    if (!job ||!currentUser) return;
 
-    const applications = JSON.parse(localStorage.getItem('applications')) || [];
-    const alreadyApplied = applications.some(app => app.job_id === job.id && app.user_id === currentUser?.uid); // 3. USE FIREBASE UID
-    setApplied(alreadyApplied);
+    const checkApplication = async () => {
+      const savedIds = JSON.parse(localStorage.getItem('savedJobs')) || [];
+      setIsSaved(savedIds.includes(job.id));
 
-    let filtered = allJobs.filter(j => j.id!== job.id);
-    let related = filtered.filter(j => j.category === job.category);
-    if (related.length < 5) {
-      const sameLocation = filtered.filter(j => j.location === job.location &&!related.find(r => r.id === j.id));
-      related = [...related,...sameLocation];
+      const q = query(
+        collection(db, "applications"),
+        where("jobId", "==", job.id),
+        where("userId", "==", currentUser.uid)
+      );
+      const snapshot = await getDocs(q);
+      setApplied(!snapshot.empty);
     }
-    if (related.length < 5) {
-      const randomJobs = filtered.filter(j =>!related.find(r => r.id === j.id));
-      related = [...related,...randomJobs];
-    }
-    setRelatedJobs(related.slice(0, 5));
-  }, [job, currentUser]); // 4. ADD currentUser
+    checkApplication();
+  }, [job, currentUser]);
 
+  if (loading) return <p style={{textAlign: 'center', marginTop: '40px'}}>Loading job...</p>
   if (!job) {
     return (
       <section className="jobDetail">
@@ -66,22 +113,21 @@ function JobDetail() {
   const skills = job.skills || [];
   const benefits = job.benefits || [];
 
-  // 5. NEW: LOGIN CHECK FUNCTION
   const requireAuth = (action) => {
     if (!currentUser) {
       navigate("/login", { state: { from: location } });
       return;
     }
-    action(); // run the action if logged in
+    action();
   }
 
   const handleToggleSave = (e) => {
     e.stopPropagation();
-    requireAuth(() => { // WRAP WITH LOGIN CHECK
+    requireAuth(() => {
       const savedIds = JSON.parse(localStorage.getItem('savedJobs')) || [];
       let newSavedIds;
       if (savedIds.includes(job.id)) {
-        newSavedIds = savedIds.filter(id => id!== job.id);
+        newSavedIds = savedIds.filter(id => String(id)!== String(job.id));
         setIsSaved(false);
       } else {
         newSavedIds = [...savedIds, job.id];
@@ -91,37 +137,74 @@ function JobDetail() {
     })
   };
 
-  const handleApplyClick = () => { // 6. NEW FUNCTION FOR BUTTON
+  const handleApplyClick = () => {
     requireAuth(() => {
       if (!applied) setShowApplyModal(true)
     })
   }
 
-  const handleApplySubmit = () => {
-    if (!resume) return;
-    const application = {
-      id: Date.now(),
-      job_id: job.id,
-      job_title: job.title,
+  // UPDATED: Real Firestore submit + NOTIFICATION
+const handleApplySubmit = async () => {
+  if (!resume) return alert("Please upload your resume");
+
+  setSubmitting(true);
+  try {
+    const applicantName = userData?.name || currentUser.displayName || currentUser.email;
+
+    // 1. CONVERT RESUME TO BASE64 URL - so employer can view it
+    const resumeUrl = await new Promise((resolve) => {
+      const reader = new FileReader();
+      reader.onload = () => resolve(reader.result);
+      reader.readAsDataURL(resume);
+    });
+
+    // 2. GET FULL JOBSEEKER PROFILE
+    const userSnap = await getDoc(doc(db, "users", currentUser.uid));
+    const userProfile = userSnap.data() || {};
+
+    // 3. Save application to Firestore with ALL details
+    await addDoc(collection(db, "applications"), {
+      jobId: job.id,
+      jobTitle: job.title,
       company: job.company,
-      user_id: currentUser.uid, // 7. USE FIREBASE UID
-      resume_name: resume.name,
-      cover_letter: coverLetter,
-      applied_at: new Date().toISOString(),
-      status: "pending"
-    };
-    const applications = JSON.parse(localStorage.getItem("applications")) || [];
-    localStorage.setItem("applications", JSON.stringify([...applications, application]));
+      employerId: job.companyId,
+      
+      userId: currentUser.uid,
+      applicantName: applicantName,
+      userEmail: currentUser.email,
+      phone: userProfile.phone || "",
+      bio: userProfile.bio || "",
+      skills: userProfile.skills || [],
+      profilePic: userProfile.photoURL || "",
+      
+      resumeName: resume.name,
+      resumeUrl: resumeUrl, // NOW EMPLOYER CAN VIEW IT
+      coverLetter: coverLetter,
+      status: "Pending",
+      appliedAt: serverTimestamp()
+    });
+
+    // 4. SEND NOTIFICATION TO EMPLOYER
+    await createNotification(job.companyId, job.title, applicantName, job.id);
+
     setApplied(true);
     setShowApplyModal(false);
     setResume(null);
     setCoverLetter("");
-  };
+
+    alert(`✅ Application Submitted Successfully!\n\nYour application for "${job.title}" at ${job.company} has been sent.`);
+
+  } catch (error) {
+    console.error("Error applying:", error);
+    alert("Failed to submit application. Please try again.");
+  }
+  setSubmitting(false);
+};
 
   const handleMessageRecruiter = () =>{
-    requireAuth(() => { // WRAP WITH LOGIN CHECK
+    requireAuth(() => {
       navigate(`/message`, {
-        state: { jobId: job.id, jobTitle: job.title, company: job.company, recruiterId: job.recruiter_id || job.company, recruiterName: job.company }
+        state: { jobId: job.id, jobTitle: job.title, company: job.company, recruiterId: job.companyId, recruiterName: job.company }
       });
     })
   };
@@ -142,7 +225,7 @@ function JobDetail() {
               <div className="heroMeta">
                 <span><MapPin size={15} />{job.location}</span>
                 <span><Briefcase size={15} />{job.type}</span>
-                <span><DollarSign size={15} />${job.salary.toLocaleString()}/mo</span>
+                <span>₦{job.salary.toLocaleString()}/mo</span>
               </div>
             </div>
             <button className="saveBtn" onClick={handleToggleSave}>
@@ -153,7 +236,7 @@ function JobDetail() {
           <div className="heroActions">
             <button
               className={`applyNowBtn ${applied? 'applied' : ''}`}
-              onClick={handleApplyClick} // 8. USE NEW FUNCTION
+              onClick={handleApplyClick}
               disabled={applied}
             >
               {applied? <><CheckCircle2 size={18} /> Applied</> : "Apply Now"}
@@ -161,9 +244,10 @@ function JobDetail() {
             <button className="messageBtn" onClick={handleMessageRecruiter}>Message Recruiter</button>
           </div>
         </div>
- <div className="detailCard">
+
+        <div className="detailCard">
           <h2>Job Description</h2>
-          <p>{job.description}</p>
+          <p style={{whiteSpace: "pre-line"}}>{job.description}</p>
         </div>
 
         <div className="detailCard">
@@ -186,36 +270,6 @@ function JobDetail() {
             )) : <p>No skills listed</p>}
           </div>
         </div>
-
-        {/* RELATED JOBS SECTION */}
-        {relatedJobs.length > 0 && (
-          <div className="relatedJobsSection">
-            <h2>Related Jobs</h2>
-            <p>More jobs you might be interested in</p>
-
-            <div className="relatedJobsGrid">
-              {relatedJobs.map(rJob => (
-                <div
-                  className="relatedCard"
-                  key={rJob.id}
-                  onClick={() => navigate(`/jobs/${rJob.id}`)} // FIX 3: just navigate by id
-                >
-                  <div className="relatedCardTop">
-                    <img src={rJob.logo} alt={rJob.company} />
-                    <div>
-                      <h4>{rJob.title}</h4>
-                      <p>{rJob.company}</p>
-                    </div>
-                  </div>
-                  <div className="relatedCardMeta">
-                    <span><MapPin size={14} /> {rJob.location}</span>
-                    <span className="salary">${rJob.salary.toLocaleString()}/mo</span>
-                  </div>
-                </div>
-              ))}
-            </div>
-          </div>
-        )}
 
       </div>
 
@@ -285,9 +339,9 @@ function JobDetail() {
               <button
                 className="btn-submit"
                 onClick={handleApplySubmit}
-                disabled={!resume}
+                disabled={!resume || submitting}
               >
-                Submit Application
+                {submitting? "Submitting..." : "Submit Application"}
               </button>
             </div>
           </div>

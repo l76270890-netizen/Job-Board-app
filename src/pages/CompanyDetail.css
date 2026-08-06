@@ -216,6 +216,39 @@ hr {
 }
 
 
+.header-rating { display: flex; align-items: center; gap: 6px; color: #6b7280; font-size: 14px; margin-top: 4px; }
+.reviews-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 24px; }
+.avg-rating { display: flex; align-items: center; gap: 8px; font-size: 16px; }
+.avg-rating strong { font-size: 32px; }
+.review-btn { background: #22c55e; color: white; border: none; padding: 10px 16px; border-radius: 8px; font-weight: 600; cursor: pointer; }
+.review-form { background: #f9fafb; padding: 20px; border-radius: 12px; margin-bottom: 24px; display: flex; flex-direction: column; gap: 12px; }
+.review-form input,.review-form textarea,.review-form select { padding: 10px; border: 1px solid #ddd; border-radius: 8px; width: 100%; }
+.review-form button { background: #22c55e; color: white; border: none; padding: 10px; border-radius: 8px; font-weight: 600; }
+.review-form .cancel { background: #e5e7eb; color: #111; }
+.review-card { border: 1px solid #e5e7eb; padding: 16px; border-radius: 12px; margin-bottom: 16px; }
+.review-top { display: flex; justify-content: space-between; margin-bottom: 10px; }
+.verified-tag { background: #ecfdf5; color: #059669; padding: 4px 8px; border-radius: 6px; font-size: 12px; display: flex; align-items: center; gap: 4px; }
+.review-footer { display: flex; justify-content: space-between; color: #6b7280; font-size: 12px; margin-top: 10px; }
+.stars { display: flex; gap: 2px; }
+
+.clickable { cursor: pointer; transition: 0.2s; }
+.clickable:hover { border-color: #16a34a; transform: translateY(-2px); }
+.header-top-row { display: flex; justify-content: space-between; align-items: center; }
+.share-btn { background: #f3f4f6; border: none; padding: 8px 12px; border-radius: 8px; cursor: pointer; }
+.verified-badge { background: #22c55e; color: white; padding: 4px 8px; border-radius: 20px; font-size: 12px; display: flex; align-items: center; gap: 4px; position: absolute; bottom: -10px; right: -10px; }
+.job-filters { display: flex; gap: 10px; align-items: center; }
+.job-filters select { padding: 6px 10px; border: 1px solid #ddd; border-radius: 8px; }
+
+
+.header-top-row { display: flex; justify-content: space-between; align-items: center; }
+.follow-btn {
+  background: #22c55e; color: white; border: none; padding: 8px 14px; border-radius: 8px;
+  display: flex; align-items: center; gap: 6px; font-weight: 600; cursor: pointer;
+}
+.follow-btn.following { background: #e5e7eb; color: #111827; }
+.job-filters { display: flex; gap: 10px; align-items: center; }
+.job-filters select { padding: 6px 10px; border: 1px solid #ddd; border-radius: 8px; }
+
 /* ===== DESKTOP ===== */
 @media (min-width: 768px) {
   .company-header { height: 240px; }
@@ -261,6 +294,31 @@ hr {
   box-shadow: 0 4px 12px rgba(37,99,235,0.08);
 }
 
+
+.header-rating { display: flex; align-items: center; gap: 6px; color: #6b7280; font-size: 14px; margin-top: 4px; }
+.reviews-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 24px; }
+.avg-rating { display: flex; align-items: center; gap: 8px; font-size: 16px; }
+.avg-rating strong { font-size: 32px; }
+.review-btn { background: #22c55e; color: white; border: none; padding: 10px 16px; border-radius: 8px; font-weight: 600; cursor: pointer; }
+.review-form { background: #f9fafb; padding: 20px; border-radius: 12px; margin-bottom: 24px; display: flex; flex-direction: column; gap: 12px; }
+.review-form input,.review-form textarea,.review-form select { padding: 10px; border: 1px solid #ddd; border-radius: 8px; width: 100%; }
+.review-form button { background: #22c55e; color: white; border: none; padding: 10px; border-radius: 8px; font-weight: 600; }
+.review-form .cancel { background: #e5e7eb; color: #111; }
+.review-card { border: 1px solid #e5e7eb; padding: 16px; border-radius: 12px; margin-bottom: 16px; }
+.review-top { display: flex; justify-content: space-between; margin-bottom: 10px; }
+.verified-tag { background: #ecfdf5; color: #059669; padding: 4px 8px; border-radius: 6px; font-size: 12px; display: flex; align-items: center; gap: 4px; }
+.review-footer { display: flex; justify-content: space-between; color: #6b7280; font-size: 12px; margin-top: 10px; }
+.stars { display: flex; gap: 2px; }
+
+
+.header-top-row { display: flex; justify-content: space-between; align-items: center; }
+.follow-btn {
+  background: #22c55e; color: white; border: none; padding: 8px 14px; border-radius: 8px;
+  display: flex; align-items: center; gap: 6px; font-weight: 600; cursor: pointer;
+}
+.follow-btn.following { background: #e5e7eb; color: #111827; }
+.job-filters { display: flex; gap: 10px; align-items: center; }
+.job-filters select { padding: 6px 10px; border: 1px solid #ddd; border-radius: 8px; }
 
 
   .Related-jobs {

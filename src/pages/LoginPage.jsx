@@ -1,26 +1,38 @@
-import { useState } from "react";
-import { useNavigate, Link } from "react-router-dom";
-import { useAuth } from "../context/AuthContext"; // use context
-import { Mail, Lock, Eye, EyeOff } from "lucide-react";
+import { useState, useEffect } from "react"; // ADD useEffect
+import { useNavigate, Link, useLocation } from "react-router-dom";
+import { useAuth } from "../context/AuthContext";
+import { Mail, Lock, Eye, EyeOff, Briefcase, UserCheck } from "lucide-react";
 import { FcGoogle } from "react-icons/fc";
 import { FaApple, FaFacebook } from "react-icons/fa";
 import "./Auth.css";
 
 export default function LoginPage() {
   const [form, setForm] = useState({ email: "", password: "" });
+  const [role, setRole] = useState("jobseeker");
   const [error, setError] = useState("");
   const [showPass, setShowPass] = useState(false);
   const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
-  const { login, loginWithGoogle } = useAuth(); // get from context
+  const location = useLocation();
+  const { login, loginWithGoogle, userData } = useAuth(); // GET userData
+
+  const from = location.state?.from?.pathname || "/";
+
+  // 1. AUTO REDIRECT WHEN userData LOADS
+  useEffect(() => {
+    if (userData) {
+      if(userData.role === "employer") navigate("/employer/post-job", { replace: true });
+      else navigate(from, { replace: true });
+    }
+  }, [userData, navigate, from]);
 
   const handleLogin = async (e) => {
     e.preventDefault();
     setLoading(true);
     setError("");
     try {
-      await login(form.email, form.password);
-      navigate("/");
+      await login(form.email, form.password, role);
+      // don't navigate here, useEffect will handle it
     } catch (err) {
       setError(err.message);
       setLoading(false);
@@ -29,11 +41,13 @@ export default function LoginPage() {
 
   const handleSocialLogin = async () => {
     setError("");
+    setLoading(true);
     try {
-      await loginWithGoogle();
-      navigate("/");
+      await loginWithGoogle(role); 
+      // don't navigate here, useEffect will handle it
     } catch (err) {
       setError(err.message);
+      setLoading(false);
     }
   };
 
@@ -44,6 +58,32 @@ export default function LoginPage() {
         <p>Sign in to continue</p>
         
         {error && <div className="auth-error">{error}</div>}
+
+        <div className="role-toggle">
+          <p>I am logging in as:</p>
+          <div className="role-options">
+            <label className={role === "jobseeker" ? "active" : ""}>
+              <input 
+                type="radio" 
+                name="loginRole" 
+                value="jobseeker" 
+                checked={role === "jobseeker"} 
+                onChange={e => setRole(e.target.value)} 
+              />
+              <UserCheck size={16} /> Job Seeker
+            </label>
+            <label className={role === "employer" ? "active" : ""}>
+              <input 
+                type="radio" 
+                name="loginRole" 
+                value="employer" 
+                checked={role === "employer"} 
+                onChange={e => setRole(e.target.value)} 
+              />
+              <Briefcase size={16} /> Employer
+            </label>
+          </div>
+        </div>
 
         <form onSubmit={handleLogin}>
           <div className="input-group">
@@ -79,7 +119,7 @@ export default function LoginPage() {
         <div className="divider">or continue with</div>
 
         <div className="social-login">
-          <button className="social-btn google" onClick={handleSocialLogin}>
+          <button className="social-btn google" onClick={handleSocialLogin} disabled={loading}>
             <FcGoogle size={20} /> Continue with Google
           </button>
           <button className="social-btn apple" onClick={() => alert("Enable Apple in Firebase first")}>
@@ -97,3 +137,39 @@ export default function LoginPage() {
     </div>
   );
 }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

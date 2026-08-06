@@ -1,26 +1,33 @@
-import { useState } from "react";
+import { useState, useEffect } from "react"; // ADD useEffect
 import { useNavigate, Link } from "react-router-dom";
-import { useAuth } from "../context/AuthContext"; // use context
-import { Mail, Lock, User, Eye, EyeOff } from "lucide-react";
+import { useAuth } from "../context/AuthContext"; 
+import { Mail, Lock, User, Eye, EyeOff, Briefcase, UserCheck } from "lucide-react";
 import { FcGoogle } from "react-icons/fc";
 import { FaApple, FaFacebook } from "react-icons/fa";
 import "./Auth.css";
 
 export default function SignUpPage() {
-  const [form, setForm] = useState({ name: "", email: "", password: "" });
+  const [form, setForm] = useState({ name: "", email: "", password: "", role: "jobseeker" });
   const [error, setError] = useState("");
   const [showPass, setShowPass] = useState(false);
   const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
-  const { signup, loginWithGoogle } = useAuth(); // get from context
+  const { signup, loginWithGoogle, userData } = useAuth(); // GET userData
+
+  // AUTO REDIRECT AFTER SIGNUP
+  useEffect(() => {
+    if (userData) {
+      if(userData.role === "employer") navigate("/employer/post-job", { replace: true });
+      else navigate("/", { replace: true });
+    }
+  }, [userData, navigate]);
 
   const handleSignup = async (e) => {
     e.preventDefault();
     setLoading(true);
     setError("");
     try {
-      await signup(form.email, form.password, form.name);
-      navigate("/");
+      await signup(form.email, form.password, form.name, form.role); 
     } catch (err) {
       setError(err.message);
       setLoading(false);
@@ -29,11 +36,12 @@ export default function SignUpPage() {
 
   const handleSocialSignup = async () => {
     setError("");
+    setLoading(true);
     try {
-      await loginWithGoogle();
-      navigate("/");
+      await loginWithGoogle(form.role);
     } catch (err) {
       setError(err.message);
+      setLoading(false);
     }
   };
 
@@ -82,6 +90,32 @@ export default function SignUpPage() {
             </button>
           </div>
 
+          <div className="role-toggle">
+            <p>I am a:</p>
+            <div className="role-options">
+              <label className={form.role === "jobseeker" ? "active" : ""}>
+                <input 
+                  type="radio" 
+                  name="role" 
+                  value="jobseeker" 
+                  checked={form.role === "jobseeker"} 
+                  onChange={e => setForm({...form, role: e.target.value})} 
+                />
+                <UserCheck size={16} /> Job Seeker
+              </label>
+              <label className={form.role === "employer" ? "active" : ""}>
+                <input 
+                  type="radio" 
+                  name="role" 
+                  value="employer" 
+                  checked={form.role === "employer"} 
+                  onChange={e => setForm({...form, role: e.target.value})} 
+                />
+                <Briefcase size={16} /> Employer
+              </label>
+            </div>
+          </div>
+
           <button type="submit" className="auth-btn" disabled={loading}>
             {loading ? "Creating..." : "Sign Up"}
           </button>
@@ -90,7 +124,7 @@ export default function SignUpPage() {
         <div className="divider">or sign up with</div>
 
         <div className="social-login">
-          <button className="social-btn google" onClick={handleSocialSignup}>
+          <button className="social-btn google" onClick={handleSocialSignup} disabled={loading}>
             <FcGoogle size={20} /> Continue with Google
           </button>
           <button className="social-btn apple" onClick={() => alert("Enable Apple in Firebase first")}>

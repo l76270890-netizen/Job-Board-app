@@ -37,7 +37,7 @@ export default function SavedJobs() {
     <section className="allJobs">
       <div className="desktopJobs">
         <div className="backHeader">
-          <button className="backBtn" onClick={() => navigate(-1)}>
+         <button className="backBtn" onClick={() => navigate(-1)}>
             <ArrowLeft size={22} />
             <span></span>
           </button>
@@ -99,8 +99,8 @@ export default function SavedJobs() {
       {/* MOBILE VIEW */}
       <div className="mobileJobs">
         <div className="mobileBack">
-          <button className="backBtn" onClick={() => navigate(-1)}>
-            <ArrowLeft size={20} />
+         <button className="backBtn" onClick={() => navigate(-1)}>
+            <ArrowLeft size={22} />
             <span></span>
           </button>
         </div>
