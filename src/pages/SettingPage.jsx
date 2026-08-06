@@ -1,15 +1,18 @@
 import "./SettingPage.css";
 import {
   ArrowLeft, User, Bell, Moon, Shield, Globe, FileText, LogOut,
-  ChevronRight, X, Upload, Check, Camera, Building2, Users, CreditCard
+  ChevronRight, X, Upload, Check, Camera, Building2, Users, CreditCard, Loader
 } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { useEffect, useState, useRef } from "react";
 import { useAuth } from "../context/AuthContext";
+import { db, storage } from "../firebase";
+import { doc, updateDoc } from "firebase/firestore";
+import { ref, uploadBytes, getDownloadURL } from "firebase/storage";
 
 export default function SettingPage() {
   const navigate = useNavigate();
-  const { currentUser, logout, updateUserProfile, userData } = useAuth(); // userData should have role: 'employer' or 'jobseeker'
+  const { currentUser, logout, userData } = useAuth();
 
   const isEmployer = userData?.role === "employer";
 
@@ -27,7 +30,7 @@ export default function SettingPage() {
 
   // EMPLOYER STATE
   const [company, setCompany] = useState({
-    companyName: "", industry: "", companySize: "", location: "", website: "", photoURL: ""
+    companyName: "", industry: "", companySize: "", location: "", website: "", photoURL: "", bannerURL: ""
   });
 
   // COMMON STATE
@@ -35,25 +38,30 @@ export default function SettingPage() {
   const [language, setLanguage] = useState("English");
   const [password, setPassword] = useState({ current: "", new: "", confirm: "" });
 
-  // LOAD DATA
+  // LOAD DATA FROM FIRESTORE
   useEffect(() => {
-    if (currentUser) {
+    if (userData) {
       if (isEmployer) {
-        setCompany(prev => ({
-         ...prev,
+        setCompany({
           companyName: userData.companyName || "",
           industry: userData.industry || "",
-          email: currentUser.email || "",
-          photoURL: currentUser.photoURL
-        }));
+          companySize: userData.companySize || "",
+          location: userData.location || "",
+          website: userData.website || "",
+          photoURL: userData.photoURL || "", // FIX 1: was missing before first load
+          bannerURL: userData.bannerURL || ""
+        });
       } else {
-        setProfile(prev => ({
-         ...prev,
-          name: currentUser.displayName || "",
-          email: currentUser.email || "",
-          photoURL: currentUser.photoURL
-        }));
+        setProfile({
+          name: userData.name || currentUser?.displayName || "",
+          title: userData.title || "",
+          email: userData.email || currentUser?.email || "",
+          phone: userData.phone || "",
+          bio: userData.bio || "",
+          photoURL: userData.photoURL || currentUser?.photoURL || ""
+        });
       }
+      setNotifications(userData.notifications || { email: true, push: true, jobAlerts: true });
     }
     const savedDark = localStorage.getItem("darkMode") === "true";
     setDarkMode(savedDark);
@@ -61,41 +69,66 @@ export default function SettingPage() {
   }, [currentUser, isEmployer, userData]);
 
   // HANDLERS
-  const handleSaveProfile = () => {
-    // TODO: connect to Firestore updateDoc
+  const handleSaveProfile = async () => {
+    await updateDoc(doc(db, "users", currentUser.uid), profile);
     alert("Profile saved!");
     setActiveModal(null);
   };
-  const handleSaveCompany = () => {
-    // TODO: connect to Firestore updateDoc
+  const handleSaveCompany = async () => {
+    await updateDoc(doc(db, "users", currentUser.uid), company);
     alert("Company profile saved!");
     setActiveModal(null);
   };
 
+  // FIX 2: Add timestamp to filename so browser doesn't cache old image
   const handleProfilePicUpload = async (e) => {
     const file = e.target.files[0];
-    if (!file) return;
+    if (!file ||!currentUser) return;
     setUploading(true);
-    try { await updateUserProfile(file); setActiveModal(null); }
-    catch (err) { alert(err.message); }
+    try {
+      const storageRef = ref(storage, `users/${currentUser.uid}/profilePic_${Date.now()}`);
+      const snap = await uploadBytes(storageRef, file);
+      const url = await getDownloadURL(snap.ref);
+
+      await updateDoc(doc(db, "users", currentUser.uid), { photoURL: url });
+
+      if (isEmployer) setCompany(prev => ({...prev, photoURL: url}));
+      else setProfile(prev => ({...prev, photoURL: url}));
+
+      alert("Profile picture updated!");
+    } catch (err) { 
+      console.error(err)
+      alert("Upload failed: " + err.message); 
+    }
     setUploading(false);
   };
 
-  const handleToggleNotif = (key) => {
+  const handleBannerUpload = async (e) => {
+    const file = e.target.files[0];
+    if (!file ||!currentUser) return;
+    setUploading(true);
+    try {
+      const storageRef = ref(storage, `users/${currentUser.uid}/banner_${Date.now()}`);
+      const snap = await uploadBytes(storageRef, file);
+      const url = await getDownloadURL(snap.ref);
+
+      await updateDoc(doc(db, "users", currentUser.uid), { bannerURL: url });
+      setCompany(prev => ({...prev, bannerURL: url}));
+    } catch (err) { alert(err.message); }
+    setUploading(false);
+  };
+
+  const handleToggleNotif = async (key) => {
     const updated = {...notifications, [key]:!notifications[key] };
     setNotifications(updated);
+    await updateDoc(doc(db, "users", currentUser.uid), { notifications: updated });
   };
-  const handleDarkMode = () => {
-    const newMode =!darkMode;
-    setDarkMode(newMode);
-    localStorage.setItem("darkMode", newMode);
-    document.body.classList.toggle("dark", newMode);
-  };
+
   const handleLogout = async () => {
     if (confirm("Logout?")) { await logout(); navigate("/login"); }
   };
 
-  // SETTINGS LIST - DIFFERENT FOR EACH ROLE
+  // SETTINGS LIST
   const jobseekerSettings = [
     { icon: <User size={22} />, title: "Profile", desc: "Edit personal info", onClick: () => setActiveModal("profile") },
     { icon: <FileText size={22} />, title: "Resume", desc: resume? resume.name : "Upload CV", onClick: () => setActiveModal("resume") },
@@ -117,6 +150,7 @@ export default function SettingPage() {
   const displayName = isEmployer? company.companyName : profile.name;
   const displaySub = isEmployer? company.industry : profile.title;
   const userInitial = displayName?.[0]?.toUpperCase() || "U";
+  const currentPhoto = isEmployer? company.photoURL : profile.photoURL; // FIX 3: use correct photo
 
   return (
     <div className="settings-page">
@@ -125,12 +159,26 @@ export default function SettingPage() {
         <h1>Settings</h1>
       </div>
 
+      {/* EMPLOYER BANNER */}
+      {isEmployer && (
+        <div className="banner-wrapper">
+          <img src={company.bannerURL || "/default-banner.jpg"} className="banner-img" alt="" />
+          <label className="change-banner-btn">
+            <Camera size={14}/> Change
+            <input type="file" accept="image/*" onChange={handleBannerUpload} hidden />
+          </label>
+        </div>
+      )}
+
       <div className="profile-card">
         <div className="avatar-wrapper">
-          {profile.photoURL || company.photoURL? (
-            <img src={profile.photoURL || company.photoURL} alt="" />
+          {currentPhoto? (
+            // FIX 3: Add cache-busting query so new image shows immediately
+            <img src={`${currentPhoto}?t=${Date.now()}`} alt="" />
           ) : (<div className="avatar-initial">{userInitial}</div>)}
-          <button className="change-avatar-btn" onClick={() => fileInputRef.current.click()}><Camera size={14} /></button>
+          <button className="change-avatar-btn" onClick={() => fileInputRef.current.click()} disabled={uploading}>
+            {uploading? <Loader size={14} className="spin"/> : <Camera size={14} />}
+          </button>
           <input type="file" accept="image/*" ref={fileInputRef} onChange={handleProfilePicUpload} hidden />
         </div>
         <div>
@@ -162,7 +210,6 @@ export default function SettingPage() {
               <X size={22} onClick={() => setActiveModal(null)} />
             </div>
 
-            {/* JOBSEEKER PROFILE */}
             {activeModal === "profile" &&!isEmployer && (
               <div className="modal-body">
                 <input value={profile.name} onChange={e => setProfile({...profile, name: e.target.value})} placeholder="Full Name" />
@@ -174,7 +221,6 @@ export default function SettingPage() {
               </div>
             )}
 
-            {/* EMPLOYER COMPANY */}
             {activeModal === "company" && isEmployer && (
               <div className="modal-body">
                 <input value={company.companyName} onChange={e => setCompany({...company, companyName: e.target.value})} placeholder="Company Name" />
@@ -189,7 +235,18 @@ export default function SettingPage() {
               </div>
             )}
 
-            {/* OTHER MODALS SAME FOR BOTH */}
+            {activeModal === "branding" && isEmployer && (
+              <div className="modal-body">
+                <p>Upload Company Logo</p>
+                <button className="btn-outline" onClick={() => fileInputRef.current.click()}>Upload Logo</button>
+                <p style={{marginTop: 16}}>Upload Banner</p>
+                <label className="btn-outline">
+                  Upload Banner
+                  <input type="file" accept="image/*" onChange={handleBannerUpload} hidden />
+                </label>
+              </div>
+            )}
+
             {activeModal === "notifications" && (
               <div className="modal-body">
                 <div className="toggle-row"><span>Email Notifications</span><label className="switch"><input type="checkbox" checked={notifications.email} onChange={() => handleToggleNotif("email")} /><span className="slider"></span></label></div>

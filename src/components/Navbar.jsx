@@ -7,7 +7,9 @@ import {
 import { useState, useRef, useEffect } from "react";
 import { Link, useLocation, useNavigate } from "react-router-dom";
 import { useAuth } from "../context/AuthContext";
-import NotificationBell from "./NotificationBell"; // 1. IMPORT BELL
+import NotificationBell from "./NotificationBell";
+import { db } from "../firebase"; // ADDED
+import { collection, query, where, getDocs, orderBy } from "firebase/firestore"; // ADDED
 
 function Navbar() {
   const [menuOpen, setMenuOpen] = useState(false);
@@ -18,7 +20,7 @@ function Navbar() {
   const { currentUser, userData, logout } = useAuth();
   const profileRef = useRef(null);
 
-  const isActive = (path) => location.pathname.startsWith(path)? "active-tab" : ""; // FIXED: startsWith so /employer/applicants/123 also active
+  const isActive = (path) => location.pathname.startsWith(path)? "active-tab" : "";
   const userRole = userData?.role;
 
   const toggleMobileMenu = () => setMobileMenuOpen(!mobileMenuOpen);
@@ -40,6 +42,31 @@ function Navbar() {
     navigate("/login");
   };
 
+  // NEW: GO TO FIRST JOB'S APPLICANTS
+  const handleGoToApplicants = async () => {
+    setMobileMenuOpen(false);
+    if(!currentUser) return navigate('/login');
+
+    try {
+      const q = query(
+        collection(db, "jobs"),
+        where("companyId", "==", currentUser.uid),
+        orderBy("createdAt", "desc")
+      );
+      const snapshot = await getDocs(q);
+      if(!snapshot.empty){
+        const firstJobId = snapshot.docs[0].id;
+        navigate(`/employer/applicants/${firstJobId}`);
+      } else {
+        navigate('/employer/jobs'); // no jobs yet
+        alert("Post a job first to see applicants")
+      }
+    } catch (error) {
+      console.error(error)
+      navigate('/employer/jobs');
+    }
+  }
+
   const userInitial = currentUser?.displayName?.[0]?.toUpperCase() || currentUser?.email?.[0]?.toUpperCase();
   const userPhoto = currentUser?.photoURL;
 
@@ -58,8 +85,8 @@ function Navbar() {
             <>
               <Link to="/employer/jobs" className={isActive("/employer/jobs")}>Manage Jobs</Link>
               <Link to="/employer/post-job" className={isActive("/employer/post-job")}>Post Job</Link>
-              <Link to="/employer/applicants" className={isActive("/employer/applicants")}>Applicants</Link>
-              <Link to="/employer/messages" className={isActive("/employer/messages")}>Messages</Link>
+              <button onClick={handleGoToApplicants} className={`nav-link-btn ${isActive("/employer/applicants")}`}>Applicants</button> {/* CHANGED */}
+              <Link to="/message" className={isActive("/employer/messages")}>Messages</Link>
             </>
           ) : (
             <>
@@ -73,15 +100,10 @@ function Navbar() {
 
         <div className="navbar-right">
           {userRole!== 'employer' && <Link to="/saved" className="icon-item2"><Bookmark size={20} /></Link>}
-
-          {/* 2. ADD BELL HERE - FOR BOTH ROLES */}
           {currentUser && <NotificationBell />}
 
           {userRole === 'employer' && (
-            <button
-              onClick={() => navigate('/employer/post-job')}
-              className="login-btn" style={{ background: "#22c55e" }}
-            >
+            <button onClick={() => navigate('/employer/post-job')} className="login-btn" style={{ background: "#22c55e" }}>
               <Plus size={16} /> Post Job
             </button>
           )}
@@ -121,8 +143,6 @@ function Navbar() {
           {mobileMenuOpen? <X size={24} /> : <Menu size={24} />}
         </button>
         <div className="logo"><Link to="/"><img src="Logo.jpg" alt="NijaJobs logo" className="logo-img" /></Link></div>
-
-        {/* 3. ADD BELL TO MOBILE TOP BAR */}
         {currentUser && <NotificationBell />}
 
         {!currentUser && <Link to="/login" className="mobile-login-btn">Join now</Link>}
@@ -154,7 +174,7 @@ function Navbar() {
             <>
               <Link to="/employer/jobs" className="drawer-item" onClick={toggleMobileMenu}><FileText size={18} /><span>Manage Jobs</span></Link>
               <Link to="/employer/post-job" className="drawer-item" onClick={toggleMobileMenu}><Plus size={18} /><span>Post Job</span></Link>
-              <Link to="/employer/applicants" className="drawer-item" onClick={toggleMobileMenu}><Users size={18} /><span>Applicants</span></Link>
+              <button className="drawer-item" onClick={handleGoToApplicants}><Users size={18} /><span>Applicants</span></button> {/* CHANGED */}
               <Link to="/employer/messages" className="drawer-item" onClick={toggleMobileMenu}><MessageSquare size={18} /><span>Messages</span></Link>
               <Link to="/employer/profile" className="drawer-item" onClick={toggleMobileMenu}><Building2 size={18} /><span>Company Profile</span></Link>
             </>
@@ -169,7 +189,6 @@ function Navbar() {
 
           <div className="drawer-divider"></div>
           <Link to="/settings" className="drawer-item" onClick={toggleMobileMenu}><Settings size={18} /><span>Account Settings</span></Link>
-          {/* REMOVED OLD NOTIFICATION LINK - NOW IT'S THE BELL */}
           <button className="drawer-item logout-btn" onClick={handleLogout}><LogOut size={18} /><span>{currentUser? "Logout" : "Login"}</span></button>
         </div>
       </div>
@@ -178,21 +197,21 @@ function Navbar() {
       <nav className="mobile-bottom-nav">
         <Link to="/" className={`mobile-nav-item ${isActive("/")}`}><Home size={22} /><span>Home</span></Link>
 
+        {userRole === 'employer' && (
+          <>
+            <Link to="/employer/jobs" className={`mobile-nav-item ${isActive("/employer/jobs")}`}><FileText size={22} /><span>Jobs</span></Link>
+            <Link to="/employer/post-job" className={`mobile-nav-item ${isActive("/employer/post-job")}`}><Plus size={22} /><span>Post</span></Link>
+            <button className={`mobile-nav-item ${isActive("/employer/applicants")}`} onClick={handleGoToApplicants}><Users size={22} /><span>Applicants</span></button> {/* CHANGED */}
+            <Link to="/employer/messages" className={`mobile-nav-item ${isActive("/employer/messages")}`}><MessageSquare size={22} /><span>Messages</span></Link>
+          </>
+        )}
+
         {userRole === 'jobseeker' && (
           <>
             <Link to="/jobs" className={`mobile-nav-item ${isActive("/jobs")}`}><Briefcase size={22} /><span>Jobs</span></Link>
             <Link to="/saved" className={`mobile-nav-item ${isActive("/saved")}`}><Bookmark size={22} /><span>Saved</span></Link>
             <Link to="/articles" className={`mobile-nav-item ${isActive("/articles")}`}><Newspaper size={22} /><span>Articles</span></Link>
             <Link to="/companies" className={`mobile-nav-item ${isActive("/companies")}`}><Building2 size={22} /><span>Companies</span></Link>
-          </>
-        )}
-
-        {userRole === 'employer' && (
-          <>
-            <Link to="/employer/jobs" className={`mobile-nav-item ${isActive("/employer/jobs")}`}><FileText size={22} /><span>Jobs</span></Link>
-            <Link to="/employer/post-job" className={`mobile-nav-item ${isActive("/employer/post-job")}`}><Plus size={22} /><span>Post</span></Link>
-            <Link to="/employer/applicants" className={`mobile-nav-item ${isActive("/employer/applicants")}`}><Users size={22} /><span>Applicants</span></Link>
-            <Link to="/employer/messages" className={`mobile-nav-item ${isActive("/employer/messages")}`}><MessageSquare size={22} /><span>Messages</span></Link>
           </>
         )}
 

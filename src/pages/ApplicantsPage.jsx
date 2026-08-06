@@ -26,7 +26,7 @@ export default function ApplicantsPage() {
 
   const [job, setJob] = useState(null);
   const [applicants, setApplicants] = useState([]);
-  const [loading, setLoading] = useState(true);
+  // REMOVED: const [loading, setLoading] = useState(true);
   const [filter, setFilter] = useState("All");
   const [selectedApplicant, setSelectedApplicant] = useState(null);
 
@@ -44,6 +44,36 @@ export default function ApplicantsPage() {
     });
   };
 
+
+const handleMessageApplicant = async (applicant) => {
+  // 1. Check if conversation already exists
+  const q = query(
+    collection(db, "conversations"),
+    where("jobId", "==", jobId),
+    where("participants", "array-contains", currentUser.uid)
+  );
+  const snap = await getDocs(q);
+  let convoId = null;
+  snap.forEach(d => {
+    if(d.data().participants.includes(applicant.userId)) convoId = d.id;
+  });
+
+  // 2. If not, create new conversation
+  if(!convoId){
+    const newConvo = await addDoc(collection(db, "conversations"), {
+      jobId: jobId,
+      jobTitle: job.title,
+      participants: [currentUser.uid, applicant.userId],
+      lastMessage: "",
+      lastMessageAt: serverTimestamp()
+    });
+    convoId = newConvo.id;
+  }
+  // 3. Navigate to messages
+  navigate(`/messages/${convoId}`);
+};
+
+
   useEffect(() => {
     const fetchData = async () => {
       const jobSnap = await getDoc(doc(db, "jobs", jobId));
@@ -54,7 +84,7 @@ export default function ApplicantsPage() {
       const apps = appSnap.docs.map(d => ({ id: d.id,...d.data() }));
       console.log("Applicants from DB:", apps) // DEBUG
       setApplicants(apps);
-      setLoading(false);
+      // REMOVED: setLoading(false);
     };
     fetchData();
   }, [jobId]);
@@ -69,7 +99,7 @@ export default function ApplicantsPage() {
 
   const filteredApplicants = filter === "All"? applicants : applicants.filter(a => a.status === filter);
 
-  if (loading) return <div className="app-loading">Loading applicants...</div>;
+  // REMOVED LOADING CHECK
   if (!job) return <div className="app-loading">Job not found</div>;
 
   return (
@@ -118,6 +148,9 @@ export default function ApplicantsPage() {
                   <button onClick={() => updateStatus(app.id, "Reviewed")}><Eye size={14} /> Review</button>
                   <button className="accept" onClick={() => updateStatus(app.id, "Accepted")}><CheckCircle size={14} /> Accept</button>
                   <button className="reject" onClick={() => updateStatus(app.id, "Rejected")}><XCircle size={14} /> Reject</button>
+                  <button className="btn-outline" onClick={() => handleMessageApplicant(app)}>
+                  <Mail size={16} /> Message
+                     </button>
                 </div>
               </div>
 
@@ -142,6 +175,12 @@ export default function ApplicantsPage() {
               <div className="modal-actions">
                 <button className="accept" onClick={() => {updateStatus(selectedApplicant.id, "Accepted"); setSelectedApplicant(null)}}><CheckCircle size={14} /> Accept</button>
                 <button className="reject" onClick={() => {updateStatus(selectedApplicant.id, "Rejected"); setSelectedApplicant(null)}}><XCircle size={14} /> Reject</button>
+                <button className="btn-outline" onClick={() => {handleMessageApplicant(selectedApplicant); setSelectedApplicant(null)}}>
+  <Mail size={16} /> Message
+</button>
+                <button className="btn-outline" onClick={() => handleMessageApplicant(app)}>
+                <Mail size={16} /> Message
+                 </button>
               </div>
             </div>
           </div>

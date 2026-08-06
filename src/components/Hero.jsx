@@ -110,8 +110,8 @@ function Hero() {
             <div className="chip-grid">
               <button onClick={() => navigate('/employer/jobs')}> Manage Jobs</button>
               <button onClick={() => navigate('/employer/applicants/:jobId')}> Applicants</button>
-              <button onClick={() => navigate('/employer/messages')}> Messages</button>
-              <button onClick={() => navigate('/employer/company-profile')}> Company Profile</button>
+              <button onClick={() => navigate('/message')}> Messages</button>
+              <button onClick={() => navigate('/employer/profile')}> Company Profile</button>
             </div>
           </div>
         </section>

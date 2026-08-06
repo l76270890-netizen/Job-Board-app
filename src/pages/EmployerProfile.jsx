@@ -1,11 +1,13 @@
 import React, { useState, useEffect } from 'react';
+import { useNavigate, useLocation, useParams } from "react-router-dom";
 import './EmployerProfile.css';
-import { Building2, Upload, Globe, Users, Save, X, Plus, Trash2, CheckCircle } from 'lucide-react';
+import { Building2, Upload, Globe, Users, Save, X, Plus, Trash2, CheckCircle, ArrowLeft } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
 import { db } from '../firebase';
 import { doc, getDoc, updateDoc, setDoc } from 'firebase/firestore';
 
 function EmployerProfile() {
+   const navigate = useNavigate();
   const { currentUser, userData } = useAuth();
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
@@ -109,6 +111,9 @@ function EmployerProfile() {
 
   return (
     <div className="profile-container">
+       <button className="detailBackBtn" onClick={() => navigate(-1)}>
+          <ArrowLeft size={20} /> Back
+        </button>
       <div className="profile-header">
         <h1><Building2 /> Company Profile</h1>
         {!editing? (

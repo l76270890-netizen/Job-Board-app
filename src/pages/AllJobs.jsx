@@ -339,7 +339,7 @@ useEffect(() => {
               <div className="mobileCard" key={job.id} onClick={() => navigate(`/jobs/${job.id}`, { state: job })}>
                 <div className="mobileTop">
                   <img src={job.logo} alt={job.company} />
-                  <Bookmark size={18} onClick={(e) => handleToggleSave(e, job.id)} fill={job.is_saved? "#16a34a" : "none"} color={job.is_saved? "#16a34a" : "currentColor"} style={{ cursor: 'pointer', position:"relative", left:"19.5rem" }} />
+                  <Bookmark size={18} onClick={(e) => handleToggleSave(e, job.id)} fill={job.is_saved? "#16a34a" : "none"} color={job.is_saved? "#16a34a" : "currentColor"} style={{ cursor: 'pointer' }} />
                 </div>
                 <h3>{job.title}</h3>
                 <p className="companyName">{job.company}</p>

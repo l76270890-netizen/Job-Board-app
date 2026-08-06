@@ -70,6 +70,9 @@ function App() {
             path="/employer/applicants/:jobId" 
             element={<ProtectedRoute><ApplicantsPage /></ProtectedRoute>} 
           />
+          
+         <Route path="/messages/:chatId?" element={<MessagesPage />} />
+
         </Routes>
       </BrowserRouter>
     </AuthProvider>

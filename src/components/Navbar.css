@@ -44,7 +44,7 @@
 
 .desktop-navbar .nav a:hover,
 .desktop-navbar .nav a.active-tab {
-  color: #2563eb;
+  color: #15803D;
 }
 
 .navbar-right {
@@ -128,7 +128,13 @@
 }
 
 
-
+.nav-link-btn { background: none; border: none; font: inherit; cursor: pointer; color: #666; padding: 0; }
+.nav-link-btn:hover{
+  color: #15803D;
+}
+.nav-link-btn.active-tab { color: #2563eb; font-weight: 600; }
+.drawer-item { background: none; border: none; width: 100%; text-align: left; }
+.mobile-nav-item { background: none; border: none; }
 
 
 
@@ -180,7 +186,8 @@
    .logo-img {
     height: 33px;
     position: relative;
-    left:18px;
+    left:-45px;
+    margin-left: 150px;
   }
   /* TOP BAR */
   .mobile-top-bar {

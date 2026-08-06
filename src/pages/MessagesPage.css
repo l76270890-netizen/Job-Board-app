@@ -193,7 +193,7 @@
 /* ===== MOBILE RESPONSIVE ===== */
 @media (max-width: 768px) {
   .messages-container {
-    height: 100vh;
+    height: 90vh;
     border: none;
     border-radius: 0;
     margin: 0;

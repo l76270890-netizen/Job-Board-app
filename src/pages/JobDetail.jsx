@@ -144,62 +144,44 @@ function JobDetail() {
   }
 
   // UPDATED: Real Firestore submit + NOTIFICATION
-const handleApplySubmit = async () => {
-  if (!resume) return alert("Please upload your resume");
+  const handleApplySubmit = async () => {
+    if (!resume) return alert("Please upload your resume");
 
-  setSubmitting(true);
-  try {
-    const applicantName = userData?.name || currentUser.displayName || currentUser.email;
+    setSubmitting(true);
+    try {
+      const applicantName = userData?.name || currentUser.displayName || currentUser.email;
 
-    // 1. CONVERT RESUME TO BASE64 URL - so employer can view it
-    const resumeUrl = await new Promise((resolve) => {
-      const reader = new FileReader();
-      reader.onload = () => resolve(reader.result);
-      reader.readAsDataURL(resume);
-    });
+      // 1. Save application to Firestore
+      await addDoc(collection(db, "applications"), {
+        jobId: job.id,
+        jobTitle: job.title,
+        company: job.company,
+        employerId: job.companyId,
+        userId: currentUser.uid,
+        userEmail: currentUser.email,
+        applicantName: applicantName, // ADDED
+        resumeName: resume.name,
+        coverLetter: coverLetter,
+        status: "pending",
+        appliedAt: serverTimestamp()
+      });
 
-    // 2. GET FULL JOBSEEKER PROFILE
-    const userSnap = await getDoc(doc(db, "users", currentUser.uid));
-    const userProfile = userSnap.data() || {};
+      // 2. SEND NOTIFICATION TO EMPLOYER - ADDED
+      await createNotification(job.companyId, job.title, applicantName, job.id);
 
-    // 3. Save application to Firestore with ALL details
-    await addDoc(collection(db, "applications"), {
-      jobId: job.id,
-      jobTitle: job.title,
-      company: job.company,
-      employerId: job.companyId,
-      
-      userId: currentUser.uid,
-      applicantName: applicantName,
-      userEmail: currentUser.email,
-      phone: userProfile.phone || "",
-      bio: userProfile.bio || "",
-      skills: userProfile.skills || [],
-      profilePic: userProfile.photoURL || "",
-      
-      resumeName: resume.name,
-      resumeUrl: resumeUrl, // NOW EMPLOYER CAN VIEW IT
-      coverLetter: coverLetter,
-      status: "Pending",
-      appliedAt: serverTimestamp()
-    });
+      setApplied(true);
+      setShowApplyModal(false);
+      setResume(null);
+      setCoverLetter("");
 
-    // 4. SEND NOTIFICATION TO EMPLOYER
-    await createNotification(job.companyId, job.title, applicantName, job.id);
+      alert(`✅ Application Submitted Successfully!\n\nYour application for "${job.title}" at ${job.company} has been sent. The recruiter will review it and contact you soon.`);
 
-    setApplied(true);
-    setShowApplyModal(false);
-    setResume(null);
-    setCoverLetter("");
-
-    alert(`✅ Application Submitted Successfully!\n\nYour application for "${job.title}" at ${job.company} has been sent.`);
-
-  } catch (error) {
-    console.error("Error applying:", error);
-    alert("Failed to submit application. Please try again.");
-  }
-  setSubmitting(false);
-};
+    } catch (error) {
+      console.error("Error applying:", error);
+      alert("Failed to submit application. Please try again.");
+    }
+    setSubmitting(false);
+  };
 
   const handleMessageRecruiter = () =>{
     requireAuth(() => {

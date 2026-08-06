@@ -9,11 +9,12 @@ import {
   X
 } from "lucide-react";
 import { useState, useEffect } from "react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useLocation, useParams } from "react-router-dom";
 import { jobs as allJobs } from "./AllJobs"; // import your jobs array
 import { useAuth } from "../context/AuthContext"; 
 
 export default function SavedJobs() {
+  const navigate = useNavigate();
   const { currentUser } = useAuth();
   const [savedJobs, setSavedJobs] = useState([]);
 

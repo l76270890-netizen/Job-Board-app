@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import "./ManageJobs.css";
 import { Plus, Edit, Trash2, Users, Eye, Briefcase, MapPin, Calendar, ArrowLeft } from "lucide-react";
 import { useNavigate } from "react-router-dom";
@@ -10,7 +10,7 @@ function ManageJobs() {
   const navigate = useNavigate();
   const { currentUser } = useAuth();
   const [jobs, setJobs] = useState([]);
-  const [loading, setLoading] = useState(true);
+  // REMOVED: const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     if (!currentUser) return navigate('/login');
@@ -18,7 +18,7 @@ function ManageJobs() {
   }, [currentUser]);
 
   const fetchJobs = async () => {
-    setLoading(true);
+    // REMOVED: setLoading(true);
     try {
       // 1. Get all jobs for this employer
       const q = query(
@@ -45,7 +45,7 @@ function ManageJobs() {
     } catch (error) {
       console.error("Error fetching jobs:", error);
     }
-    setLoading(false);
+    // REMOVED: setLoading(false);
   };
 
   const handleDelete = async (jobId) => {
@@ -57,9 +57,9 @@ function ManageJobs() {
 
   return (
     <div className="manage1-container">
-          <button className="detailBackBtn1" onClick={() => navigate(-1)}>
-          <ArrowLeft size={20} /> Back
-        </button>
+      <button className="detailBackBtn1" onClick={() => navigate(-1)}>
+        <ArrowLeft size={20} /> Back
+      </button>
       <div className="manage1-header">
         <div>
           <h1>Manage Jobs</h1>
@@ -70,9 +70,7 @@ function ManageJobs() {
         </button>
       </div>
 
-      {loading? (
-        <div className="loading1">Loading your jobs...</div>
-      ) : jobs.length === 0? (
+      {jobs.length === 0? ( // REMOVED loading check
         <div className="empty1-state">
           <Briefcase size={48} />
           <h2>No jobs posted yet</h2>
@@ -92,7 +90,7 @@ function ManageJobs() {
                 </div>
                 <div className="applicants-count1">
                   <Users size={16} />
-                  <span>{job.applicantCount} Applicants</span> {/* NOW LIVE COUNT */}
+                  <span>{job.applicantCount} Applicants</span>
                 </div>
               </div>
 
@@ -105,9 +103,6 @@ function ManageJobs() {
               <p className="job-description1">{job.description?.slice(0, 120)}...</p>
 
               <div className="job-card-actions1">
-                
-
-                {/* NEW: APPLICANTS BUTTON */}
                 <button className="btn-applicants1" onClick={() => navigate(`/employer/applicants/${job.id}`)}>
                   <Users size={16} /> Applicants
                 </button>

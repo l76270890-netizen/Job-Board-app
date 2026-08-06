@@ -224,7 +224,7 @@
 
 /* MOBILE RESPONSIVE */
 @media (max-width: 768px) {
-  .profile-container { padding: 12px; }
+  .profile-container { padding: 12px; margin-top: -40px; }
   .profile-header h1 { font-size: 1.4rem; }
   .profile-banner { height: 160px; margin-bottom: -30px; }
   .profile-logo { width: 80px; height: 80px; }
@@ -232,7 +232,8 @@
   .profile-grid {
     grid-template-columns: 1fr; /* stack on mobile */
   }
-  .profile-card { padding: 16px; }
+  .profile-card { padding: 16px;
+  display: inline-block; }
   .btn-edit, .btn-save, .btn-cancel { padding: 8px 14px; font-size: 0.9rem; }
 }
 
