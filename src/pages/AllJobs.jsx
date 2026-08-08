@@ -1,3 +1,4 @@
+
 import "./AllJobs.css";
 import {
   Search, MapPin, Bookmark, Briefcase, DollarSign, ArrowLeft, SlidersHorizontal,
@@ -6,12 +7,11 @@ import {
 import { useState, useMemo, useEffect } from "react";
 import { useNavigate, useSearchParams, useLocation } from "react-router-dom";
 import { useAuth } from "../context/AuthContext";
-import { collection, query, where, getDocs, orderBy } from "firebase/firestore"; // ADDED
-import { db } from "../firebase"; // ADDED
+import { collection, query, where, getDocs, orderBy, doc, updateDoc, arrayUnion, arrayRemove, onSnapshot } from "firebase/firestore"; // ADDED
+import { db } from "../firebase";
 
 export const jobs = [
-  // TEACHING - 7
- 
+  // TEACHING - 7 - paste your static jobs here
 ];
 
 const DESKTOP_JOBS_PER_PAGE = 9;
@@ -42,23 +42,32 @@ export default function AllJobs() {
   const [searchLocation, setSearchLocation] = useState("");
   const [sortBy, setSortBy] = useState("Newest");
   const [currentPage, setCurrentPage] = useState(1);
-  const [jobsList, setJobsList] = useState([]); // CHANGED: start empty
+  const [jobsList, setJobsList] = useState([]);
   const [filters, setFilters] = useState({ category: [], type: [], experience: [], salary: [] });
-  const [loading, setLoading] = useState(true); // ADDED
+  const [loading, setLoading] = useState(true);
+  const [savedIds, setSavedIds] = useState([]); // NEW: from Firebase
 
   const sortOptions = ["Newest", "Oldest", "A-Z", "Z-A", "Salary: High-Low", "Salary: Low-High"];
   const allCategories = ["Teaching", "Business", "IT", "Finance", "Healthcare", "Marketing", "Technology"];
 
- // ADDED: Fetch Firestore jobs and merge with static jobs
-useEffect(() => {
+ // 1. LISTEN TO FIREBASE SAVED JOBS
+ useEffect(() => {
+   if (!currentUser) return;
+   const userRef = doc(db, "users", currentUser.uid);
+   const unsub = onSnapshot(userRef, (snap) => {
+     if (snap.exists()) {
+       setSavedIds(snap.data().savedJobs || []);
+     }
+   });
+   return () => unsub();
+ }, [currentUser]);
+
+ // 2. LOAD JOBS + MERGE WITH SAVED STATE
+ useEffect(() => {
   const fetchJobs = async () => {
     setLoading(true);
     try {
-      // 1. Get jobs from Firestore - REMOVE the status filter for now
-      const q = query(
-        collection(db, "jobs"),
-        orderBy("createdAt", "desc")
-      );
+      const q = query(collection(db, "jobs"), orderBy("createdAt", "desc"));
       const snapshot = await getDocs(q);
       const firestoreJobs = snapshot.docs.map(doc => {
         const data = doc.data();
@@ -69,7 +78,7 @@ useEffect(() => {
           logo: "https://via.placeholder.com/40",
           location: data.location || "Remote",
           type: data.jobType || "Full-time",
-          salary: data.salaryMax || data.salaryMin || 50000, // use ₦50k default
+          salary: data.salaryMax || data.salaryMin || 50000,
           category: data.category || "Other",
           experience: data.experience || "Mid-Level",
           postedDate: data.createdAt?.toDate().toISOString().split('T')[0] || "2026-01-01",
@@ -81,27 +90,21 @@ useEffect(() => {
         }
       });
 
-      // 2. Get saved jobs from localStorage
-      const savedIds = JSON.parse(localStorage.getItem('savedJobs')) || [];
-
-      // 3. Merge static + firestore jobs
       const allJobs = [...jobs,...firestoreJobs].map(job => ({
-       ...job,
-        is_saved: savedIds.includes(job.id)
+      ...job,
+        is_saved: savedIds.includes(String(job.id)) // Check Firebase
       }));
 
-      console.log("Jobs loaded:", allJobs.length); // debug
       setJobsList(allJobs);
     } catch (error) {
       console.error("Error fetching jobs:", error);
-      setJobsList(jobs); // fallback to static
+      setJobsList(jobs.map(job => ({...job, is_saved: savedIds.includes(String(job.id))})));
     }
     setLoading(false);
   };
   fetchJobs();
-}, []);
+ }, [savedIds]); // re-run when savedIds changes
 
-  // READ FILTERS FROM HERO
   useEffect(() => {
     const state = location.state;
     if (state) {
@@ -136,21 +139,20 @@ useEffect(() => {
     navigate('/jobs');
   };
 
-  const handleToggleSave = (e, jobId) => {
+  // 3. FIXED: NOW SAVES TO FIREBASE
+  const handleToggleSave = async (e, jobId) => {
     e.stopPropagation();
-    requireAuth(() => {
-      const savedIds = JSON.parse(localStorage.getItem('savedJobs')) || [];
-      let newSavedIds;
-      if (savedIds.includes(jobId)) {
-        newSavedIds = savedIds.filter(id => id!== jobId);
-      } else {
-        newSavedIds = [...savedIds, jobId];
-      }
-      localStorage.setItem('savedJobs', JSON.stringify(newSavedIds));
-      setJobsList(prev => prev.map(job => job.id === jobId? {...job, is_saved:!job.is_saved } : job));
-      if(activeTab === "saved" && savedIds.includes(jobId)) {
-        setCurrentPage(1);
-      }
+    requireAuth(async () => {
+      const userRef = doc(db, "users", currentUser.uid);
+      const jobIdStr = String(jobId);
+      const isSaved = savedIds.includes(jobIdStr);
+
+      await updateDoc(userRef, {
+        savedJobs: isSaved
+        ? arrayRemove(jobIdStr)
+          : arrayUnion(jobIdStr)
+      });
+      // UI updates automatically because of onSnapshot
     })
   };
 
@@ -161,10 +163,8 @@ useEffect(() => {
     })
   }
 
-  // MAIN FILTER + SEARCH LOGIC
   const filteredJobs = useMemo(() => {
     let result = [...jobsList];
-
     if (searchTitle) {
       const query = searchTitle.toLowerCase();
       result = result.filter(j =>
@@ -175,12 +175,10 @@ useEffect(() => {
         j.skills.some(skill => skill.toLowerCase().includes(query))
       );
     }
-
     if (searchLocation) {
       const locQuery = searchLocation.toLowerCase();
       result = result.filter(j => j.location.toLowerCase().includes(locQuery));
     }
-
     if (filters.category.length) result = result.filter(j => filters.category.includes(j.category));
     if (filters.type.length) result = result.filter(j => filters.type.includes(j.type));
     if (filters.experience.length) result = result.filter(j => filters.experience.includes(j.experience));
@@ -192,14 +190,12 @@ useEffect(() => {
         return false;
       }))
     }
-
     if (sortBy === "Newest") result.sort((a, b) => new Date(b.postedDate) - new Date(a.postedDate));
     if (sortBy === "Oldest") result.sort((a, b) => new Date(a.postedDate) - new Date(b.postedDate));
     if (sortBy === "A-Z") result.sort((a, b) => a.title.localeCompare(b.title));
     if (sortBy === "Z-A") result.sort((a, b) => b.title.localeCompare(a.title));
     if (sortBy === "Salary: High-Low") result.sort((a, b) => b.salary - a.salary);
     if (sortBy === "Salary: Low-High") result.sort((a, b) => a.salary - b.salary);
-
     return result;
   }, [searchTitle, searchLocation, filters, sortBy, jobsList]);
 
@@ -274,7 +270,7 @@ useEffect(() => {
                   <div className="jobTags"><span>{job.category}</span><span>{job.type}</span><span>{job.location}</span></div>
                   <p className="des">{job.description}</p>
                   <div className="salaryRow">
-                    <div>₦{job.salary.toLocaleString()}/mo</div> {/* CHANGED: $ to ₦ */}
+                    <div>₦{job.salary.toLocaleString()}/mo</div>
                     <button onClick={(e) => handleApplyClick(e, job)}>Apply</button>
                   </div>
                 </div>
@@ -291,25 +287,13 @@ useEffect(() => {
        <div className="mobileSearch">
   <div className="mobileSearchBox">
     <Search size={18} />
-    <input
-      type="text"
-      placeholder="Job title, skills, company"
-      value={searchTitle}
-      onChange={e => setSearchTitle(e.target.value)}
-    />
+    <input type="text" placeholder="Job title, skills, company" value={searchTitle} onChange={e => setSearchTitle(e.target.value)} />
     <SlidersHorizontal size={18} className="mobile-search-options" onClick={() => setShowDropdown(!showDropdown)} />
   </div>
-
   <div className="mobileSearchBox" style={{marginTop: "10px"}}>
     <MapPin size={18} />
-    <input
-      type="text"
-      placeholder="Location"
-      value={searchLocation}
-      onChange={e => setSearchLocation(e.target.value)}
-    />
+    <input type="text" placeholder="Location" value={searchLocation} onChange={e => setSearchLocation(e.target.value)} />
   </div>
-
   {showDropdown && (
     <div className="mobileDropdown">
       <div className="dropdownHeader"><h4>Sort & Filter</h4><X size={18} onClick={() => setShowDropdown(false)} /></div>
@@ -346,13 +330,12 @@ useEffect(() => {
                 <div className="mobileInfo"><span><MapPin size={14} />{job.location}</span><span><Briefcase size={14} />{job.type}</span><span>{job.category}</span></div>
                 <p className="mobileDesc">{job.description}</p>
                 <div className="mobileBottom">
-                  <div className="salary">₦{job.salary.toLocaleString()}/mo</div> {/* CHANGED: $ to ₦ */}
+                  <div className="salary">₦{job.salary.toLocaleString()}/mo</div>
                   <button onClick={(e) => handleApplyClick(e, job)}>Apply</button>
                 </div>
               </div>
             ))
           ) : (<p className="no-jobs">No jobs found</p>)}
-
           {mobileTotalPages > 1 && (<div className="mobilePagination"><button onClick={() => goToPage(currentPage - 1)} disabled={currentPage === 1} className="pageBtn"><ChevronLeft size={18} /></button>{Array.from({ length: mobileTotalPages }, (_, i) => i + 1).map(page => (<button key={page} onClick={() => goToPage(page)} className={`pageBtn ${currentPage === page? "active" : ""}`}>{page}</button>))}<button onClick={() => goToPage(currentPage + 1)} disabled={currentPage === mobileTotalPages} className="pageBtn"><ChevronRight size={18} /></button></div>)}
         </div>
       </div>

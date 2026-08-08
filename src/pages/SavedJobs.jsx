@@ -1,38 +1,68 @@
-import "./AllJobs.css"; // reuse same styles
-import {
-  Search,
-  MapPin,
-  Bookmark,
-  Briefcase,
-  DollarSign,
-  ArrowLeft,
-  X
-} from "lucide-react";
+import "./AllJobs.css";
+import { Bookmark, ArrowLeft, DollarSign, MapPin, Briefcase } from "lucide-react";
 import { useState, useEffect } from "react";
-import { useNavigate, useLocation, useParams } from "react-router-dom";
-import { jobs as allJobs } from "./AllJobs"; // import your jobs array
-import { useAuth } from "../context/AuthContext"; 
+import { useNavigate, useLocation } from "react-router-dom";
+import { jobs as allJobs } from "./AllJobs"; // your static jobs array
+import { useAuth } from "../context/AuthContext";
+import { db } from "../firebase";
+import { doc, getDoc, updateDoc, arrayRemove, onSnapshot } from "firebase/firestore";
 
 export default function SavedJobs() {
   const navigate = useNavigate();
+  const location = useLocation();
   const { currentUser } = useAuth();
   const [savedJobs, setSavedJobs] = useState([]);
+  const [loading, setLoading] = useState(true);
 
-  // Load saved jobs from localStorage
+  // Load saved jobs from FIREBASE and listen for changes
   useEffect(() => {
-    const savedIds = JSON.parse(localStorage.getItem('savedJobs')) || [];
-    const filtered = allJobs.filter(job => savedIds.includes(job.id));
-    setSavedJobs(filtered);
-  }, []);
+    if (!currentUser) {
+      setLoading(false);
+      return;
+    }
 
-  // Remove from saved
-  const handleRemoveSave = (e, jobId) => {
+    const userRef = doc(db, "users", currentUser.uid);
+
+    // onSnapshot = auto updates when you save/unsave from AllJobs page
+    const unsub = onSnapshot(userRef, (snap) => {
+      if (snap.exists()) {
+        const savedIds = snap.data().savedJobs || [];
+        // convert job.id to string to avoid "1" vs 1 mismatch
+        const filtered = allJobs.filter(job => savedIds.includes(String(job.id)));
+        setSavedJobs(filtered);
+      }
+      setLoading(false);
+    });
+
+    return () => unsub(); // cleanup
+  }, [currentUser]);
+
+  // Remove from saved in FIREBASE
+  const handleRemoveSave = async (e, jobId) => {
     e.stopPropagation();
-    const savedIds = JSON.parse(localStorage.getItem('savedJobs')) || [];
-    const newSavedIds = savedIds.filter(id => id !== jobId);
-    localStorage.setItem('savedJobs', JSON.stringify(newSavedIds));
-    setSavedJobs(prev => prev.filter(job => job.id !== jobId));
+    if (!currentUser) return;
+
+    const userRef = doc(db, "users", currentUser.uid);
+    await updateDoc(userRef, {
+      savedJobs: arrayRemove(String(jobId)) // make sure it's string
+    });
   };
+
+  const handleApply = (e, job) => {
+    e.stopPropagation();
+    if(!currentUser) navigate('/login', {state: {from: location.pathname}})
+    else alert(`Applying for ${job.title}`);
+  };
+
+  if (loading) return <div className="allJobs"><p style={{textAlign: 'center', padding: '40px'}}>Loading...</p></div>
+
+  if (!currentUser) return (
+    <div className="allJobs" style={{textAlign: 'center', padding: '60px'}}>
+      <Bookmark size={48} color="#ccc" />
+      <h3>Please login to see saved jobs</h3>
+      <button className="applyBtn" onClick={() => navigate('/login')}>Login</button>
+    </div>
+  )
 
   return (
     <section className="allJobs">
@@ -40,7 +70,7 @@ export default function SavedJobs() {
         <div className="backHeader">
          <button className="backBtn" onClick={() => navigate(-1)}>
             <ArrowLeft size={22} />
-            <span></span>
+            <span>Back</span>
           </button>
         </div>
 
@@ -51,12 +81,11 @@ export default function SavedJobs() {
 
         <div className="jobsContainer" style={{ gridTemplateColumns: '1fr' }}>
           <div className="jobsGrid">
-            {savedJobs.length > 0 ? (
+            {savedJobs.length > 0? (
               savedJobs.map((job) => (
                 <div className="jobCard" key={job.id} onClick={() => navigate(`/jobs/${job.id}`, { state: job })}>
                   <div className="jobHeader">
                     <img src={job.logo} alt={job.company} />
-                    {/* Bookmark is filled + acts as remove button */}
                     <Bookmark
                       size={20}
                       fill="#2563eb"
@@ -75,11 +104,7 @@ export default function SavedJobs() {
                   <p className="des">{job.description}</p>
                   <div className="salaryRow">
                     <div><DollarSign size={18} />${job.salary.toLocaleString()}/mo</div>
-                    <button onClick={(e) => {
-    e.stopPropagation();
-    if(!currentUser) navigate('/login', {state: {from: location}})
-    else alert(`Applying for ${job.title}`);
-  }}>Apply</button>
+                    <button onClick={(e) => handleApply(e, job)}>Apply</button>
                   </div>
                 </div>
               ))
@@ -88,40 +113,32 @@ export default function SavedJobs() {
                 <Bookmark size={48} color="#ccc" />
                 <h3>No Saved Jobs Yet</h3>
                 <p>Click the bookmark icon on any job to save it here</p>
-                <button className="applyBtn" style={{ marginTop: '16px' }} onClick={() => navigate('/jobs')}>
-                  Browse Jobs
-                </button>
+                <button className="applyBtn" onClick={() => navigate('/jobs')}>Browse Jobs</button>
               </div>
             )}
           </div>
         </div>
       </div>
 
-      {/* MOBILE VIEW */}
+      {/* MOBILE VIEW - same as yours, just replace handleRemoveSave and handleApply */}
       <div className="mobileJobs">
         <div className="mobileBack">
          <button className="backBtn" onClick={() => navigate(-1)}>
             <ArrowLeft size={22} />
-            <span></span>
+            <span>Back</span>
           </button>
         </div>
-    <div className="jobsHero">
+        <div className="jobsHero">
           <h1>Your <span>Saved Jobs</span></h1>
         </div>
         <div className="mobileJobList">
           <p className="resultsCount">{savedJobs.length} jobs saved</p>
-          {savedJobs.length > 0 ? (
+          {savedJobs.length > 0? (
             savedJobs.map((job) => (
               <div className="mobileCard" key={job.id} onClick={() => navigate(`/jobs/${job.id}`, { state: job })}>
                 <div className="mobileTop">
                   <img src={job.logo} alt={job.company} />
-                  <Bookmark
-                    size={18}
-                    fill="#2563eb"
-                    color="#2563eb"
-                    style={{ cursor: 'pointer' }}
-                    onClick={(e) => handleRemoveSave(e, job.id)}
-                  />
+                  <Bookmark size={18} fill="#2563eb" color="#2563eb" onClick={(e) => handleRemoveSave(e, job.id)} />
                 </div>
                 <h3>{job.title}</h3>
                 <p className="companyName">{job.company}</p>
@@ -133,11 +150,7 @@ export default function SavedJobs() {
                 <p className="mobileDesc">{job.description}</p>
                 <div className="mobileBottom">
                   <div className="salary"><DollarSign size={16} />${job.salary.toLocaleString()}/mo</div>
-                   <button onClick={(e) => {
-    e.stopPropagation();
-    if(!currentUser) navigate('/login', {state: {from: location}})
-    else alert(`Applying for ${job.title}`);
-  }}>Apply</button>
+                  <button onClick={(e) => handleApply(e, job)}>Apply</button>
                 </div>
               </div>
             ))
@@ -152,3 +165,27 @@ export default function SavedJobs() {
     </section>
   );
 }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

@@ -134,7 +134,7 @@ function FeaturedJobs() {
   // EMPLOYER VIEW
   if (isEmployer) {
     return (
-      <section className="employer-featured">
+     <section className="employer-featured">
         <div className="desktop-view">
           <div className="featured-header">
             <h2>Welcome back, {userData?.companyName || "Employer"}</h2>
@@ -146,10 +146,10 @@ function FeaturedJobs() {
 
           <div style={{display: 'flex', gap: '16px', marginBottom: '24px'}}>
             <div className="job-card" style={{flex: 1, cursor: 'default'}}>
-              <Briefcase /> <h3>{stats.jobs}</h3> <p>Active Jobs</p>
+              <Briefcase /> <h3>{stats.jobs || 0}</h3> <p>Active Jobs</p> {/* FIXED */}
             </div>
             <div className="job-card" style={{flex: 1, cursor: 'default'}}>
-              <Users /> <h3>{stats.applicants}</h3> <p>Total Applicants</p>
+              <Users /> <h3>{stats.applicants || 0}</h3> <p>Total Applicants</p> {/* FIXED */}
             </div>
           </div>
 
@@ -176,7 +176,7 @@ function FeaturedJobs() {
                   <span className="job-type">{job.jobType}</span>
                   <span className="posted">
                     <Clock3 size={14}/>
-                    {job.applicantCount} Applicants
+                    {job.applicantCount || 0} Applicants {/* FIXED */}
                   </span>
                   <div style={{display: 'flex', gap: '8px'}}>
                     <Users size={18} style={{cursor: 'pointer'}} onClick={() => navigate(`/employer/applicants/${job.id}`)}/>
@@ -212,18 +212,18 @@ function FeaturedJobs() {
           {myJobs.map((job) => (
             <div className="mobileCard1" key={job.id} onClick={() => navigate(`/employer/applicants/${job.id}`)}>
               <div className="mobileTop1">
-                <img src={job.logo} alt={job.companyName} />
+                <img src={job.logo || "https://via.placeholder.com/40"} alt={job.companyName} /> {/* FIXED logo fallback */}
                 <Users size={18}/>
               </div>
               <h3>{job.title}</h3>
               <p className="companyName1">{job.companyName}</p>
               <div className="mobileInfo1">
                 <span><MapPin size={14} />{job.location}</span>
-                <span><Users size={14} />{job.applicantCount} Applicants</span>
+                <span><Users size={14} />{job.applicantCount || 0} Applicants</span> {/* FIXED */}
               </div>
               <div className="mobileBottom1">
                 <div className="salary1">{job.jobType}</div>
-                 <div className="salary1">₦{Number(job.salary).toLocaleString()}/mo</div> {/* CHANGED $ to ₦ */}
+                 <div className="salary1">₦{Number(job.salaryMax || job.salaryMin || 0).toLocaleString()}/mo</div> {/* FIXED */}
                 <button onClick={(e) => {e.stopPropagation(); navigate(`/employer/edit-job/${job.id}`)}}>Edit</button>
               </div>
             </div>

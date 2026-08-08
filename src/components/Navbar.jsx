@@ -175,7 +175,7 @@ function Navbar() {
               <Link to="/employer/jobs" className="drawer-item" onClick={toggleMobileMenu}><FileText size={18} /><span>Manage Jobs</span></Link>
               <Link to="/employer/post-job" className="drawer-item" onClick={toggleMobileMenu}><Plus size={18} /><span>Post Job</span></Link>
               <button className="drawer-item" onClick={handleGoToApplicants}><Users size={18} /><span>Applicants</span></button> {/* CHANGED */}
-              <Link to="/employer/messages" className="drawer-item" onClick={toggleMobileMenu}><MessageSquare size={18} /><span>Messages</span></Link>
+              <Link to="/message" className="drawer-item" onClick={toggleMobileMenu}><MessageSquare size={18} /><span>Messages</span></Link>
               <Link to="/employer/profile" className="drawer-item" onClick={toggleMobileMenu}><Building2 size={18} /><span>Company Profile</span></Link>
             </>
           ) : (
@@ -199,10 +199,10 @@ function Navbar() {
 
         {userRole === 'employer' && (
           <>
-            <Link to="/employer/jobs" className={`mobile-nav-item ${isActive("/employer/jobs")}`}><FileText size={22} /><span>Jobs</span></Link>
-            <Link to="/employer/post-job" className={`mobile-nav-item ${isActive("/employer/post-job")}`}><Plus size={22} /><span>Post</span></Link>
+            <Link to="/employer/jobs" className={`mobile-nav-item ${isActive("/employer/jobs")}`}><FileText size={22} /><span>Manage Jobs</span></Link>
+            <Link to="/employer/post-job" className={`mobile-nav-item ${isActive("/employer/post-job")}`}><Plus size={22} /><span>Post Jobs</span></Link>
             <button className={`mobile-nav-item ${isActive("/employer/applicants")}`} onClick={handleGoToApplicants}><Users size={22} /><span>Applicants</span></button> {/* CHANGED */}
-            <Link to="/employer/messages" className={`mobile-nav-item ${isActive("/employer/messages")}`}><MessageSquare size={22} /><span>Messages</span></Link>
+            <Link to="message" className={`mobile-nav-item ${isActive("/employer/messages")}`}><MessageSquare size={22} /><span>Messages</span></Link>
           </>
         )}
 

@@ -165,10 +165,102 @@
   transition: 0.2s;
 }
 
-.btn-view1:hover { background: #eff6ff; border-color: #3b82f6; color: #2563eb; }
+.btn-view1:hover { background: #eff6ff; border-color: #3b82f6; color: #16a34a; }
 .btn-applicants1:hover { background: #f0fdf4; border-color: #16a34a; color: #16a34a; }
 .btn-edit1:hover { background: #fffbeb; border-color: #f59e0b; color: #d97706; }
 .btn-delete1:hover { background: #fef2f2; border-color: #ef4444; color: #dc2626; }
+
+
+/* Hide mobile on desktop */
+.mobile-manage-jobs {
+  display: none;
+}
+
+/* Show mobile on screens smaller than 768px */
+@media (max-width: 768px) {
+ .desktop-manage-jobs {
+    display: none;
+  }
+ .mobile-manage-jobs {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+    padding: 0 16px;
+  }
+
+ .mobile-job-card1 {
+    background: #fff;
+    border: 1px solid #e5e7eb;
+    border-radius: 12px;
+    padding: 16px;
+    cursor: pointer;
+  }
+
+ .mobile-job-top1 {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    margin-bottom: 8px;
+  }
+ .mobile-job-top1 h3 {
+    font-size: 16px;
+    margin: 4px 0 0 0;
+  }
+ .mobile-job-actions1 {
+    display: flex;
+    gap: 12px;
+  }
+
+ .companyName1 {
+    color: #6b7280;
+    font-size: 14px;
+    margin-bottom: 8px;
+  }
+
+ .mobile-job-meta1 {
+    display: flex;
+    gap: 12px;
+    flex-wrap: wrap;
+    font-size: 13px;
+    color: #4b5563;
+    margin-bottom: 8px;
+  }
+ .mobile-job-meta1 span {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+  }
+
+ .mobile-job-desc1 {
+    font-size: 14px;
+    color: #6b7280;
+    margin-bottom: 12px;
+  }
+
+ .mobile-job-bottom1 {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+ .mobile-job-bottom1 button {
+    background: #16a34a;
+    color: white;
+    border: none;
+    padding: 8px 14px;
+    border-radius: 8px;
+    font-size: 13px;
+    cursor: pointer;
+  }
+ .posted1 {
+    font-size: 12px;
+    color: #9ca3af;
+    display: flex;
+    align-items: center;
+    gap: 4px;
+  }
+}
+
+
 
 /* MOBILE */
 @media (max-width: 640px) {

@@ -1,7 +1,8 @@
 .applicants-container {
   max-width: 1200px;
-  margin: 30px auto;
+  margin: -2px auto;
   padding: 0 20px;
+
 }
 
 .back-btn {
@@ -56,10 +57,10 @@
 }
 
 .applicant-card {
-  background: #fff;
+  background: #ffff;
   border: 1px solid #e5e7eb;
   border-radius: 16px;
-  padding: 24px;
+  padding: 29px;
 }
 
 .applicant-top {
@@ -136,8 +137,9 @@
   cursor: pointer;
 }
 .status-buttons {
-  display: flex;
-  gap: 8px;
+  display: grid;
+  grid-template-columns: repeat(2,1fr);
+  gap: 10px;
 }
 .status-buttons button {
   padding: 8px 12px;

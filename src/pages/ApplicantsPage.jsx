@@ -178,9 +178,7 @@ const handleMessageApplicant = async (applicant) => {
                 <button className="btn-outline" onClick={() => {handleMessageApplicant(selectedApplicant); setSelectedApplicant(null)}}>
   <Mail size={16} /> Message
 </button>
-                <button className="btn-outline" onClick={() => handleMessageApplicant(app)}>
-                <Mail size={16} /> Message
-                 </button>
+               
               </div>
             </div>
           </div>

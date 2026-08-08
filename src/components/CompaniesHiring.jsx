@@ -1,12 +1,11 @@
-
 import { useState, useMemo, useEffect } from "react";
-import { MapPin, Briefcase, Users, Edit, Plus, TrendingUp, Eye } from "lucide-react"; // Added Eye
+import { MapPin, Briefcase, Users, Edit, Plus, TrendingUp, Eye } from "lucide-react";
 import "./CompaniesHiring.css";
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "../context/AuthContext";
 import { jobs as staticJobs } from "../pages/AllJobs";
 import { db } from "../firebase";
-import { collection, query, where, getDocs, onSnapshot } from "firebase/firestore";
+import { collection, query, where, getDocs, onSnapshot, doc, getDoc } from "firebase/firestore";
 
 function CompaniesHiring() {
   const navigate = useNavigate();
@@ -22,37 +21,39 @@ function CompaniesHiring() {
     fetchAllJobs();
   }, []);
 
-  // LIVE STATS FOR EMPLOYER - NOW REALTIME
+  // LIVE STATS FOR EMPLOYER - FIXED TO USE companyId
   useEffect(() => {
-    if (!isEmployer ||!currentUser ||!userData?.companyName) return;
+    if (!isEmployer ||!currentUser) return;
 
-    const jobsRef = collection(db, "jobs");
-    const jobsQ = query(jobsRef, where("companyName", "==", userData.companyName));
+    setLoading(true);
 
+    // 1. Get profileViews from user doc
+    const fetchProfile = async () => {
+      const userSnap = await getDoc(doc(db, "users", currentUser.uid));
+      if(userSnap.exists()) {
+        setMyCompanyStats(prev => ({...prev, profileViews: userSnap.data().profileViews || 0}));
+      }
+    }
+    fetchProfile();
+
+    // 2. LIVE JOB COUNT - use companyId not companyName
+    const jobsQ = query(collection(db, "jobs"), where("companyId", "==", currentUser.uid));
     const unsubJobs = onSnapshot(jobsQ, (snapshot) => {
       const jobs = snapshot.docs.map(doc => ({ id: doc.id,...doc.data() }));
-      const jobCount = jobs.filter(j => j.status!== 'closed').length; // only count active
+      const jobCount = jobs.filter(j => j.status!== 'closed').length;
 
-      setMyCompanyStats(prev => ({
-       ...prev,
-        jobCount,
-        profileViews: userData.profileViews || 0 // from user doc
-      }));
+      setMyCompanyStats(prev => ({...prev, jobCount }));
     });
 
-    // LIVE APPLICANT COUNT
-    const appsRef = collection(db, "applications");
-    const appsQ = query(appsRef, where("companyName", "==", userData.companyName));
+    // 3. LIVE APPLICANT COUNT - use companyId not companyName
+    const appsQ = query(collection(db, "applications"), where("companyId", "==", currentUser.uid));
     const unsubApps = onSnapshot(appsQ, (snapshot) => {
-      setMyCompanyStats(prev => ({
-       ...prev,
-        applicantCount: snapshot.size
-      }));
+      setMyCompanyStats(prev => ({...prev, applicantCount: snapshot.size }));
       setLoading(false);
     });
 
     return () => { unsubJobs(); unsubApps(); }
-  }, [isEmployer, currentUser, userData]);
+  }, [isEmployer, currentUser]);
 
   const fetchAllJobs = async () => {
     try {
@@ -67,10 +68,8 @@ function CompaniesHiring() {
 
   const allJobs = useMemo(() => [...staticJobs,...firestoreJobs], [firestoreJobs]);
 
-  // GENERATE ALL COMPANIES FROM JOBS - MERGED
   const companies = useMemo(() => {
     const companyMap = new Map();
-
     allJobs.forEach(job => {
       const companyName = job.company || job.companyName;
       if (!companyName) return;
@@ -85,20 +84,19 @@ function CompaniesHiring() {
         });
       }
       const company = companyMap.get(companyName);
-      if(job.status!== 'closed') company.jobCount += 1; // only count active jobs
+      if(job.status!== 'closed') company.jobCount += 1;
       if (job.logo) company.logo = job.logo;
       if (job.location) company.location = job.location;
     });
     return Array.from(companyMap.values());
   }, [allJobs]);
 
-  // 1. GET SIMILAR COMPANIES FOR EMPLOYER
   const similarCompanies = useMemo(() => {
     if (!isEmployer ||!userData?.industry) return [];
     return companies
-    .filter(c => c.industry === userData.industry && c.name!== userData.companyName)
-    .sort((a, b) => b.jobCount - a.jobCount)
-    .slice(0, 3);
+   .filter(c => c.industry === userData.industry && c.name!== userData.companyName)
+   .sort((a, b) => b.jobCount - a.jobCount)
+   .slice(0, 3);
   }, [companies, isEmployer, userData]);
 
   const filteredCompanies = companies.filter((company) => {
@@ -116,9 +114,10 @@ function CompaniesHiring() {
     navigate(`/company/${encodeURIComponent(companyName)}`);
   };
 
+  if (loading && isEmployer) return <p style={{textAlign: 'center', padding: '40px'}}>Loading stats...</p>
   if (loading) return <p style={{textAlign: 'center', padding: '40px'}}>Loading...</p>
 
-  // 2. EMPLOYER VIEW - UPDATED WITH 3 REAL STATS
+  // EMPLOYER VIEW - FIXED WITH REAL NUMBERS
   if (isEmployer) {
     const myCompany = {
       name: userData.companyName,
@@ -159,21 +158,21 @@ function CompaniesHiring() {
               <div className="stat-item">
                 <Briefcase size={16} />
                 <div>
-                  <h4>{myCompanyStats.jobCount}</h4>
+                  <h4>{myCompanyStats.jobCount || 0}</h4> {/* || 0 to prevent NaN */}
                   <p>Active Jobs</p>
                 </div>
               </div>
               <div className="stat-item">
                 <Users size={16} />
                 <div>
-                  <h4>{myCompanyStats.applicantCount}</h4>
+                  <h4>{myCompanyStats.applicantCount || 0}</h4>
                   <p>Applicants</p>
                 </div>
               </div>
               <div className="stat-item">
-                <Eye size={16} /> {/* CHANGED ICON */}
+                <Eye size={16} />
                 <div>
-                  <h4>{myCompanyStats.profileViews}</h4>
+                  <h4>{myCompanyStats.profileViews || 0}</h4>
                   <p>Views</p>
                 </div>
               </div>
@@ -196,7 +195,6 @@ function CompaniesHiring() {
           </article>
         </div>
 
-        {/* 3. SIMILAR COMPANIES SECTION - NOW LIVE */}
         {similarCompanies.length > 0 && (
           <>
             <div className="companies-header" style={{marginTop: '40px'}}>
@@ -222,7 +220,7 @@ function CompaniesHiring() {
     );
   }
 
-  // 4. JOBSEEKER VIEW - UNTOUCHED
+  // JOBSEEKER VIEW - UNTOUCHED
   return (
     <section className="companies-section">
       <div className="companies-header">
@@ -279,11 +277,12 @@ function CompaniesHiring() {
   );
 };
 
-// NEW: Component for live job count on similar companies
+// Component for live job count on similar companies
 function CompanyCardWithLiveCount({ company, onClick }) {
   const [jobCount, setJobCount] = useState(company.jobCount);
 
   useEffect(() => {
+    // FIX: query by companyName to match jobs
     const q = query(collection(db, "jobs"), where("companyName", "==", company.name));
     const unsubscribe = onSnapshot(q, (snapshot) => {
       const activeJobs = snapshot.docs.filter(d => d.data().status!== 'closed').length;

@@ -473,7 +473,7 @@
     align-items:center;
     margin-bottom:8px;
     margin-top: 65px; /* too big for small phones */
-    padding: 0 16px;
+    padding: 0 1px;
   }
 
   .featured-header h2{
@@ -525,7 +525,7 @@
     justify-content:space-between;
     align-items:center;
     margin-bottom:8px;
-    margin-top: 60px;
+    margin-top: 80px;
 }
 
 
