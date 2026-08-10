@@ -171,6 +171,10 @@
 .btn-delete1:hover { background: #fef2f2; border-color: #ef4444; color: #dc2626; }
 
 
+.spin { animation: spin 1s linear infinite; }
+@keyframes spin { 100% { transform: rotate(360deg); } }
+
+
 /* Hide mobile on desktop */
 .mobile-manage-jobs {
   display: none;
@@ -258,6 +262,9 @@
     align-items: center;
     gap: 4px;
   }
+
+  .spin { animation: spin 1s linear infinite; }
+@keyframes spin { 100% { transform: rotate(360deg); } }
 }
 
 

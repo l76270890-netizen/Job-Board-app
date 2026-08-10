@@ -1,57 +1,100 @@
 import { useEffect, useState } from "react";
 import "./ManageJobs.css";
-import { Plus, Edit, Trash2, Users, Eye, Briefcase, MapPin, Calendar, ArrowLeft } from "lucide-react";
+import { Plus, Edit, Trash2, Users, Eye, Briefcase, MapPin, Calendar, ArrowLeft, WifiOff, Loader2, RefreshCw } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "../context/AuthContext";
 import { db } from "../firebase";
-import { collection, query, where, getDocs, deleteDoc, doc, orderBy } from "firebase/firestore";
+import {
+  collection, query, where, getDocs, getDocsFromServer,
+  deleteDoc, doc, orderBy, onSnapshot, documentId
+} from "firebase/firestore";
 
 function ManageJobs() {
   const navigate = useNavigate();
   const { currentUser } = useAuth();
   const [jobs, setJobs] = useState([]);
-  const [loading, setLoading] = useState(true); // ADDED BACK
+  const [loading, setLoading] = useState(true);
+  const [isOnline, setIsOnline] = useState(navigator.onLine);
+
+  // Track internet
+  useEffect(() => {
+    const handleOnline = () => setIsOnline(true);
+    const handleOffline = () => setIsOnline(false);
+    window.addEventListener('online', handleOnline);
+    window.addEventListener('offline', handleOffline);
+    return () => {
+      window.removeEventListener('online', handleOnline);
+      window.removeEventListener('offline', handleOffline);
+    };
+  }, []);
 
   useEffect(() => {
     if (!currentUser) return navigate('/login');
-    fetchJobs();
-  }, [currentUser]);
-
-  const fetchJobs = async () => {
-    setLoading(true); // ADDED BACK
-    try {
-      const q = query(
-        collection(db, "jobs"),
-        where("companyId", "==", currentUser.uid),
-        orderBy("createdAt", "desc")
-      );
-      const snapshot = await getDocs(q);
-      const jobsData = snapshot.docs.map(doc => ({ id: doc.id,...doc.data() }));
-
-      const jobsWithCount = await Promise.all(
-        jobsData.map(async (job) => {
-          const appQ = query(collection(db, "applications"), where("jobId", "==", job.id));
-          const appSnap = await getDocs(appQ);
-          return {...job, applicantCount: appSnap.size };
-        })
-      );
-
-      setJobs(jobsWithCount);
-    } catch (error) {
-      console.error("Error fetching jobs:", error);
+    if (!isOnline) {
+      setLoading(false);
+      return;
     }
-    setLoading(false); // ADDED BACK
-  };
 
-  const handleDelete = async (e, jobId) => { // ADDED e
-    e.stopPropagation(); // ADDED
+    setLoading(true);
+    const jobsRef = collection(db, "jobs");
+    const q = query(
+      jobsRef,
+      where("companyId", "==", currentUser.uid),
+      orderBy("createdAt", "desc")
+    );
+
+    // FAST: Real-time listener + server first
+    const unsubscribe = onSnapshot(q,
+      { includeMetadataChanges: false, source: "server" }, // force server
+      async (snapshot) => {
+        const jobsData = snapshot.docs.map(doc => ({ id: doc.id,...doc.data() }));
+
+        if (jobsData.length === 0) {
+          setJobs([]);
+          setLoading(false);
+          return;
+        }
+
+        // FAST: Get all applicant counts in 1 query using "in"
+        const jobIds = jobsData.map(j => j.id);
+        const appRef = collection(db, "applications");
+        const appQ = query(appRef, where("jobId", "in", jobIds));
+        const appSnap = await getDocsFromServer(appQ);
+
+        // Count applicants per job
+        const counts = {};
+        appSnap.forEach(doc => {
+          const jobId = doc.data().jobId;
+          counts[jobId] = (counts[jobId] || 0) + 1;
+        });
+
+        const jobsWithCount = jobsData.map(job => ({
+         ...job,
+          applicantCount: counts[job.id] || 0
+        }));
+
+        setJobs(jobsWithCount);
+        setLoading(false);
+      },
+      (error) => {
+        console.error("Error fetching jobs:", error);
+        setLoading(false);
+      }
+    );
+
+    return () => unsubscribe(); // cleanup listener
+  }, [currentUser, isOnline, navigate]);
+
+  const handleDelete = async (e, jobId) => {
+    e.stopPropagation();
+    if (!isOnline) return alert("Connect to internet to delete");
     if (window.confirm("Are you sure you want to delete this job?")) {
       await deleteDoc(doc(db, "jobs", jobId));
-      fetchJobs();
+      // no need to fetchJobs, onSnapshot updates automatically
     }
   };
 
-  const timeAgo = (date) => { // ADDED for mobile
+  const timeAgo = (date) => {
     if (!date) return "Just now";
     const d = date?.toDate?.() || new Date(date);
     const seconds = Math.floor((new Date() - d) / 1000);
@@ -62,7 +105,24 @@ function ManageJobs() {
     return "Today";
   }
 
-  if (loading) return <div className="manage1-container"><p style={{textAlign: 'center', padding: '40px'}}>Loading...</p></div> // ADDED
+  if (!isOnline) return (
+    <div className="manage1-container">
+      <div className="empty1-state">
+        <WifiOff size={48} />
+        <h2>No Internet</h2>
+        <p>Connect to load your jobs</p>
+      </div>
+    </div>
+  )
+
+  if (loading) return (
+    <div className="manage1-container">
+      <div className="empty1-state">
+        <Loader2 size={32} className="spin" />
+        <p>Loading your jobs...</p>
+      </div>
+    </div>
+  )
 
   return (
     <div className="manage1-container">
@@ -90,7 +150,7 @@ function ManageJobs() {
         </div>
       ) : (
         <>
-          {/* DESKTOP VIEW - KEPT EVERYTHING */}
+          {/* DESKTOP VIEW */}
           <div className="desktop-manage-jobs">
             <div className="jobs-grid1">
               {jobs.map(job => (
@@ -130,7 +190,7 @@ function ManageJobs() {
             </div>
           </div>
 
-          {/* MOBILE VIEW - NEW */}
+          {/* MOBILE VIEW */}
           <div className="mobile-manage-jobs">
             {jobs.map(job => (
               <div key={job.id} className="mobile-job-card1" onClick={() => navigate(`/employer/applicants/${job.id}`)}>

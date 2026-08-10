@@ -236,6 +236,7 @@
 .footer-cta-group {
   display: flex;
   gap: 10px;
+  margin-left: 60px;
   flex-wrap: wrap;
 }
 
