@@ -1,96 +1,134 @@
 import { useEffect, useState } from "react";
 import "./ManageJobs.css";
-import { Plus, Edit, Trash2, Users, Eye, Briefcase, MapPin, Calendar, ArrowLeft, WifiOff, Loader2, RefreshCw } from "lucide-react";
+import { Plus, Edit, Trash2, Users, Eye, Briefcase, MapPin, Calendar, ArrowLeft, Loader2 } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "../context/AuthContext";
 import { db } from "../firebase";
-import {
-  collection, query, where, getDocs, getDocsFromServer,
-  deleteDoc, doc, orderBy, onSnapshot, documentId
-} from "firebase/firestore";
+import { collection, query, where, getDocs, deleteDoc, doc, orderBy, onSnapshot } from "firebase/firestore";
 
 function ManageJobs() {
   const navigate = useNavigate();
   const { currentUser } = useAuth();
   const [jobs, setJobs] = useState([]);
   const [loading, setLoading] = useState(true);
-  const [isOnline, setIsOnline] = useState(navigator.onLine);
-
-  // Track internet
-  useEffect(() => {
-    const handleOnline = () => setIsOnline(true);
-    const handleOffline = () => setIsOnline(false);
-    window.addEventListener('online', handleOnline);
-    window.addEventListener('offline', handleOffline);
-    return () => {
-      window.removeEventListener('online', handleOnline);
-      window.removeEventListener('offline', handleOffline);
-    };
-  }, []);
 
   useEffect(() => {
     if (!currentUser) return navigate('/login');
-    if (!isOnline) {
-      setLoading(false);
-      return;
-    }
+    fetchJobs();
+  }, [currentUser]);
 
+  const fetchJobs = async () => {
     setLoading(true);
-    const jobsRef = collection(db, "jobs");
+    try {
+      const q = query(
+        collection(db, "jobs"),
+        where("companyId", "==", currentUser.uid),
+        orderBy("createdAt", "desc")
+      );
+
+      // 1. GET JOBS - cache first = instant
+      const snapshot = await getDocs(q);
+      const jobsData = snapshot.docs.map(doc => {
+        const data = doc.data();
+        return {
+          id: doc.id,
+        ...data,
+          // Normalize fields to match AllJobs
+          company: data.companyName,
+          type: data.jobType,
+          salary: data.salaryMax || data.salaryMin || 0,
+          postedDate: data.createdAt?.toDate?.().toISOString() || new Date().toISOString(),
+        }
+      });
+
+      if (jobsData.length === 0) {
+        setJobs([]);
+        setLoading(false);
+        return;
+      }
+
+      // 2. GET ALL APPLICANT COUNTS IN 1 QUERY - SAME AS BEFORE
+      const jobIds = jobsData.map(j => j.id);
+      // Firestore "in" query max 10. If you have >10 jobs, chunk it
+      const chunks = [];
+      for(let i = 0; i < jobIds.length; i += 10) {
+        chunks.push(jobIds.slice(i, i + 10));
+      }
+
+      let allApps = [];
+      for(const chunk of chunks) {
+        const appQ = query(collection(db, "applications"), where("jobId", "in", chunk));
+        const appSnap = await getDocs(appQ);
+        allApps = [...allApps,...appSnap.docs];
+      }
+
+      // Count applicants per job
+      const counts = {};
+      allApps.forEach(doc => {
+        const jobId = doc.data().jobId;
+        counts[jobId] = (counts[jobId] || 0) + 1;
+      });
+
+      const jobsWithCount = jobsData.map(job => ({
+    ...job,
+        applicantCount: counts[job.id] || 0
+      }));
+
+      setJobs(jobsWithCount);
+    } catch (error) {
+      console.error("Error fetching jobs:", error);
+    }
+    setLoading(false);
+
+    // 3. ADD REALTIME LISTENER - SAME AS ALLJOBS onSnapshot
     const q = query(
-      jobsRef,
+      collection(db, "jobs"),
       where("companyId", "==", currentUser.uid),
       orderBy("createdAt", "desc")
     );
-
-    // FAST: Real-time listener + server first
-    const unsubscribe = onSnapshot(q,
-      { includeMetadataChanges: false, source: "server" }, // force server
-      async (snapshot) => {
-        const jobsData = snapshot.docs.map(doc => ({ id: doc.id,...doc.data() }));
-
-        if (jobsData.length === 0) {
-          setJobs([]);
-          setLoading(false);
-          return;
+    const unsub = onSnapshot(q, async (snapshot) => {
+      const jobsData = snapshot.docs.map(doc => {
+        const data = doc.data();
+        return {
+          id: doc.id,
+        ...data,
+          company: data.companyName,
+          type: data.jobType,
+          salary: data.salaryMax || data.salaryMin || 0,
+          postedDate: data.createdAt?.toDate?.().toISOString() || new Date().toISOString(),
         }
+      });
 
-        // FAST: Get all applicant counts in 1 query using "in"
+      if(jobsData.length > 0) {
         const jobIds = jobsData.map(j => j.id);
-        const appRef = collection(db, "applications");
-        const appQ = query(appRef, where("jobId", "in", jobIds));
-        const appSnap = await getDocsFromServer(appQ);
+        const chunks = [];
+        for(let i = 0; i < jobIds.length; i += 10) chunks.push(jobIds.slice(i, i + 10));
 
-        // Count applicants per job
+        let allApps = [];
+        for(const chunk of chunks) {
+          const appQ = query(collection(db, "applications"), where("jobId", "in", chunk));
+          const appSnap = await getDocs(appQ);
+          allApps = [...allApps,...appSnap.docs];
+        }
         const counts = {};
-        appSnap.forEach(doc => {
-          const jobId = doc.data().jobId;
-          counts[jobId] = (counts[jobId] || 0) + 1;
-        });
+        allApps.forEach(doc => { counts[doc.data().jobId] = (counts[doc.data().jobId] || 0) + 1; });
 
-        const jobsWithCount = jobsData.map(job => ({
-         ...job,
-          applicantCount: counts[job.id] || 0
-        }));
-
-        setJobs(jobsWithCount);
-        setLoading(false);
-      },
-      (error) => {
-        console.error("Error fetching jobs:", error);
-        setLoading(false);
+        setJobs(jobsData.map(job => ({...job, applicantCount: counts[job.id] || 0})));
+      } else {
+        setJobs([]);
       }
-    );
+      setLoading(false);
+    });
 
-    return () => unsubscribe(); // cleanup listener
-  }, [currentUser, isOnline, navigate]);
+    return () => unsub(); // cleanup
+  };
 
   const handleDelete = async (e, jobId) => {
     e.stopPropagation();
-    if (!isOnline) return alert("Connect to internet to delete");
     if (window.confirm("Are you sure you want to delete this job?")) {
+      // Optimistic update: remove from UI immediately like AllJobs
+      setJobs(prev => prev.filter(j => j.id!== jobId));
       await deleteDoc(doc(db, "jobs", jobId));
-      // no need to fetchJobs, onSnapshot updates automatically
     }
   };
 
@@ -104,16 +142,6 @@ function ManageJobs() {
     if (hours > 0) return `${hours}h ago`;
     return "Today";
   }
-
-  if (!isOnline) return (
-    <div className="manage1-container">
-      <div className="empty1-state">
-        <WifiOff size={48} />
-        <h2>No Internet</h2>
-        <p>Connect to load your jobs</p>
-      </div>
-    </div>
-  )
 
   if (loading) return (
     <div className="manage1-container">

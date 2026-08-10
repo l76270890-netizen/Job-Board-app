@@ -356,7 +356,8 @@
   border: 1px #BBF7D0 solid;
 }
 
-
+.spin { animation: spin 1s linear infinite; }
+@keyframes spin { 100% { transform: rotate(360deg); } }
 
 
 /* ===== MOBILE TWEAKS ===== */
@@ -655,6 +656,9 @@
     -webkit-box-orient:vertical;
     overflow:hidden;
 }
+
+.spin { animation: spin 1s linear infinite; }
+@keyframes spin { 100% { transform: rotate(360deg); } }
 
 /* Bottom */
 
