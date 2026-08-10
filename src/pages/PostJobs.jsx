@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import "./PostJobs.css";
-import { ArrowLeft, Briefcase, MapPin, DollarSign, FileText, Plus, X, Building2 } from "lucide-react"; // ADDED Building2
+import { ArrowLeft, Briefcase, MapPin, DollarSign, FileText, Plus, X, Building2 } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "../context/AuthContext";
 import { db } from "../firebase";
@@ -12,11 +12,11 @@ function PostJobs() {
   const [loading, setLoading] = useState(false);
   const [requirements, setRequirements] = useState([""]);
   const [benefits, setBenefits] = useState([""]);
-  const [responsibilities, setResponsibilities] = useState([""]); // ADDED
+  const [responsibilities, setResponsibilities] = useState([""]);
 
   const [formData, setFormData] = useState({
     title: "",
-    companyName: userData?.name || currentUser?.displayName || "", // ADDED: company name input
+    companyName: userData?.companyName || userData?.name || currentUser?.displayName || "", // FIX 1: use companyName first
     category: "",
     jobType: "Full-time",
     workMode: "On-site",
@@ -41,8 +41,8 @@ function PostJobs() {
       const newBen = [...benefits];
       newBen[index] = value;
       setBenefits(newBen);
-    } else { // resp
-      const newRes = [...responsibilities]; // ADDED
+    } else { 
+      const newRes = [...responsibilities];
       newRes[index] = value;
       setResponsibilities(newRes);
     }
@@ -51,13 +51,13 @@ function PostJobs() {
   const addField = (type) => {
     if (type === 'req') setRequirements([...requirements, ""]);
     else if (type === 'ben') setBenefits([...benefits, ""]);
-    else setResponsibilities([...responsibilities, ""]); // ADDED
+    else setResponsibilities([...responsibilities, ""]);
   };
 
   const removeField = (type, index) => {
     if (type === 'req') setRequirements(requirements.filter((_, i) => i!== index));
     else if (type === 'ben') setBenefits(benefits.filter((_, i) => i!== index));
-    else setResponsibilities(responsibilities.filter((_, i) => i!== index)); // ADDED
+    else setResponsibilities(responsibilities.filter((_, i) => i!== index));
   };
 
   const handleSubmit = async (e) => {
@@ -71,16 +71,16 @@ function PostJobs() {
         salaryMin: Number(formData.salaryMin) || 0,
         salaryMax: Number(formData.salaryMax) || 0,
         requirements: requirements.filter(r => r.trim()!== ""),
-        responsibilities: responsibilities.filter(r => r.trim()!== ""), // ADDED
+        responsibilities: responsibilities.filter(r => r.trim()!== ""),
         benefits: benefits.filter(b => b.trim()!== ""),
-        employerId: currentUser.uid,
-        companyId: currentUser.uid,
-        status: "active",
+        employerId: currentUser.uid, // for ManageJobs
+        companyId: currentUser.uid, // for Categories + old data
+        status: "active", // FIX 2: IMPORTANT for filtering
         applicants: 0,
         createdAt: serverTimestamp()
       });
       alert("Job posted successfully!");
-      navigate("/employer/jobs");
+      navigate("/employer/manage-jobs"); // FIX 3: go to manage jobs after posting
     } catch (error) {
       console.error("Error posting job: ", error);
       alert("Failed to post job: " + error.message);
@@ -99,7 +99,6 @@ function PostJobs() {
       </div>
 
       <form className="postjob-form" onSubmit={handleSubmit}>
-        {/* Section 1: Job Details */}
         <div className="form-section">
           <h2><Briefcase size={20}/> Job Details</h2>
           <div className="form-grid">
@@ -108,7 +107,6 @@ function PostJobs() {
               <input type="text" name="title" value={formData.title} onChange={handleChange} placeholder="e.g. Frontend Developer" required />
             </div>
 
-            {/* ADDED: Company Name Input */}
             <div className="form-group">
               <label><Building2 size={16} style={{verticalAlign: 'middle'}}/> Company Name *</label>
               <input type="text" name="companyName" value={formData.companyName} onChange={handleChange} placeholder="e.g. TechCorp Ltd" required />
@@ -118,12 +116,14 @@ function PostJobs() {
               <label>Category *</label>
               <select name="category" value={formData.category} onChange={handleChange} required>
                 <option value="">Select Category</option>
-                <option value="IT">IT & Software</option>
+                <option value="Technology">IT & Software</option> {/* FIX 4: Match Categories.jsx icons */}
                 <option value="Design">Design</option>
                 <option value="Marketing">Marketing</option>
                 <option value="Finance">Finance</option>
                 <option value="Healthcare">Healthcare</option>
                 <option value="Education">Education</option>
+                <option value="Business">Business</option>
+                <option value="Human Resources">Human Resources</option>
               </select>
             </div>
             <div className="form-group">
@@ -146,7 +146,6 @@ function PostJobs() {
           </div>
         </div>
 
-        {/* Section 2: Location & Salary */}
         <div className="form-section">
           <h2><MapPin size={20}/> Location & Compensation</h2>
           <div className="form-grid">
@@ -169,7 +168,6 @@ function PostJobs() {
           </div>
         </div>
 
-        {/* Section 3: Description */}
         <div className="form-section">
           <h2><FileText size={20}/> Job Description</h2>
           <div className="form-group">
@@ -178,7 +176,6 @@ function PostJobs() {
           </div>
         </div>
 
-        {/* ADDED: Section 4: Responsibilities */}
         <div className="form-section">
           <h2>Responsibilities</h2>
           {responsibilities.map((res, i) => (
@@ -190,7 +187,6 @@ function PostJobs() {
           <button type="button" className="add-btn" onClick={() => addField('res')}><Plus size={16}/> Add Responsibility</button>
         </div>
 
-        {/* Section 5: Requirements */}
         <div className="form-section">
           <h2>Requirements</h2>
           {requirements.map((req, i) => (
@@ -202,7 +198,6 @@ function PostJobs() {
           <button type="button" className="add-btn" onClick={() => addField('req')}><Plus size={16}/> Add Requirement</button>
         </div>
 
-        {/* Section 6: Benefits */}
         <div className="form-section">
           <h2>Benefits</h2>
           {benefits.map((ben, i) => (
@@ -214,7 +209,6 @@ function PostJobs() {
           <button type="button" className="add-btn" onClick={() => addField('ben')}><Plus size={16}/> Add Benefit</button>
         </div>
 
-        {/* Section 7: Deadline */}
         <div className="form-section">
           <h2>Application Deadline</h2>
           <div className="form-group">
