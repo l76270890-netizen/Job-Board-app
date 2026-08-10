@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from "react";
 import "./FeaturedJobs.css";
 import {
@@ -26,7 +25,7 @@ function FeaturedJobs() {
   const navigate = useNavigate();
   const location = useLocation();
   const { currentUser, userData } = useAuth();
-  const [savedIds, setSavedIds] = useState([]); // NOW FROM FIREBASE LIKE ALLJOBS
+  const [savedIds, setSavedIds] = useState([]);
   const [myJobs, setMyJobs] = useState([]);
   const [stats, setStats] = useState({ jobs: 0, applicants: 0 });
   const [featuredJobs, setFeaturedJobs] = useState([]);
@@ -52,20 +51,20 @@ function FeaturedJobs() {
     if (isEmployer && currentUser) {
       fetchEmployerData();
     }
-  }, [isEmployer, currentUser, savedIds]); // re-run when savedIds changes
+  }, [isEmployer, currentUser, savedIds]);
 
-  const fetchFeaturedJobs = async () => { // JOB SEEKER - NOW SAME LOGIC AS ALLJOBS
+  const fetchFeaturedJobs = async () => { // JOB SEEKER - FIXED
     if(isEmployer) return;
     setLoading(true);
     try {
+      // FIX 1: Remove where("status") from query to avoid index error. We filter in code
       const q = query(
         collection(db, "jobs"),
-        where("status", "==", "active"),
         orderBy("createdAt", "desc"),
-        limit(6)
+        limit(12) // fetch 12 then filter to 6
       );
-      const snapshot = await getDocs(q); // cache first = instant
-      const firestoreJobs = snapshot.docs.map(doc => {
+      const snapshot = await getDocs(q);
+      let firestoreJobs = snapshot.docs.map(doc => {
         const data = doc.data();
         return {
           id: doc.id,
@@ -77,22 +76,25 @@ function FeaturedJobs() {
           salary: data.salaryMax || data.salaryMin || 50000,
           category: data.category || "Other",
           experience: data.experience || "Mid-Level",
-          postedDate: data.createdAt?.toDate().toISOString() || new Date().toISOString(),
+          postedDate: data.createdAt?.toDate?.().toISOString() || new Date().toISOString(), // FIX 2: safe toDate
           description: data.description || "",
+          status: data.status || "active", // FIX 3: default old jobs to active
           isFirestore: true
         }
       });
 
-      // MERGE STATIC + FIRESTORE + CHECK SAVED - SAME AS ALLJOBS
+      // FIX 4: Filter active jobs in code so old jobs show
+      firestoreJobs = firestoreJobs.filter(job => job.status === "active").slice(0, 6);
+
+      // MERGE STATIC + FIRESTORE + CHECK SAVED
       const allJobs = [...firestoreJobs,...staticJobs].slice(0, 6).map(job => ({
-     ...job,
+    ...job,
         is_saved: savedIds.includes(String(job.id))
       }));
 
       setFeaturedJobs(allJobs);
     } catch (error) {
       console.error("Error fetching featured jobs:", error);
-      // FALLBACK WITH SAVED STATE
       setFeaturedJobs(staticJobs.map(job => ({...job, is_saved: savedIds.includes(String(job.id))})));
     }
     setLoading(false);
@@ -109,7 +111,7 @@ function FeaturedJobs() {
       const appsSnap = await getDocs(appsQ);
 
       const jobsWithCount = jobsData.map(job => ({
-      ...job,
+     ...job,
         applicantCount: appsSnap.docs.filter(app => app.data().jobId === job.id).length
       }))
 
@@ -129,7 +131,6 @@ function FeaturedJobs() {
     action();
   }
 
-  // 2. FIXED: NOW SAVES TO FIREBASE LIKE ALLJOBS
   const toggleSave = async (e, jobId) => {
     e.stopPropagation();
     requireAuth(async () => {
@@ -139,10 +140,9 @@ function FeaturedJobs() {
 
       await updateDoc(userRef, {
         savedJobs: isSaved
-       ? arrayRemove(jobIdStr)
+      ? arrayRemove(jobIdStr)
           : arrayUnion(jobIdStr)
       });
-      // UI updates automatically because of onSnapshot
     })
   };
 
@@ -220,7 +220,7 @@ function FeaturedJobs() {
     )
   }
 
-  // JOBSEEKER VIEW - NOW SAME LOGIC AS ALLJOBS
+  // JOBSEEKER VIEW - UPDATED
   return (
     <section className="featured">
       <div className="desktop-view">
@@ -234,6 +234,8 @@ function FeaturedJobs() {
             <Loader2 size={32} className="spin" />
             <p>Loading jobs...</p>
           </div>
+        ) : featuredJobs.length === 0? ( // FIX 5: empty state
+          <p style={{textAlign: 'center', padding: '40px'}}>No active jobs yet. Check back soon!</p>
         ) :
           featuredJobs.map((job) => (
             <div className="job-card" key={job.id} onClick={() => navigate(`/jobs/${job.id}`, { state: job })}>
@@ -250,7 +252,7 @@ function FeaturedJobs() {
                 <span className="posted"><Clock3 size={14}/>{timeAgo(job.postedDate)}</span>
                 <Bookmark
                   className="bookmark"
-                  fill={job.is_saved? "#22C55E" : "none"} // CHANGED: use job.is_saved
+                  fill={job.is_saved? "#22C55E" : "none"}
                   color={job.is_saved? "#22C55E" : "currentColor"}
                   onClick={(e) => toggleSave(e, job.id)}
                 />
@@ -268,6 +270,8 @@ function FeaturedJobs() {
         </div>
         {loading? (
           <div style={{textAlign: 'center', padding: '40px'}}><Loader2 size={32} className="spin" /></div>
+        ) : featuredJobs.length === 0? ( // FIX 5: empty state
+          <p style={{textAlign: 'center', padding: '40px'}}>No jobs yet</p>
         ) :
           featuredJobs.map((job) => (
             <div className="mobileCard1" key={job.id} onClick={() => navigate(`/jobs/${job.id}`, { state: job })}>
@@ -275,7 +279,7 @@ function FeaturedJobs() {
                 <img src={job.logo} alt={job.company} />
                 <Bookmark
                   size={18}
-                  fill={job.is_saved? "#22C55E" : "none"} // CHANGED: use job.is_saved
+                  fill={job.is_saved? "#22C55E" : "none"}
                   color={job.is_saved? "#22C55E" : "currentColor"}
                   onClick={(e) => toggleSave(e, job.id)}
                 />
