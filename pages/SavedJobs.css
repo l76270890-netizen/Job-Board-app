@@ -1,0 +1,207 @@
+.savedJobsPage {
+  padding: 20px;
+  max-width: 1200px;
+  margin: 0 auto;
+  min-height: 80vh;
+  background: #f8fafc;
+}
+
+.savedHeader {
+  margin-bottom: 30px;
+}
+.savedHeader .backBtn {
+  background: none;
+  border: none;
+  cursor: pointer;
+  margin-bottom: 10px;
+}
+.savedHeader h1 {
+  font-size: 28px;
+  font-weight: 700;
+  color: #1e293b;
+  margin: 0;
+}
+.savedCount {
+  color: #64748b;
+  font-size: 14px;
+  margin-top: 5px;
+}
+
+/* EMPTY STATE */
+.emptyState {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  padding: 60px 20px;
+  background: white;
+  border-radius: 16px;
+  border: 1px dashed #cbd5e1;
+}
+.emptyState svg {
+  color: #94a3b8;
+  margin-bottom: 16px;
+}
+.emptyState h2 {
+  font-size: 20px;
+  color: #1e293b;
+  margin-bottom: 8px;
+}
+.emptyState p {
+  color: #64748b;
+  margin-bottom: 20px;
+}
+.browseBtn {
+  background: #2563eb;
+  color: white;
+  border: none;
+  padding: 12px 24px;
+  border-radius: 8px;
+  font-weight: 600;
+  cursor: pointer;
+}
+.browseBtn:hover {
+  background: #1d4ed8;
+}
+
+/* JOB GRID */
+.savedJobsGrid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+  gap: 20px;
+}
+
+.savedJobCard {
+  background: white;
+  border: 1px solid #e2e8f0;
+  border-radius: 16px;
+  padding: 20px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+.savedJobCard:hover {
+  box-shadow: 0 4px 12px rgba(0,0,0,0.08);
+  transform: translateY(-2px);
+}
+
+.savedJobTop {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 12px;
+}
+
+.savedCompanyFallbackLogo {
+  width: 40px;
+  height: 40px;
+  border-radius: 8px;
+  background: #f1f5f9;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #64748b;
+}
+
+.unsaveBtn {
+  background: #fee2e2;
+  border: none;
+  border-radius: 8px;
+  padding: 8px;
+  color: #ef4444;
+  cursor: pointer;
+  transition: background 0.2s;
+}
+.unsaveBtn:hover {
+  background: #fecaca;
+}
+
+.savedJobCard h3 {
+  font-size: 18px;
+  font-weight: 600;
+  color: #1e293b;
+  margin: 0 0 4px 0;
+}
+.savedCompanyName {
+  color: #64748b;
+  font-size: 14px;
+  margin-bottom: 12px;
+}
+
+.savedJobInfo {
+  display: flex;
+  gap: 12px;
+  flex-wrap: wrap;
+  margin-bottom: 12px;
+  font-size: 13px;
+  color: #475569;
+}
+.savedJobInfo span {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.savedJobDesc {
+  font-size: 14px;
+  color: #64748b;
+  line-height: 1.5;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+  margin-bottom: 16px;
+}
+
+.savedJobBottom {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding-top: 16px;
+  border-top: 1px solid #f1f5f9;
+}
+
+.savedSalary {
+  font-weight: 600;
+  color: #16a34a;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.applyBtn {
+  background: #2563eb;
+  color: white;
+  border: none;
+  padding: 8px 16px;
+  border-radius: 8px;
+  font-weight: 600;
+  cursor: pointer;
+  font-size: 14px;
+}
+.applyBtn:hover {
+  background: #1d4ed8;
+}
+
+.loadingText {
+  text-align: center;
+  color: #64748b;
+  padding: 40px;
+}
+
+/* MOBILE */
+@media (max-width: 768px) {
+  .savedJobsGrid {
+    grid-template-columns: 1fr;
+  }
+  .savedJobsPage {
+    padding: 16px;
+  }
+
+
+  .jobsHero{
+    display: flex;
+  }
+
+  
+}

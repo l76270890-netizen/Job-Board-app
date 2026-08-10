@@ -1,0 +1,107 @@
+.settings-page {
+  max-width: 800px;
+  margin: 0 auto;
+  padding: 20px;
+  font-family: "Inter", sans-serif;
+}
+
+.settings-header {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 24px;
+}
+.settings-header h1 { font-size: 1.8rem; font-weight: 700; }
+.backBtn {
+  background: #f3f4f6;
+  border: none;
+  border-radius: 8px;
+  padding: 8px;
+  cursor: pointer;
+}
+
+/* PROFILE CARD */
+.profile-card {
+  background: white;
+  border-radius: 16px;
+  padding: 20px;
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+  margin-bottom: 24px;
+}
+.avatar-wrapper { position: relative; }
+.avatar-wrapper img,.avatar-initial {
+  width: 64px; height: 64px; border-radius: 50%; object-fit: cover;
+  background: #2563eb; color: white; display: flex; align-items: center; justify-content: center; font-weight: 700; font-size: 1.5rem;
+}
+.change-avatar-btn {
+  position: absolute; bottom: 0; right: 0;
+  background: #2563eb; color: white; border: none; border-radius: 50%; padding: 4px; cursor: pointer;
+}
+.role-badge {
+  background: #dbeafe; color: #1e40af; font-size: 0.75rem; padding: 2px 8px; border-radius: 12px; margin-left: 8px;
+}
+
+/* SETTINGS LIST */
+.settings-list { display: flex; flex-direction: column; gap: 12px; }
+.setting-item {
+  background: white; padding: 16px; border-radius: 12px;
+  display: flex; justify-content: space-between; align-items: center;
+  cursor: pointer; transition: 0.2s; box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+}
+.setting-item:hover { transform: translateX(4px); }
+.setting-left { display: flex; align-items: center; gap: 14px; }
+.iconBox { background: #eff6ff; color: #2563eb; padding: 10px; border-radius: 10px; }
+.setting-left h3 { font-size: 1rem; font-weight: 600; margin: 0; }
+.setting-left p { font-size: 0.85rem; color: #6b7280; margin: 2px 0 0; }
+
+.logoutBtn {
+  width: 100%; margin-top: 24px; padding: 14px;
+  background: #fee2e2; color: #b91c1c; border: none; border-radius: 12px;
+  font-weight: 600; display: flex; align-items: center; justify-content: center; gap: 8px; cursor: pointer;
+}
+.logoutBtn:hover { background: #fecaca; }
+
+/* MODAL */
+.modal-overlay {
+  position: fixed; top: 0; left: 0; right: 0; bottom: 0;
+  background: rgba(0,0,0,0.5); display: flex; align-items: center; justify-content: center; z-index: 1000; padding: 20px;
+}
+.modal-content {
+  background: white; border-radius: 16px; width: 100%; max-width: 500px; max-height: 90vh; overflow-y: auto;
+}
+.modal-header { display: flex; justify-content: space-between; align-items: center; padding: 20px; border-bottom: 1px solid #e5e7eb; }
+.modal-body { padding: 20px; display: flex; flex-direction: column; gap: 12px; }
+.modal-body input,.modal-body textarea,.modal-body select {
+  width: 100%; padding: 12px; border: 1px solid #d1d5db; border-radius: 8px; font-size: 0.95rem;
+}
+.btn-save {
+  background: #22c55e; color: white; border: none; padding: 12px; border-radius: 8px; font-weight: 600; cursor: pointer; margin-top: 8px;
+}
+.toggle-row { display: flex; justify-content: space-between; align-items: center; padding: 10px 0; }
+.upload-box {
+  border: 2px dashed #d1d5db; padding: 30px; border-radius: 12px; text-align: center; cursor: pointer;
+  display: flex; flex-direction: column; align-items: center; gap: 8px;
+}
+
+/* SWITCH */
+.switch { position: relative; display: inline-block; width: 46px; height: 24px; }
+.switch input { opacity: 0; width: 0; height: 0; }
+.slider { position: absolute; cursor: pointer; top: 0; left: 0; right: 0; bottom: 0; background-color: #ccc; transition:.4s; border-radius: 24px; }
+.slider:before { position: absolute; content: ""; height: 18px; width: 18px; left: 3px; bottom: 3px; background-color: white; transition:.4s; border-radius: 50%; }
+input:checked +.slider { background-color: #22c55e; }
+input:checked +.slider:before { transform: translateX(22px); }
+
+/* DARK MODE */
+body.dark { background: #111827; color: #e5e7eb; }
+body.dark.profile-card, body.dark.setting-item, body.dark.modal-content { background: #1f2937; }
+body.dark.setting-left p { color: #9ca3af; }
+
+/* MOBILE */
+@media (max-width: 640px) {
+ .settings-page { padding: 12px; }
+ .settings-header h1 { font-size: 1.4rem; }
+ .profile-card { padding: 16px; }
+}

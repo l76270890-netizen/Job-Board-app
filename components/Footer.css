@@ -119,6 +119,45 @@
 
 }
 
+.employer-footer {
+  background: #111827; /* darker bg for employer */
+}
+.employer-footer .footer-brand p {
+  color: #D1D5DB;
+}
+
+.footer-cta-btn {
+  display: inline-block;
+  margin-top: 16px;
+  padding: 10px 20px;
+  background: #22C55E;
+  color: white;
+  border-radius: 8px;
+  font-weight: 700;
+  text-decoration: none;
+}
+.employer-footer .footer-cta-btn {
+  background: #10B981;
+}
+
+.footer-cta-btn-outline {
+  display: inline-block;
+  margin-top: 16px;
+  margin-left: 10px;
+  padding: 10px 20px;
+  background: transparent;
+  color: white;
+  border: 2px solid white;
+  border-radius: 8px;
+  font-weight: 700;
+  text-decoration: none;
+}
+.footer-cta-group {
+  display: flex;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+
 
 
 /* TABLET */
@@ -159,6 +198,46 @@
 
  justify-content:center;
 
+}
+
+.employer-footer {
+  background: #111827; /* darker bg for employer */
+}
+.employer-footer .footer-brand p {
+  color: #D1D5DB;
+}
+
+.footer-cta-btn {
+  display: inline-block;
+  margin-top: 16px;
+  padding: 10px 20px;
+  background: #22C55E;
+  color: white;
+  border-radius: 8px;
+  font-weight: 700;
+  text-decoration: none;
+}
+.employer-footer .footer-cta-btn {
+  background: #10B981;
+}
+
+.footer-cta-btn-outline {
+  display: inline-block;
+  margin-top: 16px;
+  margin-left: 10px;
+  padding: 10px 20px;
+  background: transparent;
+  color: white;
+  border: 2px solid white;
+  border-radius: 8px;
+  font-weight: 700;
+  text-decoration: none;
+}
+.footer-cta-group {
+  display: flex;
+  gap: 10px;
+  margin-left: 60px;
+  flex-wrap: wrap;
 }
 
 

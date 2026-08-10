@@ -1,0 +1,498 @@
+/* Container Layout */
+.articlePage-section {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 3rem 1.5rem;
+  font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+}
+
+.articlePage-header {
+  margin-bottom: 2.5rem;
+  text-align: center;
+}
+
+.sectionPage-title {
+  font-size: 1.75rem;
+  color: #111827;
+  font-weight: 700;
+  margin: 0 0 0.5rem 0;
+  letter-spacing: -0.02em;
+}
+
+.sectionPage-subtitle {
+  font-size: 0.95rem;
+  color: #6b7280;
+  margin: 0;
+}
+
+/* Grid System */
+.articlePage-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+  gap: 2rem;
+  margin-bottom: 3rem;
+}
+
+/* Card Styling */
+.articlePage-card {
+  background-color: #ffffff;
+  border: 1px solid #e5e7eb;
+  border-radius: 14px;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.02), 0 2px 4px -1px rgba(0, 0, 0, 0.02);
+  transition: transform 0.25s ease, box-shadow 0.25s ease, border-color 0.25s ease;
+}
+
+.articlePage-card:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 10px 20px -5px rgba(0, 0, 0, 0.08);
+  border-color: #cbd5e1;
+}
+
+/* Image Container with Fixed Aspect Ratio */
+.articlePage-image-wrapper {
+  position: relative;
+  width: 100%;
+  padding-top: 56.25%; /* Modern 16:9 Aspect Ratio */
+  background-color: #f3f4f6;
+  overflow: hidden;
+}
+
+.articlePage-image-wrapper img {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  transition: transform 0.4s ease;
+}
+
+.articlePage-card:hover .article-image-wrapper img {
+  transform: scale(1.04); /* Suble zoom on image hover */
+}
+
+/* Internal Card Text Content */
+.articlePage-content {
+  padding: 1.25rem;
+  display: flex;
+  flex-direction: column;
+  flex-grow: 1;
+}
+
+/* Tag Pill Badges */
+.articlePage-tags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  margin-bottom: 0.75rem;
+}
+
+.tagPage {
+  font-size: 0.75rem;
+  font-weight: 600;
+  color: #166534;
+  background-color: #DCFCE7;
+  padding: 0.2rem 0.6rem;
+  border-radius: 6px;
+  text-transform: uppercase;
+  letter-spacing: 0.02em;
+}
+
+/* Card Header Title Link */
+.articlePage-title {
+  margin: 0 0 1.25rem 0;
+  font-size: 1.15rem;
+  font-weight: 600;
+  line-height: 1.4;
+}
+
+.articlePage-title a {
+  color: #1f2937;
+  text-decoration: none;
+  transition: color 0.15s ease;
+}
+
+.articlePage-title a:hover {
+  color: #2563eb;
+}
+
+/* Bottom Footer Metadata alignment */
+.articlePage-footer {
+  margin-top: auto; /* Pushes footer neatly to bottom of variable heights */
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding-top: 0.85rem;
+  border-top: 1px solid #f3f4f6;
+  color: #16a34a;
+  font-size: 0.825rem;
+}
+
+/* Right alignment stats icons */
+.articlePage-stats {
+  display: flex;
+  align-items: center;
+  gap: 0.85rem;
+}
+
+.stat {
+  display: flex;
+  align-items: center;
+  gap: 0.3rem;
+}
+
+/* Center Bottom Action Button */
+.actionPage-wrapper {
+  display: flex;
+  justify-content: center;
+}
+
+.view-all-btn {
+ background-color: #fff;
+  color: #16a34a;
+  text-align: center;
+  padding: 13px;
+  width: 40%;
+  border-radius:8px;
+  border: 1px  #16a34a solid;
+  top: 20px;
+  font-size: 14px;
+}
+
+
+
+.articlePage-section {
+  padding: 40px;
+  background: #f8fafc;
+}
+
+.articlePage-header { text-align: center; margin-bottom: 32px; }
+.sectionPage-title { font-size: 28px; font-weight: 700; }
+.sectionPage-subtitle { color: #64748b; margin-top: 8px; }
+
+.articlePage-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 24px;
+  margin-bottom: 32px;
+}
+
+.articlePage-card {
+  background: #fff;
+  border: 1px solid #e2e8f0;
+  border-radius: 16px;
+  overflow: hidden;
+  cursor: pointer; /* 1. MAKE IT CLICKABLE */
+  transition: 0.3s;
+}
+.articlePage-card:hover {
+  transform: translateY(-4px); /* 2. HOVER EFFECT */
+  box-shadow: 0 10px 25px rgba(37, 99, 235, 0.1);
+}
+
+.articlePage-image-wrapper img {
+  width: 100%;
+  height: 200px;
+  object-fit: cover;
+}
+
+.articlePage-content { padding: 20px; }
+
+.articlePage-tags {
+  display: flex;
+  gap: 8px;
+  margin-bottom: 12px;
+  flex-wrap: wrap;
+}
+.tag {
+  background: #dbeafe;
+  color: #22C55E;
+  padding: 4px 10px;
+  border-radius: 20px;
+  font-size: 12px;
+  font-weight: 600;
+}
+
+.article-title {
+  font-size: 18px;
+  font-weight: 600;
+  line-height: 1.4;
+  margin-bottom: 16px;
+  color: #0f172a;
+}
+
+.articlePage-footer {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-size: 13px;
+  color: #64748b;
+  border-top: 1px solid #f1f5f9;
+  padding-top: 12px;
+}
+.articlePage-stats { display: flex; gap: 12px; }
+.stat { display: flex; align-items: center; gap: 4px; }
+
+.actionPage-wrapper { text-align: center; }
+.view-all-btn {
+  background: #ffff;
+  color: #16a34a;
+  border: 1px #16a34a solid;
+  padding: 12px 24px;
+  border-radius: 10px;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+
+/* RELATED/POPULAR SECTION WRAPPER */
+.Related-jobs {
+  margin: 40px 0;
+  padding: 0 16px;
+}
+
+.Related-jobs h2 {
+  font-size: 22px;
+  font-weight: 700;
+  margin-bottom: 20px;
+  color: #111;
+}
+
+/* 1. HORIZONTAL SCROLL GRID */
+.articlePage2-grid {
+  display: flex;
+  gap: 16px;
+  overflow-x: auto;
+  padding-bottom: 12px;
+  scroll-snap-type: x mandatory;
+  -webkit-overflow-scrolling: touch; /* smooth scroll on mobile */
+}
+
+/* hide scrollbar */
+.articlePage2-grid::-webkit-scrollbar {
+  display: none;
+}
+.articlePage2-grid {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}
+
+/* 2. CARD STYLE - SAME AS YOUR articlePage-card but fixed width */
+.articlePage2-grid .articlePage-card {
+  min-width: 300px; /* important for horizontal scroll */
+  max-width: 300px;
+  background: #fff;
+  border: 1px solid #e5e7eb;
+  border-radius: 16px;
+  overflow: hidden;
+  cursor: pointer;
+  scroll-snap-align: start;
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.articlePage2-grid .articlePage-card:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 6px 16px rgba(0, 0, 0, 0.08);
+}
+
+/* 3. IMAGE */
+.articlePage2-grid .articlePage-image-wrapper {
+  width: 100%;
+  height: 170px;
+  overflow: hidden;
+}
+
+.articlePage2-grid .articlePage-image-wrapper img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+/* 4. CONTENT */
+.articlePage2-grid .articlePage-content {
+  padding: 14px 16px 16px 16px;
+}
+
+.articlePage2-grid .articlePage-tags {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+  margin-bottom: 10px;
+}
+
+.articlePage2-grid .tagPage {
+  background: #eef2ff;
+  color: #166534;
+  background-color: #DCFCE7;
+  font-size: 12px;
+  padding: 4px 10px;
+  border-radius: 20px;
+  font-weight: 500;
+}
+
+.articlePage2-grid .articlePage-title {
+  font-size: 16px;
+  font-weight: 600;
+  line-height: 1.4;
+  color: #111;
+  margin-bottom: 12px;
+  display: -webkit-box;
+  -webkit-line-clamp: 2; /* 2 lines max */
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+/* 5. FOOTER */
+.articlePage2-grid .articlePage-footer {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-size: 12px;
+  color: #6b7280;
+}
+
+.articlePage2-grid .articlePage-stats {
+  display: flex;
+  gap: 12px;
+}
+
+.articlePage2-grid .articlePage-stats .stat {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+/* TABS BAR */
+.articleTabsWrapper {
+  display: flex;
+  gap: 24px;
+  padding: 0 16px;
+  border-bottom: 1px solid #e5e7eb;
+  margin-bottom: 30px;
+  overflow-x: auto;
+}
+.articleTabsWrapper::-webkit-scrollbar {
+  display: none;
+}
+
+.articleTab {
+  background: none;
+  border: none;
+  padding: 16px 0;
+  font-size: 16px;
+  font-weight: 500;
+  color: #6b7280;
+  cursor: pointer;
+  position: relative;
+  white-space: nowrap;
+}
+
+.articleTab.active {
+  color: #16a34a;
+  font-weight: 600;
+}
+
+.articleTab.active::after { /* blue underline */
+  content: "";
+  position: absolute;
+  bottom: -1px;
+  left: 0;
+  width: 100%;
+  height: 3px;
+  background: #22C55E;
+  border-radius: 2px;
+}
+
+
+.apply-btn{
+  padding: 6px 10px;
+  border: 1px #DCFCE7 solid;
+  background-color: transparent;
+  cursor: pointer;
+}
+
+
+/* MOBILE */
+@media (max-width: 1024px) {
+  .articlePage-section { padding: 20px; }
+  .articlePage-grid { grid-template-columns: 1fr; }
+  
+.articlePage-section {
+  background: #fff;
+  height: 160vh;
+  position: relative;
+  bottom: 56px;
+}
+
+.articlePage2-grid{
+   grid-template-columns: 1fr; 
+}
+
+.view-all-btn {
+  display: none;;
+}
+
+.sectionPage-title {
+  font-size: 1.75rem;
+  color: #111827;
+  font-weight: 700;
+  margin-top: 40px;
+  letter-spacing: -0.02em;
+}
+.backBtn{
+    background-color:transparent;
+    
+}
+
+/* TABS BAR */
+.articleTabsWrapper {
+  display: flex;
+  gap: 24px;
+  padding: 0 16px;
+  border-bottom: 1px solid #e5e7eb;
+  margin-bottom: 30px;
+  overflow-x: auto;
+}
+.articleTabsWrapper::-webkit-scrollbar {
+  display: none;
+}
+
+.articleTab {
+  background: none;
+  border: none;
+  padding: 16px 0;
+  font-size: 16px;
+  font-weight: 500;
+  color: #6b7280;
+  cursor: pointer;
+  position: relative;
+  white-space: nowrap;
+}
+
+.articleTab.active {
+  color: #16a34a;
+  font-weight: 600;
+}
+
+.articleTab.active::after { /* blue underline */
+  content: "";
+  position: absolute;
+  bottom: -1px;
+  left: 0;
+  width: 100%;
+  height: 3px;
+  background:#22C55E ;
+  border-radius: 2px;
+}
+
+.apply-btn{
+  padding: 6px 10px;
+  border: 1px #DCFCE7 solid;
+  background-color: transparent;
+}
+
+
+}

@@ -4,53 +4,124 @@ import {
   MapPin,
   Briefcase,
   ArrowRight,
+  Users,
+  FileText,
+  TrendingUp,
+  Plus,
+  MessageSquare,  // ADDED
+  Building2       // ADDED
 } from "lucide-react";
-import { useNavigate, useLocation } from "react-router-dom"; 
+import { useNavigate, useLocation } from "react-router-dom";
 import { useState } from "react";
-import { useAuth } from "../context/AuthContext"; // 1. IMPORT THIS
+import { useAuth } from "../context/AuthContext";
 
 function Hero() {
-  const navigate = useNavigate(); 
-  const location = useLocation(); // 2. GET CURRENT LOCATION
-  const { currentUser } = useAuth(); // 3. GET USER
+  const navigate = useNavigate();
+  const location = useLocation();
+  const { currentUser, userData } = useAuth(); // FIX 1: get userData
   const [searchTerm, setSearchTerm] = useState("");
-  const [locationInput, setLocationInput] = useState(""); // renamed to avoid clash
+  const [locationInput, setLocationInput] = useState("");
   const [jobType, setJobType] = useState("");
 
-  // 4. LOGIN CHECK WRAPPER
+  const userRole = userData?.role; // FIX 1: role is in userData
+
+  // 1. LOGIN CHECK WRAPPER - for jobseekers
   const requireAuthAndNavigate = (filters = {}) => {
     if (!currentUser) {
-      // send them to login, and remember where they came from
       navigate("/login", { state: { from: location, filters: filters } });
       return;
     }
-    navigate("/jobs", { state: filters }); 
+    navigate("/jobs", { state: filters });
   };
 
-  // Handle main search button
   const handleSearch = () => {
-    requireAuthAndNavigate({ 
-      search: searchTerm, 
-      location: locationInput, 
-      jobType: jobType 
+    requireAuthAndNavigate({
+      search: searchTerm,
+      location: locationInput,
+      jobType: jobType
     });
   };
 
-  // Handle popular category click
   const handleCategoryClick = (category) => {
     requireAuthAndNavigate({ selectedCategory: category });
   };
 
-  // Handle location click
   const handleLocationClick = (loc) => {
     requireAuthAndNavigate({ location: loc });
   };
 
-  // Handle job type click
   const handleJobTypeClick = (type) => {
     requireAuthAndNavigate({ jobType: type });
   };
 
+  // ==========================================
+  // EMPLOYER HERO VIEW
+  // ==========================================
+  if (userRole === 'employer') {
+    return (
+      <>
+        {/* DESKTOP EMPLOYER HERO */}
+        <section className="hero desktop-view">
+          <div className="hero-overlay"></div>
+          <div className="hero-content">
+            <span className="hero-badge">💼 Employer Dashboard</span>
+            <h1>Hire Top <span>Talent</span> For Your Company</h1>
+            <p>Post jobs, review applications, and find the perfect candidate in days, not weeks.</p>
+
+            <div className="hero-search" style={{justifyContent: "center"}}>
+              <button
+                onClick={() => navigate('/employer/post-job')} // FIX 3: removed S
+                style={{background: "#fff", color: "#2563eb", padding: "16px 32px", fontSize: "16px", display: "flex", alignItems: "center", gap: "8px"}}
+              >
+                <Plus size={18} /> Post a Job
+              </button>
+              <button
+                onClick={() => navigate('/employer/applicants/:jobId')}
+                style={{background: "transparent", border: "2px solid #fff", color: "#fff", display: "flex", alignItems: "center", gap: "8px"}}
+              >
+                View Applicants <ArrowRight size={18} />
+              </button>
+            </div>
+
+            <div className="hero-stats">
+              <div><h2>50K+</h2><span>Job Seekers</span></div>
+              <div><h2>127</h2><span>Your Applicants</span></div>
+              <div><h2>4</h2><span>Active Jobs</span></div>
+            </div>
+          </div>
+        </section>
+
+        {/* MOBILE EMPLOYER HERO */}
+        <section className="mobile-hero-container">
+          <div className="hero-feature-card" style={{background: "linear-gradient(135deg, #22C55E 0%, #15803D 100%)"}}>
+            <div className="feature-overlay"></div>
+            <div className="feature-content">
+              <span className="feature-tag">💼 Employer</span>
+              <h1 className="feature-title">Find Your Next Hire</h1>
+              <p className="feature-description">Manage jobs and connect with qualified candidates instantly.</p>
+              <button className="action-cta-btn" onClick={() => navigate('/employer/post-job')}> {/* FIX 3: removed S */}
+                <Plus size={18} /> Post New Job
+              </button>
+            </div>
+          </div>
+
+          <div className="mobile-section">
+            <h3>📊 Quick Actions</h3>
+            <div className="chip-grid">
+              <button onClick={() => navigate('/employer/jobs')}> Manage Jobs</button>
+              <button onClick={() => navigate('/employer/applicants/:jobId')}> Applicants</button>
+              <button onClick={() => navigate('/message')}> Messages</button>
+              <button onClick={() => navigate('/employer/profile')}> Company Profile</button>
+            </div>
+          </div>
+        </section>
+      </>
+    )
+  }
+
+  // ==========================================
+  // JOBSEEKER HERO VIEW - YOUR ORIGINAL CODE
+  // ==========================================
   return (
     <>
       {/* DESKTOP HERO */}
@@ -126,7 +197,6 @@ function Hero() {
           </div>
         </div>
 
-        {/* Popular Categories */}
         <div className="mobile-section">
           <h3>🔥 Popular Categories</h3>
           <div className="chip-grid">
@@ -139,7 +209,6 @@ function Hero() {
           </div>
         </div>
 
-        {/* Locations */}
         <div className="mobile-section">
           <h3>📍 Browse by Location</h3>
           <div className="chip-grid">
@@ -152,7 +221,6 @@ function Hero() {
           </div>
         </div>
 
-        {/* Job Type */}
         <div className="mobile-section">
           <h3>⏰ Job Type</h3>
           <div className="chip-grid">

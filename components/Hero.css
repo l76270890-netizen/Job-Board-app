@@ -314,6 +314,15 @@ color:#22C55E;
     background-size:20px 20px;
 }
 
+.chip-grid button{
+    margin: 5px;
+}
+
+.chip-grid button:hover{
+    background-color: transparent;
+   
+}
+
 .feature-content{
     position:relative;
     z-index:2;

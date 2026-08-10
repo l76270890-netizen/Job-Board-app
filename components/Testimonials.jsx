@@ -1,7 +1,8 @@
 import "./Testimonials.css";
 import { Star, Quote } from "lucide-react";
+import { useAuth } from "../context/AuthContext"; // 1. ADD
 
-const testimonials = [
+const jobseekerTestimonials = [ // 2. RENAME YOURS
   {
     id: 1,
     name: "Sarah Johnson",
@@ -34,15 +35,55 @@ const testimonials = [
   },
 ];
 
+// 3. NEW: EMPLOYER TESTIMONIALS
+const employerTestimonials = [
+  {
+    id: 1,
+    name: "Tunde Adeleke",
+    role: "HR Manager",
+    company: "Paystack",
+    image: "https://randomuser.me/api/portraits/men/45.jpg",
+    review:
+      "We hired 4 developers in 30 days. The quality of applicants here is way better than LinkedIn and Jobberman combined.",
+    rating: 5,
+  },
+  {
+    id: 2,
+    name: "Grace Okoro",
+    role: "Founder",
+    company: "Kuda Bank",
+    image: "https://randomuser.me/api/portraits/women/65.jpg",
+    review:
+      "Posting a job took 2 minutes. We got 200+ qualified applications in the first week. The dashboard analytics are amazing.",
+    rating: 5,
+  },
+  {
+    id: 3,
+    name: "Chidi Nwosu",
+    role: "CTO",
+    company: "Flutterwave",
+    image: "https://randomuser.me/api/portraits/men/22.jpg",
+    review:
+      "Finally a platform that understands African hiring. Fast, affordable, and the candidates are actually qualified.",
+    rating: 5,
+  },
+];
+
 function Testimonials() {
+  const { userData } = useAuth(); // 4. ADD
+  const isEmployer = userData?.role === 'employer'; // 5. ADD
+  
+  const testimonials = isEmployer ? employerTestimonials : jobseekerTestimonials; // 6. ADD
+
   return (
-    <section className="testimonials">
+    <section className={`testimonials ${isEmployer ? 'employer-testimonials' : ''}`}> {/* 7. ADD CLASS */}
       <div className="testimonial-heading">
         <span>💬 Testimonials</span>
-        <h2>What Our Users Say</h2>
+        <h2>{isEmployer ? 'What Companies Are Saying' : 'What Our Users Say'}</h2> {/* 8. DYNAMIC TITLE */}
         <p>
-          Thousands of professionals have found their dream jobs through our
-          platform.
+          {isEmployer 
+            ? '500+ companies are hiring top talent faster with JobConnect' 
+            : 'Thousands of professionals have found their dream jobs through our platform.'}
         </p>
       </div>
 

@@ -34,6 +34,7 @@
     display:grid;
     grid-template-columns:repeat(4,1fr);
     gap:25px;
+    margin: 20px;
 }
 
 /* ===========================
@@ -47,11 +48,10 @@
     padding:35px 25px;
     text-align:center;
     transition:.35s;
-    cursor:pointer;
 }
 
 .why-card:hover{
-    transform:translateY(-8px);
+    transform:translateY(-3px);
     box-shadow:0 18px 35px rgba(0,0,0,.08);
     border: color #E5E7EB;
 }
@@ -80,6 +80,29 @@
     color:#6b7280;
     line-height:1.7;
     font-size:15px;
+}
+
+/* EMPLOYER VIEW */
+.employer-why {
+  background: #fff; /* light green bg to differentiate */
+  padding: 60px 0;
+}
+
+.why-cta-btn {
+  background: #22C55E;
+  color: white;
+  border: none;
+  padding: 14px 28px;
+  border-radius: 8px;
+  font-size: 16px;
+  font-weight: 600;
+  cursor: pointer;
+  margin: 30px auto 0;
+  display: block;
+  transition: background 0.2s;
+}
+.why-cta-btn:hover {
+  background: #16A34A;
 }
 
 /* ===========================
@@ -134,6 +157,29 @@ height:65px;
 
 .why-card h3{
 font-size:18px;
+}
+
+/* EMPLOYER VIEW */
+.employer-why {
+  background: #ffff; /* light green bg to differentiate */
+  padding: 60px 0;
+}
+
+.why-cta-btn {
+  background: #22C55E;
+  color: white;
+  border: none;
+  padding: 14px 28px;
+  border-radius: 8px;
+  font-size: 16px;
+  font-weight: 600;
+  cursor: pointer;
+  margin: 30px auto 0;
+  display: block;
+  transition: background 0.2s;
+}
+.why-cta-btn:hover {
+  background: #16A34A;
 }
 
 }

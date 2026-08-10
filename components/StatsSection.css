@@ -33,6 +33,28 @@
   font-weight: 500;
 }
 
+.stats-header {
+  text-align: center;
+  margin-bottom: 40px;
+}
+.stats-header h2 {
+  font-size: 32px;
+  font-weight: 800;
+  margin-bottom: 8px;
+}
+.stats-header p {
+  color: #6B7280;
+  font-size: 16px;
+}
+
+.employer-stats {
+  background: #ffff; /* light green bg for employer */
+}
+.employer-stats.stat-icon {
+  background: #DCFCE7;
+  color: #16A34A;
+}
+
 /* Mobile */
 @media (max-width: 768px) {
   .stats-container {
