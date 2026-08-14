@@ -6,9 +6,11 @@ import {
   User,
   Bookmark,
   Share2,
-  Tag
+  Tag,
+  Check
 } from "lucide-react";
 import { useNavigate, useLocation, useParams } from "react-router-dom";
+import { useState } from "react"; // <-- add this
 
 // Dummy articles array. Replace with import from your articles file
 export const articles = [
@@ -38,16 +40,39 @@ export const articles = [
     coverImage: "https://images.unsplash.com/photo-1552664730-d307ca884978?q=80&w=1200",
     tags: ["Skills", "AI", "Learning"]
   },
-  // add more articles...
 ];
 
 function ArticleDetail() {
   const navigate = useNavigate();
   const { state: articleFromState } = useLocation();
   const { id } = useParams();
+  const [copied, setCopied] = useState(false); // <-- add this
 
   // 1. Get article from state OR find by ID for refresh support
   const article = articleFromState || articles.find(a => a.id === Number(id));
+
+  // SHARE FUNCTION - NEW
+  const handleShare = async () => {
+    const shareData = {
+      title: article.title,
+      text: article.excerpt,
+      url: window.location.href,
+    };
+
+    try {
+      // 1. Try native share - works on mobile Chrome, Safari
+      if (navigator.share) {
+        await navigator.share(shareData);
+      } else {
+        // 2. Fallback: copy to clipboard
+        await navigator.clipboard.writeText(window.location.href);
+        setCopied(true);
+        setTimeout(() => setCopied(false), 2000);
+      }
+    } catch (err) {
+      console.log("Share cancelled", err);
+    }
+  };
 
   if (!article) {
     return (
@@ -89,8 +114,11 @@ function ArticleDetail() {
               </div>
             </div>
             <div className="articleActions">
-              <button><Bookmark size={18}/></button>
-              <button><Share2 size={18}/></button>
+              {/* UPDATED SHARE BUTTON */}
+              <button onClick={handleShare} title="Share article">
+                {copied ? <Check size={18} color="green"/> : <Share2 size={18}/>}
+                {copied ? 'Copied' : ''}
+              </button>
             </div>
           </div>
         </div>
@@ -134,24 +162,24 @@ function ArticleDetail() {
         </div>
 
        <div className="sideCard">
-  <h4>Related Articles</h4>
-  {articles
-    .filter(a => a.id !== article.id) // exclude current article
-    .slice(0,3) // show only 3
-    .map(rel => (
-      <div 
-        key={rel.id} 
-        className="relatedItem" 
-        onClick={() => navigate(`/articles/${rel.id}`, {state: rel})}
-      >
-        <img src={rel.coverImage} alt={rel.title} />
-        <div className="relatedInfo">
-          <p>{rel.title}</p>
-          <span>{new Date(rel.publishedAt).toDateString()}</span>
-        </div>
+        <h4>Related Articles</h4>
+        {articles
+          .filter(a => a.id !== article.id) // exclude current article
+          .slice(0,3) // show only 3
+          .map(rel => (
+            <div 
+              key={rel.id} 
+              className="relatedItem" 
+              onClick={() => navigate(`/articles/${rel.id}`, {state: rel})}
+            >
+              <img src={rel.coverImage} alt={rel.title} />
+              <div className="relatedInfo">
+                <p>{rel.title}</p>
+                <span>{new Date(rel.publishedDate).toDateString()}</span> {/* fixed bug: was publishedAt */}
+              </div>
+            </div>
+        ))}
       </div>
-  ))}
-</div>
       </aside>
     </section>
   );

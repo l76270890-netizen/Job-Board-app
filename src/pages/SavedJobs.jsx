@@ -1,4 +1,4 @@
-import "./AllJobs.css";
+import "./Savedjobs.css";
 import { Bookmark, ArrowLeft, DollarSign, MapPin, Briefcase } from "lucide-react";
 import { useState, useEffect } from "react";
 import { useNavigate, useLocation } from "react-router-dom";

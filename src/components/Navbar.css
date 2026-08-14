@@ -134,7 +134,7 @@
 }
 .nav-link-btn.active-tab { color: #2563eb; font-weight: 600; }
 .drawer-item { background: none; border: none; width: 100%; text-align: left; }
-.mobile-nav-item { background: none; border: none; }
+.mobile-nav-item,.mobile-nav-item1 { background: none; border: none; }
 
 
 
@@ -201,7 +201,7 @@
     border-bottom: 1px solid #e2e8f0;
     align-items: center;
     justify-content: space-between;
-    padding: 0 16px;
+    padding: 0 8px;
     z-index: 1001;
   }
 
@@ -210,6 +210,8 @@
     border: none;
     cursor: pointer;
     color: #1e293b;
+    position: relative;
+    left: 10px;
   }
 
   .mobile-logo {
@@ -289,7 +291,7 @@
     align-items: center;
     z-index: 999;
   }
-  .mobile-nav-item {
+  .mobile-nav-item, .mobile-nav-item1 {
     display: flex;
     flex-direction: column;
     align-items: center;
@@ -304,6 +306,7 @@
   height: 32px;
   border-radius: 50%;
   overflow: hidden;
+ background-color: #15803D;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -316,6 +319,10 @@
 }
   
   .mobile-nav-item.active-tab { color: #2563eb; font-weight: 600; }
+}
+
+.mobile-nav-item1.active-tab{
+   color: #2563eb; font-weight: 600;
 }
 
 /* DESKTOP ONLY */
@@ -363,7 +370,7 @@
     left: 0;
     right: 0;
     height: 64px;
-    background-color: #ffffff;
+    background-color: #f3f4f6;
     border-top: 1px solid #e5e7eb;
     display: flex;
     align-items: center;
@@ -374,7 +381,7 @@
   }
 
   /* Individual App Dock Grid Elements */
-  .mobile-nav-item {
+  .mobile-nav-item{
     display: flex;
     flex-direction: column;
     align-items: center;
@@ -394,9 +401,47 @@
     -webkit-tap-highlight-color: transparent;
   }
 
+  .plus-btn{
+    background-color: #22C55E;
+    border-radius: 50%;
+    height: 45px;
+    width: 45px;
+    color: #f3f4f6;
+    margin: 15px;
+    position: relative;
+    bottom:5px;
+    border: none;
+  }
+
+  .mobile-nav-item1{
+     display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 0.25rem;
+    background: none;
+    border: none;
+    color: #f3f4f6;
+    text-decoration: none;
+    font-family: system-ui, -apple-system, sans-serif;
+    font-size: 0.7rem;
+    font-weight: 500;
+    flex: 1;
+    height: 100%;
+    cursor: pointer;
+    transition: color 0.15s ease;
+    -webkit-tap-highlight-color: transparent;
+  }
+  }
+
   /* Active/Current Active Tabs Route Highlights */
   .mobile-nav-item.active-tab,
   .mobile-nav-item:active {
+    color: #22C55E;
+  }
+
+  .mobile-nav-item1.active-tab,
+  .mobile-nav-item:active{
     color: #22C55E;
   }
 
@@ -593,9 +638,12 @@
 .mobile-login-btn{
   background-color: #22C55E;
   padding: 8px 9.5px ;
+  position: relative;
+  left: -20px;
   border-radius: 10px;
   text-decoration: none;
   color: #fff;
+  font-size: 11.6px;
   border: none;
 }
 
@@ -639,4 +687,4 @@
 
 }
 
-}
+

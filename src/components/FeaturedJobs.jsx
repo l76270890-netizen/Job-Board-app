@@ -205,7 +205,7 @@ function FeaturedJobs() {
           <div className="tip-banner"><h4>💡 Pro Tip</h4><p>Jobs with salary listed get 2.3x more applicants.</p></div>
         </div>
         <div className="mobileJobList1" style={{ position:"relative", top:"-410px", height:"77vh" }}>
-          <hr /><div className="featured-header"><h2>My Jobs</h2><button className="plus-btn" onClick={() => navigate('/employer/post-job')}><Plus size={16}/></button></div>
+          <hr /><div className="featured-header"><h2>My Jobs</h2><a href="/employer/jobs">Manage all →</a></div>
           {loading? <p style={{textAlign: 'center', padding: '20px'}}><Loader2 size={20} className="spin" /></p> :
           myJobs.map((job) => (
             <div className="mobileCard1" key={job.id} onClick={() => navigate(`/employer/applicants/${job.id}`)}>
@@ -266,7 +266,11 @@ function FeaturedJobs() {
         <hr />
         <div className="featured-header">
           <h2>Featured Jobs</h2>
-          <a href="/jobs">View all</a>
+          <a href="/jobs"
+          style={{
+            position:"relative",
+            left:"20px"
+          }}>View all</a>
         </div>
         {loading? (
           <div style={{textAlign: 'center', padding: '40px'}}><Loader2 size={32} className="spin" /></div>

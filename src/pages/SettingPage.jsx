@@ -20,13 +20,14 @@ export default function SettingPage() {
   const [activeModal, setActiveModal] = useState(null);
   const [darkMode, setDarkMode] = useState(false);
   const [uploading, setUploading] = useState(false);
+  const [saving, setSaving] = useState(false);
   const fileInputRef = useRef(null);
 
   // JOBSEEKER STATE
   const [profile, setProfile] = useState({
-    name: "", title: "Frontend Developer", email: "", phone: "", bio: "", photoURL: ""
+    name: "", title: "Frontend Developer", email: "", phone: "", bio: "", photoURL: "", cvUrl: ""
   });
-  const [resume, setResume] = useState(null);
+  const [cvFile, setCvFile] = useState(null);
 
   // EMPLOYER STATE
   const [company, setCompany] = useState({
@@ -48,7 +49,7 @@ export default function SettingPage() {
           companySize: userData.companySize || "",
           location: userData.location || "",
           website: userData.website || "",
-          photoURL: userData.photoURL || "", // FIX 1: was missing before first load
+          photoURL: userData.photoURL || "",
           bannerURL: userData.bannerURL || ""
         });
       } else {
@@ -58,7 +59,8 @@ export default function SettingPage() {
           email: userData.email || currentUser?.email || "",
           phone: userData.phone || "",
           bio: userData.bio || "",
-          photoURL: userData.photoURL || currentUser?.photoURL || ""
+          photoURL: userData.photoURL || currentUser?.photoURL || "",
+          cvUrl: userData.cvUrl || ""
         });
       }
       setNotifications(userData.notifications || { email: true, push: true, jobAlerts: true });
@@ -68,19 +70,44 @@ export default function SettingPage() {
     document.body.classList.toggle("dark", savedDark);
   }, [currentUser, isEmployer, userData]);
 
+  // Upload CV to storage and get URL
+  const uploadCV = async () => {
+    if (!cvFile ||!currentUser) return profile.cvUrl;
+    setUploading(true);
+    try {
+      const storageRef = ref(storage, `users/${currentUser.uid}/resume_${Date.now()}_${cvFile.name}`);
+      const snap = await uploadBytes(storageRef, cvFile);
+      const url = await getDownloadURL(snap.ref);
+      setUploading(false);
+      return url;
+    } catch (err) {
+      setUploading(false);
+      alert("CV Upload failed: " + err.message);
+      return profile.cvUrl;
+    }
+  };
+
   // HANDLERS
   const handleSaveProfile = async () => {
-    await updateDoc(doc(db, "users", currentUser.uid), profile);
+    setSaving(true);
+    const cvUrl = await uploadCV();
+    const dataToSave = {...profile, cvUrl };
+    await updateDoc(doc(db, "users", currentUser.uid), dataToSave);
+    setProfile(prev => ({...prev, cvUrl}));
+    setCvFile(null);
     alert("Profile saved!");
-    setActiveModal(null);
-  };
-  const handleSaveCompany = async () => {
-    await updateDoc(doc(db, "users", currentUser.uid), company);
-    alert("Company profile saved!");
+    setSaving(false);
     setActiveModal(null);
   };
 
-  // FIX 2: Add timestamp to filename so browser doesn't cache old image
+  const handleSaveCompany = async () => {
+    setSaving(true);
+    await updateDoc(doc(db, "users", currentUser.uid), company);
+    alert("Company profile saved!");
+    setSaving(false);
+    setActiveModal(null);
+  };
+
   const handleProfilePicUpload = async (e) => {
     const file = e.target.files[0];
     if (!file ||!currentUser) return;
@@ -89,16 +116,13 @@ export default function SettingPage() {
       const storageRef = ref(storage, `users/${currentUser.uid}/profilePic_${Date.now()}`);
       const snap = await uploadBytes(storageRef, file);
       const url = await getDownloadURL(snap.ref);
-
       await updateDoc(doc(db, "users", currentUser.uid), { photoURL: url });
-
       if (isEmployer) setCompany(prev => ({...prev, photoURL: url}));
       else setProfile(prev => ({...prev, photoURL: url}));
-
       alert("Profile picture updated!");
-    } catch (err) { 
+    } catch (err) {
       console.error(err)
-      alert("Upload failed: " + err.message); 
+      alert("Upload failed: " + err.message);
     }
     setUploading(false);
   };
@@ -111,10 +135,13 @@ export default function SettingPage() {
       const storageRef = ref(storage, `users/${currentUser.uid}/banner_${Date.now()}`);
       const snap = await uploadBytes(storageRef, file);
       const url = await getDownloadURL(snap.ref);
-
       await updateDoc(doc(db, "users", currentUser.uid), { bannerURL: url });
       setCompany(prev => ({...prev, bannerURL: url}));
-    } catch (err) { alert(err.message); }
+      alert("Banner updated!");
+    } catch (err) {
+      console.error(err);
+      alert("Upload failed: " + err.message);
+    }
     setUploading(false);
   };
 
@@ -128,10 +155,14 @@ export default function SettingPage() {
     if (confirm("Logout?")) { await logout(); navigate("/login"); }
   };
 
-  // SETTINGS LIST
+  // FIX: MOVE SETTINGS ARRAYS UP HERE BEFORE USING THEM
+  const resumeDesc = profile.cvUrl
+   ? <a href={profile.cvUrl} target="_blank" rel="noreferrer" style={{color: '#22c55e'}}>View Current CV</a>
+    : cvFile? cvFile.name : "Upload CV";
+
   const jobseekerSettings = [
     { icon: <User size={22} />, title: "Profile", desc: "Edit personal info", onClick: () => setActiveModal("profile") },
-    { icon: <FileText size={22} />, title: "Resume", desc: resume? resume.name : "Upload CV", onClick: () => setActiveModal("resume") },
+    { icon: <FileText size={22} />, title: "Resume", desc: resumeDesc, onClick: () => setActiveModal("resume") },
     { icon: <Bell size={22} />, title: "Notifications", desc: "Job alerts & emails", onClick: () => setActiveModal("notifications") },
     { icon: <Shield size={22} />, title: "Security", desc: "Change password", onClick: () => setActiveModal("security") },
     { icon: <Globe size={22} />, title: "Language", desc: language, onClick: () => setActiveModal("language") },
@@ -150,7 +181,7 @@ export default function SettingPage() {
   const displayName = isEmployer? company.companyName : profile.name;
   const displaySub = isEmployer? company.industry : profile.title;
   const userInitial = displayName?.[0]?.toUpperCase() || "U";
-  const currentPhoto = isEmployer? company.photoURL : profile.photoURL; // FIX 3: use correct photo
+  const currentPhoto = isEmployer? company.photoURL : profile.photoURL;
 
   return (
     <div className="settings-page">
@@ -159,7 +190,6 @@ export default function SettingPage() {
         <h1>Settings</h1>
       </div>
 
-      {/* EMPLOYER BANNER */}
       {isEmployer && (
         <div className="banner-wrapper">
           <img src={company.bannerURL || "/default-banner.jpg"} className="banner-img" alt="" />
@@ -173,7 +203,6 @@ export default function SettingPage() {
       <div className="profile-card">
         <div className="avatar-wrapper">
           {currentPhoto? (
-            // FIX 3: Add cache-busting query so new image shows immediately
             <img src={`${currentPhoto}?t=${Date.now()}`} alt="" />
           ) : (<div className="avatar-initial">{userInitial}</div>)}
           <button className="change-avatar-btn" onClick={() => fileInputRef.current.click()} disabled={uploading}>
@@ -217,7 +246,9 @@ export default function SettingPage() {
                 <input value={profile.email} disabled />
                 <input value={profile.phone} onChange={e => setProfile({...profile, phone: e.target.value})} placeholder="Phone" />
                 <textarea value={profile.bio} onChange={e => setProfile({...profile, bio: e.target.value})} placeholder="Bio" rows="3" />
-                <button className="btn-save" onClick={handleSaveProfile}>Save Changes</button>
+                <button className="btn-save" onClick={handleSaveProfile} disabled={saving || uploading}>
+                  {saving? "Saving..." : uploading? "Uploading CV..." : "Save Changes"}
+                </button>
               </div>
             )}
 
@@ -231,7 +262,9 @@ export default function SettingPage() {
                 </select>
                 <input value={company.location} onChange={e => setCompany({...company, location: e.target.value})} placeholder="Location" />
                 <input value={company.website} onChange={e => setCompany({...company, website: e.target.value})} placeholder="Website" />
-                <button className="btn-save" onClick={handleSaveCompany}>Save Company</button>
+                <button className="btn-save" onClick={handleSaveCompany} disabled={saving}>
+                  {saving? "Saving..." : "Save Company"}
+                </button>
               </div>
             )}
 
@@ -266,7 +299,24 @@ export default function SettingPage() {
 
             {activeModal === "resume" &&!isEmployer && (
               <div className="modal-body">
-                <label className="upload-box"><Upload size={20} /><span>{resume? resume.name : "Click to upload PDF, DOC"}</span><input type="file" accept=".pdf,.doc,.docx" onChange={e => setResume({name: e.target.files[0].name})} hidden /></label>
+                {profile.cvUrl && (
+                  <a href={profile.cvUrl} target="_blank" rel="noreferrer" className="btn-outline" style={{marginBottom: 12, display: 'block'}}>
+                    📄 View Current CV
+                  </a>
+                )}
+                <label className="upload-box">
+                  <Upload size={20} />
+                  <span>{cvFile? cvFile.name : "Click to upload PDF, DOC"}</span>
+                  <input
+                    type="file"
+                    accept=".pdf,.doc,.docx"
+                    onChange={e => setCvFile(e.target.files[0])}
+                    hidden
+                  />
+                </label>
+                <button className="btn-save" onClick={handleSaveProfile} disabled={saving || uploading}>
+                  {saving? "Saving..." : uploading? "Uploading..." : "Save CV"}
+                </button>
               </div>
             )}
           </div>

@@ -143,9 +143,9 @@ function Navbar() {
           {mobileMenuOpen? <X size={24} /> : <Menu size={24} />}
         </button>
         <div className="logo"><Link to="/"><img src="Logo.jpg" alt="NijaJobs logo" className="logo-img" /></Link></div>
-        {currentUser && <NotificationBell />}
+        {currentUser && <NotificationBell  />}
 
-        {!currentUser && <Link to="/login" className="mobile-login-btn">Join now</Link>}
+        {!currentUser && <Link to="/login" className="mobile-login-btn">Joinnow</Link>}
         {currentUser && (
           <Link to="/settings" className="mobile-user-avatar">
             {userPhoto? <img src={userPhoto} alt="user" className="avatar-img" /> : <div className="avatar-initial">{userInitial}</div>}
@@ -200,7 +200,9 @@ function Navbar() {
         {userRole === 'employer' && (
           <>
             <Link to="/employer/jobs" className={`mobile-nav-item ${isActive("/employer/jobs")}`}><FileText size={22} /><span>Manage Jobs</span></Link>
-            <Link to="/employer/post-job" className={`mobile-nav-item ${isActive("/employer/post-job")}`}><Plus size={22} /><span>Post Jobs</span></Link>
+           <div className="plus-btn">
+             <Link to="/employer/post-job" className={`mobile-nav-item1 ${isActive("/employer/post-job")}`}><Plus size={22} /><span></span></Link>
+           </div>
             <button className={`mobile-nav-item ${isActive("/employer/applicants")}`} onClick={handleGoToApplicants}><Users size={22} /><span>Applicants</span></button> {/* CHANGED */}
             <Link to="message" className={`mobile-nav-item ${isActive("/employer/messages")}`}><MessageSquare size={22} /><span>Messages</span></Link>
           </>

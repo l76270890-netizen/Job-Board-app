@@ -13,11 +13,13 @@ import {
 } from "lucide-react";
 import { useNavigate, useLocation } from "react-router-dom";
 import { useState } from "react";
+import { db } from "../firebase";
 import { useAuth } from "../context/AuthContext";
 
 function Hero() {
   const navigate = useNavigate();
   const location = useLocation();
+    const [stats, setStats] = useState({ jobs: 0, applicants: 0 });
   const { currentUser, userData } = useAuth(); // FIX 1: get userData
   const [searchTerm, setSearchTerm] = useState("");
   const [locationInput, setLocationInput] = useState("");
@@ -41,6 +43,30 @@ function Hero() {
       jobType: jobType
     });
   };
+
+   const fetchEmployerData = async () => { // EMPLOYER - UNCHANGED
+      setLoading(true);
+      try {
+        const jobsQ = query(collection(db, "jobs"), where("companyId", "==", currentUser.uid));
+        const jobsSnap = await getDocs(jobsQ);
+        const jobsData = jobsSnap.docs.map(d => ({ id: d.id,...d.data() }));
+  
+        const appsQ = query(collection(db, "applications"), where("employerId", "==", currentUser.uid));
+        const appsSnap = await getDocs(appsQ);
+  
+        const jobsWithCount = jobsData.map(job => ({
+       ...job,
+          applicantCount: appsSnap.docs.filter(app => app.data().jobId === job.id).length
+        }))
+  
+        setMyJobs(jobsWithCount.slice(0, 5));
+        setStats({ jobs: jobsData.length, applicants: appsSnap.size });
+      } catch (error) {
+        console.error("Error fetching employer data:", error);
+      }
+      setLoading(false);
+    };
+  
 
   const handleCategoryClick = (category) => {
     requireAuthAndNavigate({ selectedCategory: category });
@@ -71,7 +97,7 @@ function Hero() {
             <div className="hero-search" style={{justifyContent: "center"}}>
               <button
                 onClick={() => navigate('/employer/post-job')} // FIX 3: removed S
-                style={{background: "#fff", color: "#2563eb", padding: "16px 32px", fontSize: "16px", display: "flex", alignItems: "center", gap: "8px"}}
+                style={{background: "#fff", color: "#15803D", padding: "16px 32px", fontSize: "16px", display: "flex", alignItems: "center", gap: "8px"}}
               >
                 <Plus size={18} /> Post a Job
               </button>
@@ -84,9 +110,9 @@ function Hero() {
             </div>
 
             <div className="hero-stats">
-              <div><h2>50K+</h2><span>Job Seekers</span></div>
+              <div> <h3>{stats.jobs || 0}</h3><span>Job Seekers</span></div>
               <div><h2>127</h2><span>Your Applicants</span></div>
-              <div><h2>4</h2><span>Active Jobs</span></div>
+              <div><h3>{stats.jobs || 0}</h3><span>Active Jobs</span></div>
             </div>
           </div>
         </section>
@@ -191,8 +217,8 @@ function Hero() {
             <span className="feature-tag">✨ New Feature</span>
             <h1 className="feature-title">Accelerate Your Career Growth</h1>
             <p className="feature-description">Connect directly with recruiters and discover thousands of verified jobs.</p>
-            <button className="action-cta-btn" onClick={() => navigate('/profile')}>
-              Complete Profile
+            <button className="action-cta-btn" onClick={() => navigate('/jobs')}>
+              Find jobs
             </button>
           </div>
         </div>

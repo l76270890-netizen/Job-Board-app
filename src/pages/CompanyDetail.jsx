@@ -1,13 +1,13 @@
 import React, { useState, useMemo, useEffect } from 'react';
 import './CompanyDetail.css';
-import { ArrowLeft, MapPin, Briefcase, Users, Building2, CheckCircle, Share2, Filter, ExternalLink, Bookmark, Plus, Star, ShieldCheck } from "lucide-react"; // added Star, ShieldCheck
-import { useNavigate, useParams } from "react-router-dom";
+import { ArrowLeft, MapPin, Briefcase, Users, Building2, CheckCircle, Share2, Filter, ExternalLink, Bookmark, Plus, Star, ShieldCheck } from "lucide-react";
+import { useNavigate, useParams, Link } from "react-router-dom";
 import { jobs as staticJobs } from "./AllJobs";
 import { db } from "../firebase";
-import { collection, getDocs, doc, updateDoc, increment, setDoc, deleteDoc, getDoc, query, where, onSnapshot, addDoc, serverTimestamp } from "firebase/firestore"; // added review imports
+import { collection, getDocs, doc, updateDoc, increment, setDoc, deleteDoc, getDoc, query, where, onSnapshot, addDoc, serverTimestamp } from "firebase/firestore";
 import { useAuth } from '../context/AuthContext';
 
-const baseCompanies = [ 
+const baseCompanies = [
   {
     name: "GIZ KE", banner: "https://images.unsplash.com/photo-1557804506-669a67965ba0?w=1200",
     employees: "1000-5000", about: "GIZ is a German development agency working worldwide...",
@@ -26,7 +26,7 @@ const CompanyLogo = ({ logo, name }) => (
   <img src={logo} alt={name} onError={(e) => { e.target.src = `https://ui-avatars.com/api/?name=${encodeURIComponent(name)}&background=22C55E&color=fff`}} />
 );
 
-const StarRating = ({ rating }) => ( // NEW
+const StarRating = ({ rating }) => (
   <div className="stars">
     {[...Array(5)].map((_, i) => (
       <Star key={i} size={16} fill={i < Math.round(rating)? "#f59e0b" : "none"} color="#f59e0b" />
@@ -38,14 +38,14 @@ function CompanyDetail(){
   const navigate = useNavigate();
   const { companyName } = useParams();
   const { currentUser, userData } = useAuth();
-  const [activeTab, setActiveTab] = useState('overview');
-  const [firestoreJobs, setFirestoreJobs] = useState([]);
-  const [loading, setLoading] = useState(true);
-  const [jobFilters, setJobFilters] = useState({ location: '', type: '' });
-  const [isFollowing, setIsFollowing] = useState(false);
-  const [reviews, setReviews] = useState([]); // NEW
-  const [showReviewForm, setShowReviewForm] = useState(false); // NEW
-  const [reviewForm, setReviewForm] = useState({ rating: 5, title: '', pros: '', cons: '' }); // NEW
+  const [activeTab,setActiveTab] = useState('overview');
+  const [firestoreJobs,setFirestoreJobs] = useState([]);
+  const [loading,setLoading] = useState(true);
+  const [jobFilters,setJobFilters] = useState({ location: '', type: '' });
+  const [isFollowing,setIsFollowing] = useState(false);
+  const [reviews,setReviews] = useState([]);
+  const [showReviewForm,setShowReviewForm] = useState(false);
+  const [reviewForm,setReviewForm] = useState({ rating: 5, title: '', pros: '', cons: '' });
   const decodedName = decodeURIComponent(companyName);
 
   useEffect(() => {
@@ -58,14 +58,13 @@ function CompanyDetail(){
     fetchJobs();
     incrementProfileView();
     checkIfFollowing();
-    
-    // NEW: LIVE FETCH REVIEWS
+
     const q = query(collection(db, "reviews"), where("companyName", "==", decodedName));
     const unsub = onSnapshot(q, (snap) => {
       setReviews(snap.docs.map(d => ({ id: d.id,...d.data() })));
     });
     return () => unsub();
-  }, [decodedName, currentUser]);
+  }, [decodedName][currentUser]);
 
   const allJobs = useMemo(() => [...staticJobs,...firestoreJobs], [firestoreJobs]);
 
@@ -95,13 +94,12 @@ function CompanyDetail(){
     }
   }
 
-  // NEW: SUBMIT REVIEW
   const handleReviewSubmit = async (e) => {
     e.preventDefault();
     if (!currentUser) return navigate('/login');
 
     await addDoc(collection(db, "reviews"), {
-     ...reviewForm,
+    ...reviewForm,
       companyName: decodedName,
       employerId: companyData?.employerId,
       userId: currentUser.uid,
@@ -122,8 +120,8 @@ function CompanyDetail(){
     const baseInfo = baseCompanies.find(c => c.name.toLowerCase() === decodedName.toLowerCase());
     const allBenefits = [...new Set(companyJobs.flatMap(j => j.benefits || []))];
 
-    const avgRating = reviews.length > 0 // NEW
-     ? (reviews.reduce((acc, r) => acc + r.rating, 0) / reviews.length).toFixed(1)
+    const avgRating = reviews.length > 0
+    ? (reviews.reduce((acc, r) => acc + r.rating, 0) / reviews.length).toFixed(1)
       : 0;
 
     return {
@@ -134,14 +132,14 @@ function CompanyDetail(){
       banner: baseInfo?.banner || firstJob.companyBanner || "https://images.unsplash.com/photo-1486406146926-c627a92ad1ab?w=1200",
       employees: baseInfo?.employees || firstJob.companySize || "51-200",
       about: baseInfo?.about || firstJob.companyDescription || `${firstJob.company || firstJob.companyName} is hiring in ${firstJob.category}. Join our team and grow your career.`,
-      benefits: baseInfo?.benefits?.length > 0 ? baseInfo.benefits : allBenefits.length > 0 ? allBenefits : ["Health Insurance", "Flexible Hours", "Career Growth"],
+      benefits: baseInfo?.benefits?.length > 0? baseInfo.benefits : allBenefits.length > 0? allBenefits : ["Health Insurance", "Flexible Hours", "Career Growth"],
       links: baseInfo?.links || { website: firstJob.companyWebsite || "#", linkedin: "#", facebook: "#", instagram: "#" },
       website: firstJob.companyWebsite || "#",
       verified: firstJob.verified || false,
       jobCount: companyJobs.length,
       employerId: firstJob.employerId,
-      avgRating, // NEW
-      reviewCount: reviews.length // NEW
+      avgRating,
+      reviewCount: reviews.length
     }
   }, [decodedName, allJobs, reviews]);
 
@@ -150,15 +148,19 @@ function CompanyDetail(){
     return <div className="company-page"><button className="detailBack" onClick={() => navigate(-1)}><ArrowLeft size={20} /></button><div className="container"><h2>Company not found</h2></div></div>
   }
 
-  const companyJobs = allJobs.filter(job => String(job.company || job.companyName).toLowerCase() === companyData.name.toLowerCase() && job.status !== 'closed');
-  const relatedJobs = allJobs.filter(j => String(j.company || j.companyName)!== companyData.name && (j.category || j.industry) === companyData.industry && j.status !== 'closed').filter(j => jobFilters.location === '' || j.location.toLowerCase().includes(jobFilters.location.toLowerCase())).filter(j => jobFilters.type === '' || (j.type || j.jobType) === jobFilters.type).slice(0,6);
+  const companyJobs = allJobs
+   .filter(job => String(job.company || job.companyName).toLowerCase() === companyData.name.toLowerCase() && job.status!== 'closed')
+   .map(job => ({...job, companyId: job.employerId || job.companyId }));
+
+  const relatedJobs = allJobs
+   .filter(j => String(j.company || j.companyName)!== companyData.name && (j.category || j.industry) === companyData.industry && j.status!== 'closed')
+   .filter(j => jobFilters.location === '' || j.location.toLowerCase().includes(jobFilters.location.toLowerCase()))
+   .filter(j => jobFilters.type === '' || (j.type || j.jobType) === jobFilters.type)
+   .map(job => ({...job, companyId: job.employerId || job.companyId }))
+   .slice(0,6);
+
   const allCompanies = Array.from(new Map(allJobs.map(j => [j.company || j.companyName, j])).values());
   const relatedCompanies = allCompanies.filter(c => (c.category || c.industry) === companyData.industry && (c.company || c.companyName)!== companyData.name).slice(0,4).map(c => ({ name: c.company || c.companyName, logo: c.logo, industry: c.category || c.industry }));
-
-  const handleShare = () => {
-    navigator.clipboard.writeText(window.location.href);
-    alert("Company link copied!");
-  }
 
   return (
     <div className="company-page-fuzu">
@@ -177,7 +179,6 @@ function CompanyDetail(){
           <div className="header-top-row">
             <div>
               <h1 className="company-name">{companyData.name}</h1>
-              {/* NEW: SHOW RATING IN HEADER */}
               {companyData.reviewCount > 0 && (
                 <div className="header-rating">
                   <StarRating rating={companyData.avgRating} />
@@ -185,23 +186,18 @@ function CompanyDetail(){
                 </div>
               )}
             </div>
-            <div style={{display: 'flex', gap: '10px'}}>
-              <button className={`follow-btn ${isFollowing? 'following' : ''}`} onClick={handleFollow}>
-                {isFollowing? 'Following' : <><Plus size={16}/> Follow</>}
-              </button>
-              <button className="share-btn" onClick={handleShare}><Share2 size={16} /> Share</button>
-            </div>
+            <div style={{display: 'flex', gap: '10px'}}></div>
           </div>
           <div className="company-meta">
             <span><Briefcase size={14}/> {companyData.industry}</span>
             <span><MapPin size={14}/> {companyData.location}</span>
             <span><Users size={14}/> {companyData.employees} employees</span>
           </div>
-          {companyData.website !== "#" && <a href={companyData.website} target="_blank" className="company-website-link"><ExternalLink size={14} /> Visit Website</a>}
+          {companyData.website!== "#" && <a href={companyData.website} target="_blank" className="company-website-link"><ExternalLink size={14} /> Visit Website</a>}
           <div className="company-stats">
             <div><strong>{companyData.jobCount}</strong><span>Open Jobs</span></div>
             <div><strong>{companyData.employees}</strong><span>Employees</span></div>
-            <div><strong>{companyData.avgRating || 'N/A'}</strong><span>Rating</span></div> {/* UPDATED */}
+            <div><strong>{companyData.avgRating || 'N/A'}</strong><span>Rating</span></div>
           </div>
           <button className="view-jobs-main-btn" onClick={() => setActiveTab('jobs')}>View Jobs ({companyData.jobCount})</button>
         </div>
@@ -210,7 +206,7 @@ function CompanyDetail(){
           <button className={activeTab === 'overview'? 'tab active' : 'tab'} onClick={() => setActiveTab('overview')}>Overview</button>
           <button className={activeTab === 'jobs'? 'tab active' : 'tab'} onClick={() => setActiveTab('jobs')}>Jobs ({companyData.jobCount})</button>
           <button className={activeTab === 'culture'? 'tab active' : 'tab'} onClick={() => setActiveTab('culture')}>Culture & Benefits</button>
-          <button className={activeTab === 'reviews'? 'tab active' : 'tab'} onClick={() => setActiveTab('reviews')}>Reviews ({companyData.reviewCount})</button> {/* NEW TAB */}
+          <button className={activeTab === 'reviews'? 'tab active' : 'tab'} onClick={() => setActiveTab('reviews')}>Reviews ({companyData.reviewCount})</button>
         </div>
 
         {activeTab === 'overview' && (
@@ -226,7 +222,24 @@ function CompanyDetail(){
           <div className="jobs-section">
             <div className="jobs-header"><h3>Open Jobs at {companyData.name}</h3></div>
             {companyJobs.length === 0? (<p style={{color: '#6b7280'}}>No open jobs at {companyData.name} right now.</p>) : (
-              <div className="jobs-grid">{companyJobs.map(job => (<div className="job-card clickable" key={job.id} onClick={() => navigate(`/jobs/${job.id}`, { state: job })}><div className="job-info"><h4>{job.title}</h4><p><MapPin size={14}/> {job.location} • <span className="job-tag">{job.type || job.jobType}</span></p><p className="salary"><strong>₦{Number(job.salary || job.salaryMax || 0).toLocaleString()}/mo</strong></p></div><button className="btn">View Job</button></div>))}</div>
+              <div className="jobs-grid">
+                {companyJobs.map(job => (
+                  // CHANGED: Wrapped in Link to go to Job Detail
+                  <Link
+                    to={`/jobs/${job.id}`}
+                    state={job}
+                    className="job-card clickable"
+                    key={job.id}
+                  >
+                    <div className="job-info">
+                      <h4>{job.title}</h4>
+                      <p><MapPin size={14}/> {job.location} • <span className="job-tag">{job.type || job.jobType}</span></p>
+                      <p className="salary"><strong>₦{Number(job.salary || job.salaryMax || 0).toLocaleString()}/mo</strong></p>
+                    </div>
+                    <span className="btn">View Job</span>
+                  </Link>
+                ))}
+              </div>
             )}
           </div>
         )}
@@ -240,7 +253,6 @@ function CompanyDetail(){
           </div>
         )}
 
-        {/* NEW: REVIEWS TAB */}
         {activeTab === 'reviews' && (
           <div className="reviews-section">
             <div className="reviews-header">
@@ -260,7 +272,7 @@ function CompanyDetail(){
                 <h4>Rate your experience at {companyData.name}</h4>
                 <label>Overall Rating
                   <select value={reviewForm.rating} onChange={e => setReviewForm({...reviewForm, rating: Number(e.target.value)})}>
-                    {[5,4,3,2,1].map(n => <option key={n} value={n}>{n} Stars</option>)}
+                    {[5][4][3][2][1].map(n => <option key={n} value={n}>{n} Stars</option>)}
                   </select>
                 </label>
                 <input placeholder="Review Title" value={reviewForm.title} onChange={e => setReviewForm({...reviewForm, title: e.target.value})} required/>
@@ -306,11 +318,42 @@ function CompanyDetail(){
               </select>
             </div>
           </div>
-          <div className="jobs-grid">{relatedJobs.length > 0 ? relatedJobs.map(job => (<div className="job-card clickable" key={job.id + 100} onClick={() => navigate(`/jobs/${job.id}`, { state: job })}><div className="job-info"><h4>{job.title}</h4><p className="company-name-small">{job.company || job.companyName}</p><p><MapPin size={14}/> {job.location} • <span className="job-tag">{job.type || job.jobType}</span></p></div><button className="btn">View Job</button></div>)) : <p>No related jobs found</p>}</div>
+          <div className="jobs-grid">
+            {relatedJobs.length > 0? relatedJobs.map(job => (
+              // CHANGED: Wrapped in Link to go to Job Detail
+              <Link
+                to={`/jobs/${job.id}`}
+                state={job}
+                className="job-card clickable"
+                key={job.id}
+              >
+                <div className="job-info">
+                  <h4>{job.title}</h4>
+                  <p className="company-name-small">{job.company || job.companyName}</p>
+                  <p><MapPin size={14}/> {job.location} • <span className="job-tag">{job.type || job.jobType}</span></p>
+                </div>
+                <span className="btn">View Job</span>
+              </Link>
+            )) : <p>No related jobs found</p>}
+          </div>
         </div>
         <hr />
 
-        {relatedCompanies.length > 0 && (<><div className='Related-jobs'><h2>Similar Companies</h2><div className="jobs-grid">{relatedCompanies.map(comp => (<div className="company-mini-card" key={comp.name} onClick={() => navigate(`/company/${encodeURIComponent(comp.name)}`)}><img src={comp.logo} alt={comp.name} onError={(e) => e.target.src = `https://ui-avatars.com/api/?name=${encodeURIComponent(comp.name)}&background=22C55E&color=fff`} /><h4>{comp.name}</h4><p>{comp.industry}</p></div>))}</div></div><hr /></>)}
+        {relatedCompanies.length > 0 && (<>
+          <div className='Related-jobs'>
+            <h2>Similar Companies</h2>
+            <div className="jobs-grid">
+              {relatedCompanies.map(comp => (
+                <div className="company-mini-card" key={comp.name} onClick={() => navigate(`/company/${encodeURIComponent(comp.name)}`)}>
+                  <img src={comp.logo} alt={comp.name} onError={(e) => e.target.src = `https://ui-avatars.com/api/?name=${encodeURIComponent(comp.name)}&background=22C55E&color=fff`} />
+                  <h4>{comp.name}</h4>
+                  <p>{comp.industry}</p>
+                </div>
+              ))}
+            </div>
+          </div>
+          <hr />
+        </>)}
       </div>
     </div>
   );

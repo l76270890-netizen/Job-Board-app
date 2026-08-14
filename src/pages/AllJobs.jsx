@@ -1,4 +1,3 @@
-
 import "./AllJobs.css";
 import {
   Search, MapPin, Bookmark, Briefcase, DollarSign, ArrowLeft, SlidersHorizontal,
@@ -7,7 +6,7 @@ import {
 import { useState, useMemo, useEffect } from "react";
 import { useNavigate, useSearchParams, useLocation } from "react-router-dom";
 import { useAuth } from "../context/AuthContext";
-import { collection, query, where, getDocs, orderBy, doc, updateDoc, arrayUnion, arrayRemove, onSnapshot } from "firebase/firestore"; // ADDED
+import { collection, query, where, getDocs, orderBy, doc, updateDoc, arrayUnion, arrayRemove, onSnapshot } from "firebase/firestore";
 import { db } from "../firebase";
 
 export const jobs = [
@@ -52,11 +51,16 @@ export default function AllJobs() {
 
  // 1. LISTEN TO FIREBASE SAVED JOBS
  useEffect(() => {
-   if (!currentUser) return;
+   if (!currentUser) {
+     setSavedIds([]); // clear when logged out
+     return;
+   }
    const userRef = doc(db, "users", currentUser.uid);
    const unsub = onSnapshot(userRef, (snap) => {
      if (snap.exists()) {
        setSavedIds(snap.data().savedJobs || []);
+     } else {
+       setSavedIds([]);
      }
    });
    return () => unsub();
@@ -91,7 +95,7 @@ export default function AllJobs() {
       });
 
       const allJobs = [...jobs,...firestoreJobs].map(job => ({
-      ...job,
+     ...job,
         is_saved: savedIds.includes(String(job.id)) // Check Firebase
       }));
 
@@ -149,7 +153,7 @@ export default function AllJobs() {
 
       await updateDoc(userRef, {
         savedJobs: isSaved
-        ? arrayRemove(jobIdStr)
+       ? arrayRemove(jobIdStr)
           : arrayUnion(jobIdStr)
       });
       // UI updates automatically because of onSnapshot
@@ -263,7 +267,13 @@ export default function AllJobs() {
                 <div className="jobCard" key={job.id} onClick={() => navigate(`/jobs/${job.id}`, { state: job })}>
                   <div className="jobHeader">
                     <img src={job.logo} alt={job.company} />
-                    <Bookmark size={25} onClick={(e) => handleToggleSave(e, job.id)} fill={job.is_saved? "#16a34a" : "none"} color={job.is_saved? "#16a34a" : "currentColor"} style={{ cursor: 'pointer', position:"relative", left:"22rem" }} />
+                    <Bookmark 
+                      size={25} 
+                      onClick={(e) => handleToggleSave(e, job.id)} 
+                      fill={job.is_saved? "#16a34a" : "none"} 
+                      color={job.is_saved? "#16a34a" : "currentColor"} 
+                      style={{ cursor: 'pointer' }} 
+                    />
                   </div>
                   <h2>{job.title}</h2>
                   <h4>{job.company}</h4>
@@ -323,7 +333,13 @@ export default function AllJobs() {
               <div className="mobileCard" key={job.id} onClick={() => navigate(`/jobs/${job.id}`, { state: job })}>
                 <div className="mobileTop">
                   <img src={job.logo} alt={job.company} />
-                  <Bookmark size={18} onClick={(e) => handleToggleSave(e, job.id)} fill={job.is_saved? "#16a34a" : "none"} color={job.is_saved? "#16a34a" : "currentColor"} style={{ cursor: 'pointer' }} />
+                  <Bookmark 
+                    size={18} 
+                    onClick={(e) => handleToggleSave(e, job.id)} 
+                    fill={job.is_saved? "#16a34a" : "none"} 
+                    color={job.is_saved? "#16a34a" : "currentColor"} 
+                    style={{ cursor: 'pointer' }} 
+                  />
                 </div>
                 <h3>{job.title}</h3>
                 <p className="companyName">{job.company}</p>
