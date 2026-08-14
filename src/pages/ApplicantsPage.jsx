@@ -176,8 +176,8 @@ const handleMessageApplicant = async (applicant) => {
                 <button className="accept" onClick={() => {updateStatus(selectedApplicant.id, "Accepted"); setSelectedApplicant(null)}}><CheckCircle size={14} /> Accept</button>
                 <button className="reject" onClick={() => {updateStatus(selectedApplicant.id, "Rejected"); setSelectedApplicant(null)}}><XCircle size={14} /> Reject</button>
                 <button className="btn-outline" onClick={() => {handleMessageApplicant(selectedApplicant); setSelectedApplicant(null)}}>
-  <Mail size={16} /> Message
-</button>
+                <Mail size={16} /> Message
+                </button>
                
               </div>
             </div>
