@@ -146,11 +146,7 @@ function Navbar() {
         {currentUser && <NotificationBell  />}
 
         {!currentUser && <Link to="/login" className="mobile-login-btn">Joinnow</Link>}
-        {currentUser && (
-          <Link to="/settings" className="mobile-user-avatar">
-            {userPhoto? <img src={userPhoto} alt="user" className="avatar-img" /> : <div className="avatar-initial">{userInitial}</div>}
-          </Link>
-        )}
+       
       </header>
 
       {/* MOBILE DRAWER */}
