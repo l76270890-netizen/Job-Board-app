@@ -23,26 +23,49 @@ from dotenv import load_dotenv
 from pwdlib import PasswordHash
 from pydantic import BaseModel, ConfigDict, EmailStr, Field
 from sqlalchemy import Boolean, DateTime, ForeignKey, Integer, JSON, String, Text, UniqueConstraint, create_engine, func, or_, select
+from sqlalchemy.exc import SQLAlchemyError
 from sqlalchemy.orm import DeclarativeBase, Mapped, Session, mapped_column, relationship, sessionmaker
 
 
 BACKEND_DIR = Path(__file__).resolve().parents[1]
 load_dotenv(BACKEND_DIR / ".env")
 
-DATABASE_URL = os.getenv("DATABASE_URL", f"sqlite:///{(BACKEND_DIR / '9ja.db').as_posix()}")
+HOSTED_ENVIRONMENT = bool(os.getenv("VERCEL") or os.getenv("RENDER"))
+ENVIRONMENT = os.getenv("ENVIRONMENT", "production" if HOSTED_ENVIRONMENT else "development").lower()
+CONFIGURED_DATABASE_URL = os.getenv("DATABASE_URL", "").strip()
+if ENVIRONMENT == "production" and not CONFIGURED_DATABASE_URL:
+    raise RuntimeError("DATABASE_URL must point to a persistent PostgreSQL database in production")
+DATABASE_URL = CONFIGURED_DATABASE_URL or f"sqlite:///{(BACKEND_DIR / '9ja.db').as_posix()}"
 if DATABASE_URL.startswith("postgres://"):
     DATABASE_URL = DATABASE_URL.replace("postgres://", "postgresql+psycopg://", 1)
 elif DATABASE_URL.startswith("postgresql://"):
     DATABASE_URL = DATABASE_URL.replace("postgresql://", "postgresql+psycopg://", 1)
 JWT_SECRET = os.getenv("JWT_SECRET", "development-only-change-me")
-if os.getenv("ENVIRONMENT", "development").lower() == "production" and JWT_SECRET == "development-only-change-me":
-    raise RuntimeError("Set a unique JWT_SECRET before production startup")
-COOKIE_SECURE = os.getenv("COOKIE_SECURE", "false").lower() == "true"
+if ENVIRONMENT == "production" and (JWT_SECRET == "development-only-change-me" or len(JWT_SECRET) < 32):
+    raise RuntimeError("Set a unique JWT_SECRET with at least 32 characters before production startup")
+COOKIE_SECURE = ENVIRONMENT == "production" or os.getenv("COOKIE_SECURE", "false").lower() == "true"
 COOKIE_NAME = "nineja_session"
 TOKEN_TTL_HOURS = 24 * 7
-PUBLIC_API_URL = os.getenv("PUBLIC_API_URL", "http://localhost:8000").rstrip("/")
-FRONTEND_ORIGINS = [x.strip() for x in os.getenv("FRONTEND_ORIGINS", "http://localhost:5173").split(",") if x.strip()]
-UPLOAD_DIR = Path(os.getenv("UPLOAD_DIR", str(BACKEND_DIR / "uploads"))).resolve()
+PUBLIC_API_URL = os.getenv("PUBLIC_API_URL", "" if HOSTED_ENVIRONMENT else "http://localhost:8000").strip().rstrip("/")
+FRONTEND_ORIGINS = [x.strip().rstrip("/") for x in os.getenv("FRONTEND_ORIGINS", "http://localhost:5173").split(",") if x.strip()]
+if ENVIRONMENT == "production":
+    if not FRONTEND_ORIGINS or any(origin == "*" or not origin.startswith("https://") for origin in FRONTEND_ORIGINS):
+        raise RuntimeError("Set FRONTEND_ORIGINS to the exact HTTPS origin of your frontend")
+    if not PUBLIC_API_URL.startswith("https://"):
+        raise RuntimeError("Set PUBLIC_API_URL to this backend's public HTTPS URL")
+else:
+    # Vite may move to 5174 (or 127.0.0.1) when its default port is occupied.
+    FRONTEND_ORIGINS = list(dict.fromkeys([
+        *FRONTEND_ORIGINS,
+        "http://localhost:5173",
+        "http://localhost:5174",
+        "http://127.0.0.1:5173",
+        "http://127.0.0.1:5174",
+    ]))
+# Vercel's packaged filesystem is read-only; /tmp is writable but ephemeral.
+# Uploads are disabled on Vercel until durable object storage is integrated.
+DEFAULT_UPLOAD_DIR = "/tmp/9ja-uploads" if os.getenv("VERCEL") else str(BACKEND_DIR / "uploads")
+UPLOAD_DIR = Path(os.getenv("UPLOAD_DIR", DEFAULT_UPLOAD_DIR)).resolve()
 UPLOAD_DIR.mkdir(parents=True, exist_ok=True)
 
 engine = create_engine(DATABASE_URL, connect_args={"check_same_thread": False} if DATABASE_URL.startswith("sqlite") else {}, pool_pre_ping=True)
@@ -242,8 +265,30 @@ def employer(user: User = Depends(current_user)) -> User:
     return user
 
 
-def public_user(user: User) -> dict[str, Any]:
-    return {"id": user.id, "uid": str(user.id), "email": user.email, "name": user.name, "displayName": user.name, "role": user.role, "photoURL": user.photo_url or (user.profile or {}).get("photoURL"), **(user.profile or {})}
+PRIVATE_PROFILE_FIELDS = {"email", "phone", "cvUrl", "resumeUrl", "notifications", "savedJobs"}
+RESERVED_PROFILE_FIELDS = PRIVATE_PROFILE_FIELDS | {"id", "uid", "role", "name", "displayName", "photoURL", "password", "passwordHash", "password_hash", "token_version", "is_active"}
+PUBLIC_PROFILE_FIELDS = {
+    "title", "bio", "companyName", "companySize", "industry", "location", "website",
+    "companyWebsite", "companyDescription", "companyLocation", "companyLogo", "companyBanner",
+    "companyBenefits", "companySocials", "bannerURL", "profileViews",
+}
+
+
+def public_user(user: User, *, include_private: bool = False) -> dict[str, Any]:
+    profile = user.profile if isinstance(user.profile, dict) else {}
+    visible_profile = {
+        key: value
+        for key, value in profile.items()
+        if key not in RESERVED_PROFILE_FIELDS and (include_private or key in PUBLIC_PROFILE_FIELDS)
+    }
+    result = {**visible_profile}
+    result.update({"id": user.id, "uid": str(user.id), "name": user.name, "displayName": user.name, "role": user.role, "photoURL": user.photo_url or profile.get("photoURL")})
+    if include_private:
+        result["email"] = user.email
+        for key in PRIVATE_PROFILE_FIELDS - {"email"}:
+            if key in profile:
+                result[key] = profile[key]
+    return result
 
 
 def public_job(job: Job, db: Session) -> dict[str, Any]:
@@ -526,18 +571,34 @@ def signup(data: SignupIn, response: Response, db: Session = Depends(get_db)):
     user = User(email=email, password_hash=password_hash.hash(data.password), role=data.role, name=data.name.strip())
     db.add(user); db.commit(); db.refresh(user)
     response.set_cookie(COOKIE_NAME, token_for(user), httponly=True, secure=COOKIE_SECURE, samesite="none" if COOKIE_SECURE else "lax", max_age=TOKEN_TTL_HOURS * 3600, path="/")
-    return public_user(user)
+    return public_user(user, include_private=True)
 
 @app.post("/api/auth/login")
 def login(data: LoginIn, response: Response, db: Session = Depends(get_db)):
     user = db.scalar(select(User).where(User.email == data.email.lower().strip()))
     if not user or not password_hash.verify(data.password, user.password_hash): raise HTTPException(401, "Email or password is incorrect")
     response.set_cookie(COOKIE_NAME, token_for(user), httponly=True, secure=COOKIE_SECURE, samesite="none" if COOKIE_SECURE else "lax", max_age=TOKEN_TTL_HOURS * 3600, path="/")
-    return public_user(user)
+    return public_user(user, include_private=True)
 
 @app.post("/api/auth/logout", status_code=204)
-def logout(response: Response, db: Session = Depends(get_db), user: User = Depends(current_user)):
-    user.token_version += 1; db.commit(); response.delete_cookie(COOKIE_NAME, path="/")
+def logout(request: Request, response: Response, db: Session = Depends(get_db)):
+    # Logout should remain idempotent: clear the browser cookie even if it has
+    # expired, is malformed, or the database is temporarily unavailable.
+    try:
+        user = user_from_token(request.cookies.get(COOKIE_NAME, ""), db)
+        if user:
+            user.token_version += 1
+            db.commit()
+    except SQLAlchemyError:
+        db.rollback()
+    response.delete_cookie(
+        COOKIE_NAME,
+        path="/",
+        httponly=True,
+        secure=COOKIE_SECURE,
+        samesite="none" if COOKIE_SECURE else "lax",
+        max_age=0,
+    )
 
 @app.patch("/api/auth/password")
 def change_password(data: PasswordChangeIn, response: Response, db: Session = Depends(get_db), user: User = Depends(current_user)):
@@ -547,16 +608,16 @@ def change_password(data: PasswordChangeIn, response: Response, db: Session = De
     user.token_version += 1
     db.commit(); db.refresh(user)
     response.set_cookie(COOKIE_NAME, token_for(user), httponly=True, secure=COOKIE_SECURE, samesite="none" if COOKIE_SECURE else "lax", max_age=TOKEN_TTL_HOURS * 3600, path="/")
-    return public_user(user)
+    return public_user(user, include_private=True)
 
 @app.get("/api/auth/me")
-def me(user: User = Depends(current_user)): return public_user(user)
+def me(user: User = Depends(current_user)): return public_user(user, include_private=True)
 
 @app.get("/api/users/{user_id}")
 def get_public_user(user_id: int, db: Session = Depends(get_db), viewer: User = Depends(current_user)):
     user = db.get(User, user_id)
     if not user: raise HTTPException(404, "User not found")
-    result = public_user(user)
+    result = public_user(user, include_private=viewer.id == user.id)
     if viewer.id == user.id:
         result["savedJobs"] = [str(x) for x in db.scalars(select(SavedJob.job_id).where(SavedJob.user_id == user.id)).all()]
     else:
@@ -576,10 +637,12 @@ def update_profile(data: ProfileIn, db: Session = Depends(get_db), user: User = 
     if data.profile is not None:
         user.profile = {**(user.profile or {}), **data.profile}
         if "photoURL" in data.profile: user.photo_url = data.profile["photoURL"]
-    db.commit(); db.refresh(user); return public_user(user)
+    db.commit(); db.refresh(user); return public_user(user, include_private=True)
 
 @app.post("/api/users/me/upload", status_code=201)
 async def upload_file(file: UploadFile = File(...), db: Session = Depends(get_db), user: User = Depends(current_user)):
+    if os.getenv("VERCEL"):
+        raise HTTPException(503, "File uploads are temporarily unavailable until durable file storage is configured")
     suffix = Path(file.filename or "").suffix.lower()
     allowed = {".pdf", ".doc", ".docx", ".png", ".jpg", ".jpeg", ".webp"}
     if suffix not in allowed: raise HTTPException(415, "Upload a PDF, DOC, DOCX, JPG, PNG, or WEBP file")
@@ -589,6 +652,10 @@ async def upload_file(file: UploadFile = File(...), db: Session = Depends(get_db
     mime_type = expected_mime[suffix]
     if suffix == ".pdf" and not contents.startswith(b"%PDF-"): raise HTTPException(415, "This file is not a valid PDF")
     if suffix in {".jpg", ".jpeg"} and not contents.startswith(b"\xff\xd8\xff"): raise HTTPException(415, "This file is not a valid JPEG")
+    if suffix == ".png" and not contents.startswith(b"\x89PNG\r\n\x1a\n"): raise HTTPException(415, "This file is not a valid PNG")
+    if suffix == ".webp" and not (contents.startswith(b"RIFF") and contents[8:12] == b"WEBP"): raise HTTPException(415, "This file is not a valid WEBP image")
+    if suffix == ".doc" and not (contents.startswith(b"\xd0\xcf\x11\xe0\xa1\xb1\x1a\xe1") or contents.startswith(b"PK\x03\x04")): raise HTTPException(415, "This file is not a valid DOC file")
+    if suffix == ".docx" and not contents.startswith(b"PK\x03\x04"): raise HTTPException(415, "This file is not a valid DOCX file")
     name = f"{secrets.token_hex(20)}{suffix}"
     (UPLOAD_DIR / name).write_bytes(contents)
     original_name = Path((file.filename or name).replace("\\", "/")).name
@@ -609,7 +676,7 @@ def download_file(file_id: int, db: Session = Depends(get_db), user: User | None
     if not permitted: raise HTTPException(403, "You cannot access this file")
     path = UPLOAD_DIR / record.stored_name
     if not path.is_file(): raise HTTPException(404, "File not found")
-    return FileResponse(path, media_type=record.mime_type, filename=record.original_name)
+    return FileResponse(path, media_type=record.mime_type, filename=record.original_name, headers={"X-Content-Type-Options": "nosniff"})
 
 @app.get("/api/jobs")
 def list_jobs(search: str | None = None, location: str | None = None, category: str | None = None, job_type: str | None = Query(default=None, alias="jobType"), limit: int = Query(50, ge=1, le=100), offset: int = Query(0, ge=0), db: Session = Depends(get_db)):

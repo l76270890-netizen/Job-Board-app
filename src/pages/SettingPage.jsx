@@ -166,7 +166,13 @@ export default function SettingPage() {
   };
 
   const handleLogout = async () => {
-    if (confirm("Logout?")) { await logout(); navigate("/login"); }
+    if (confirm("Logout?")) {
+      const serverLogoutSucceeded = await logout();
+      navigate("/login");
+      if (!serverLogoutSucceeded) {
+        alert("You were signed out in this tab, but the server could not confirm it. Check the API connection and try again.");
+      }
+    }
   };
 
   // FIX: MOVE SETTINGS ARRAYS UP HERE BEFORE USING THEM

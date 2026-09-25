@@ -36,10 +36,13 @@ function Navbar() {
   }, []);
 
   const handleLogout = async () => {
-    await logout();
+    const serverLogoutSucceeded = await logout();
     setMobileMenuOpen(false);
     setProfileOpen(false);
     navigate("/login");
+    if (!serverLogoutSucceeded) {
+      window.alert("You were signed out in this tab, but the server could not confirm it. Check the API connection and try again.");
+    }
   };
 
   // NEW: GO TO FIRST JOB'S APPLICANTS

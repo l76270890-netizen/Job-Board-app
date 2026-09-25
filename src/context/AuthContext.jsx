@@ -39,8 +39,16 @@ export function AuthProvider({ children }) {
   };
 
   const logout = async () => {
-    await api("/api/auth/logout", { method: "POST" });
-    setCurrentUser(null);
+    try {
+      await api("/api/auth/logout", { method: "POST" });
+      setCurrentUser(null);
+      return true;
+    } catch {
+      // A failed API request must not leave the UI stuck in an authenticated
+      // state. The caller can warn that server-side revocation was not confirmed.
+      setCurrentUser(null);
+      return false;
+    }
   };
 
   const changePassword = async (currentPassword, newPassword) => {
