@@ -2,8 +2,8 @@ import { useState, useEffect } from "react"; // ADD useEffect
 import { useNavigate, Link, useLocation } from "react-router-dom";
 import { useAuth } from "../context/AuthContext";
 import { Mail, Lock, Eye, EyeOff, Briefcase, UserCheck } from "lucide-react";
+import { FaApple, FaGithub } from "react-icons/fa";
 import { FcGoogle } from "react-icons/fc";
-import { FaApple, FaFacebook } from "react-icons/fa";
 import "./Auth.css";
 
 export default function LoginPage() {
@@ -14,7 +14,7 @@ export default function LoginPage() {
   const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
   const location = useLocation();
-  const { login, loginWithGoogle, userData } = useAuth(); // GET userData
+  const { login, loginWithProvider, userData } = useAuth();
 
   const from = location.state?.from?.pathname || "/";
 
@@ -25,6 +25,11 @@ export default function LoginPage() {
       else navigate(from, { replace: true });
     }
   }, [userData, navigate, from]);
+
+  useEffect(() => {
+    const oauthError = new URLSearchParams(location.search).get("oauth_error");
+    if (oauthError) setError(oauthError);
+  }, [location.search]);
 
   const handleLogin = async (e) => {
     e.preventDefault();
@@ -39,14 +44,13 @@ export default function LoginPage() {
     }
   };
 
-  const handleSocialLogin = async () => {
-    setError("");
+  const handleProviderLogin = async (provider) => {
     setLoading(true);
+    setError("");
     try {
-      await loginWithGoogle(role); 
-      // don't navigate here, useEffect will handle it
+      await loginWithProvider(provider, role);
     } catch (err) {
-      setError(err.message);
+      setError(err.message || `Could not start ${provider} sign-in.`);
       setLoading(false);
     }
   };
@@ -117,16 +121,15 @@ export default function LoginPage() {
         </form>
 
         <div className="divider">or continue with</div>
-
         <div className="social-login">
-          <button className="social-btn google" onClick={handleSocialLogin} disabled={loading}>
-            <FcGoogle size={20} /> Continue with Google
+          <button type="button" className="social-btn google" onClick={() => handleProviderLogin("google")} disabled={loading}>
+            <FcGoogle size={20} aria-hidden="true" /> Continue with Google
           </button>
-          <button className="social-btn apple" onClick={() => alert("Enable Apple in Firebase first")}>
-            <FaApple size={20} /> Continue with Apple
+          <button type="button" className="social-btn apple" onClick={() => handleProviderLogin("apple")} disabled={loading}>
+            <FaApple size={20} aria-hidden="true" /> Continue with Apple
           </button>
-          <button className="social-btn facebook" onClick={() => alert("Enable Facebook in Firebase first")}>
-            <FaFacebook size={20} /> Continue with Facebook
+          <button type="button" className="social-btn github" onClick={() => handleProviderLogin("github")} disabled={loading}>
+            <FaGithub size={20} aria-hidden="true" /> Continue with GitHub
           </button>
         </div>
 

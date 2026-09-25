@@ -1,11 +1,11 @@
 import { useState, useEffect } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import { useAuth } from "../context/AuthContext";
-import { db } from "../firebase";
+import { db } from "../lib/firestoreCompat";
 import {
   collection, query, where, getDocs, doc, updateDoc, addDoc,
   getDoc, orderBy, serverTimestamp
-} from "firebase/firestore";
+} from "../lib/firestoreCompat";
 import {
   ArrowLeft, Mail, Phone, Download, Eye, X,
   CheckCircle, XCircle, User
@@ -154,7 +154,7 @@ const handleMessageApplicant = async (applicant) => {
                 </div>
               </div>
 
-              <div className="applied-date">Applied: {app.appliedAt?.toDate().toLocaleDateString()}</div>
+              <div className="applied-date">Applied: {new Date(app.appliedAt?.toDate?.() || app.appliedAt).toLocaleDateString()}</div>
             </div>
           ))
         )}

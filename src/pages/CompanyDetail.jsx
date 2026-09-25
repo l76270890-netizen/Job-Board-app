@@ -3,8 +3,8 @@ import './CompanyDetail.css';
 import { ArrowLeft, MapPin, Briefcase, Users, Building2, CheckCircle, Share2, Filter, ExternalLink, Bookmark, Plus, Star, ShieldCheck } from "lucide-react";
 import { useNavigate, useParams, Link } from "react-router-dom";
 import { jobs as staticJobs } from "./AllJobs";
-import { db } from "../firebase";
-import { collection, getDocs, doc, updateDoc, increment, setDoc, deleteDoc, getDoc, query, where, onSnapshot, addDoc, serverTimestamp } from "firebase/firestore";
+import { db } from "../lib/firestoreCompat";
+import { collection, getDocs, doc, updateDoc, increment, setDoc, deleteDoc, getDoc, query, where, onSnapshot, addDoc, serverTimestamp } from "../lib/firestoreCompat";
 import { useAuth } from '../context/AuthContext';
 
 const baseCompanies = [
@@ -64,7 +64,7 @@ function CompanyDetail(){
       setReviews(snap.docs.map(d => ({ id: d.id,...d.data() })));
     });
     return () => unsub();
-  }, [decodedName][currentUser]);
+  }, [decodedName, currentUser]);
 
   const allJobs = useMemo(() => [...staticJobs,...firestoreJobs], [firestoreJobs]);
 
@@ -199,7 +199,7 @@ function CompanyDetail(){
             <div><strong>{companyData.employees}</strong><span>Employees</span></div>
             <div><strong>{companyData.avgRating || 'N/A'}</strong><span>Rating</span></div>
           </div>
-          <button className="view-jobs-main-btn" onClick={() => setActiveTab('jobs')}>View Jobs ({companyData.jobCount})</button>
+          <button className="view-jobs-main-btn" onClick={() => navigate(`/company/${encodeURIComponent(companyData.name)}/jobs`)}>View Jobs ({companyData.jobCount})</button>
         </div>
 
         <div className="company-tabs">
@@ -272,7 +272,7 @@ function CompanyDetail(){
                 <h4>Rate your experience at {companyData.name}</h4>
                 <label>Overall Rating
                   <select value={reviewForm.rating} onChange={e => setReviewForm({...reviewForm, rating: Number(e.target.value)})}>
-                    {[5][4][3][2][1].map(n => <option key={n} value={n}>{n} Stars</option>)}
+                    {[5, 4, 3, 2, 1].map(n => <option key={n} value={n}>{n} Stars</option>)}
                   </select>
                 </label>
                 <input placeholder="Review Title" value={reviewForm.title} onChange={e => setReviewForm({...reviewForm, title: e.target.value})} required/>
@@ -297,7 +297,7 @@ function CompanyDetail(){
                     <p><strong>Cons:</strong> {review.cons}</p>
                     <div className="review-footer">
                       <span>{review.userName}</span>
-                      <span>{review.createdAt?.toDate().toLocaleDateString()}</span>
+                      <span>{new Date(review.createdAt?.toDate?.() || review.createdAt).toLocaleDateString()}</span>
                     </div>
                   </div>
                 ))

@@ -3,8 +3,8 @@ import { useNavigate, useLocation, useParams } from "react-router-dom";
 import './EmployerProfile.css';
 import { Building2, Upload, Globe, Users, Save, X, Plus, Trash2, CheckCircle, ArrowLeft } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
-import { db } from '../firebase';
-import { doc, getDoc, updateDoc, setDoc } from 'firebase/firestore';
+import { db } from '../lib/firestoreCompat';
+import { doc, getDoc, updateDoc, setDoc } from '../lib/firestoreCompat';
 
 function EmployerProfile() {
    const navigate = useNavigate();
@@ -66,7 +66,7 @@ function EmployerProfile() {
     if (!file) return;
     const reader = new FileReader();
     reader.onloadend = () => {
-      setForm({...form, [type]: reader.result }); // base64 for now. Use cloudinary/firebase storage later
+      setForm({...form, [type]: reader.result }); // keep existing profile image preview behavior
     };
     reader.readAsDataURL(file);
   };

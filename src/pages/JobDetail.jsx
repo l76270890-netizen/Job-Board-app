@@ -6,8 +6,9 @@ import { useNavigate, useLocation, useParams } from "react-router-dom";
 import { useEffect, useState } from "react";
 import { jobs as allJobs } from "./AllJobs";
 import { useAuth } from "../context/AuthContext";
-import { doc, getDoc, collection, addDoc, serverTimestamp, query, where, getDocs } from "firebase/firestore";
-import { db } from "../firebase";
+import { doc, getDoc, collection, addDoc, serverTimestamp, query, where, getDocs } from "../lib/firestoreCompat";
+import { db } from "../lib/firestoreCompat";
+import { api } from "../lib/api";
 
 function JobDetail() {
   const navigate = useNavigate();
@@ -60,7 +61,7 @@ function JobDetail() {
             salary: data.salaryMax || data.salaryMin || 50000,
             category: data.category,
             experience: data.experience || "Mid-Level",
-            postedDate: data.createdAt?.toDate().toISOString() || new Date().toISOString(),
+            postedDate: data.createdAt?.toDate?.()?.toISOString?.() || data.createdAt || new Date().toISOString(),
             description: data.description,
             responsibilities: [],
             skills: data.requirements || [],
@@ -81,16 +82,20 @@ function JobDetail() {
     if (!job ||!currentUser) return;
 
     const checkApplication = async () => {
-      const savedIds = JSON.parse(localStorage.getItem('savedJobs')) || [];
-      setIsSaved(savedIds.includes(job.id));
-
-      const q = query(
-        collection(db, "applications"),
-        where("jobId", "==", job.id),
-        where("userId", "==", currentUser.uid)
-      );
-      const snapshot = await getDocs(q);
-      setApplied(!snapshot.empty);
+      try {
+        const [savedJobs, applications] = await Promise.all([
+          api("/api/saved-jobs"),
+          getDocs(query(
+            collection(db, "applications"),
+            where("jobId", "==", job.id),
+            where("userId", "==", currentUser.uid)
+          )),
+        ]);
+        setIsSaved(savedJobs.some((savedJob) => String(savedJob.id) === String(job.id)));
+        setApplied(!applications.empty);
+      } catch (error) {
+        console.error("Could not load this job's saved or application status:", error);
+      }
     }
     checkApplication();
   }, [job, currentUser]);
@@ -121,20 +126,20 @@ function JobDetail() {
     action();
   }
 
-  const handleToggleSave = (e) => {
+  const handleToggleSave = async (e) => {
     e.stopPropagation();
-    requireAuth(() => {
-      const savedIds = JSON.parse(localStorage.getItem('savedJobs')) || [];
-      let newSavedIds;
-      if (savedIds.includes(job.id)) {
-        newSavedIds = savedIds.filter(id => String(id)!== String(job.id));
-        setIsSaved(false);
-      } else {
-        newSavedIds = [...savedIds, job.id];
-        setIsSaved(true);
-      }
-      localStorage.setItem('savedJobs', JSON.stringify(newSavedIds));
-    })
+    if (!currentUser) {
+      navigate("/login");
+      return;
+    }
+    const wasSaved = isSaved;
+    setIsSaved(!wasSaved);
+    try {
+      await api(`/api/saved-jobs/${encodeURIComponent(String(job.id))}`, { method: wasSaved ? "DELETE" : "PUT" });
+    } catch (error) {
+      setIsSaved(wasSaved);
+      window.alert(error.message || "Could not update saved jobs. Please try again.");
+    }
   };
 
   const handleApplyClick = () => {
@@ -150,6 +155,9 @@ function JobDetail() {
     setSubmitting(true);
     try {
       const applicantName = userData?.name || currentUser.displayName || currentUser.email;
+      const upload = new FormData();
+      upload.append("file", resume);
+      const uploadedResume = await api("/api/users/me/upload", { method: "POST", body: upload });
 
       // 1. Save application to Firestore
       await addDoc(collection(db, "applications"), {
@@ -161,6 +169,7 @@ function JobDetail() {
         userEmail: currentUser.email,
         applicantName: applicantName, // ADDED
         resumeName: resume.name,
+        resumeFileId: uploadedResume.id,
         coverLetter: coverLetter,
         status: "pending",
         appliedAt: serverTimestamp()

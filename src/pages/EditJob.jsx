@@ -3,8 +3,8 @@ import "./PostJobs.css";
 import { ArrowLeft, Briefcase, MapPin, FileText, Plus, X, Building2, Save } from "lucide-react";
 import { useNavigate, useParams } from "react-router-dom";
 import { useAuth } from "../context/AuthContext";
-import { db } from "../firebase";
-import { doc, getDoc, updateDoc, serverTimestamp } from "firebase/firestore";
+import { db } from "../lib/firestoreCompat";
+import { doc, getDoc, updateDoc, serverTimestamp } from "../lib/firestoreCompat";
 
 function EditJob() {
   const navigate = useNavigate();

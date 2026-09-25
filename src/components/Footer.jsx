@@ -33,7 +33,7 @@ function Footer() {
           {isGuest && (
             <div className="footer-cta-group">
               <Link to="/jobs" className="footer-cta-btn">Find Jobs</Link>
-              <Link to="/employer/post-job" className="footer-cta-btn-outline">Hire Talent</Link>
+              <Link to="/signup?role=employer" className="footer-cta-btn-outline">Hire Talent</Link>
             </div>
           )}
         </div>
@@ -44,16 +44,16 @@ function Footer() {
           {isEmployer ? (
             <>
               <Link to="/employer/post-job">Post a Job</Link>
-              <Link to="/employer/dashboard">Dashboard</Link>
-              <Link to="/employer/candidates">Browse Candidates</Link>
-              <Link to="/employer/pricing">Pricing</Link>
+              <Link to="/employer/jobs">Manage Jobs</Link>
+              <Link to="/employer/profile">Company Profile</Link>
+              <Link to="/messages">Messages</Link>
             </>
           ) : (
             <>
               <Link to="/jobs">Find Jobs</Link>
-              <Link to="/profile">Create Profile</Link>
-              <Link to="/career-advice">Career Advice</Link>
-              <Link to="/saved-jobs">Saved Jobs</Link>
+              <Link to="/settings">Create Profile</Link>
+              <Link to="/articles">Career Advice</Link>
+              <Link to="/saved">Saved Jobs</Link>
             </>
           )}
         </div>
@@ -63,17 +63,17 @@ function Footer() {
           <h3>{isEmployer ? 'Hiring Resources' : 'Company'}</h3>
           {isEmployer ? (
             <>
-              <Link to="/employer/resources">Hiring Guide</Link>
-              <Link to="/employer/tools">Recruitment Tools</Link>
-              <Link to="/employer/success-stories">Success Stories</Link>
-              <Link to="/contact">Support</Link>
+              <Link to="/articles">Hiring Guide</Link>
+              <Link to="/employer/jobs">Manage Jobs</Link>
+              <Link to="/companies">Companies</Link>
+              <Link to="/settings">Account Settings</Link>
             </>
           ) : (
             <>
-              <Link to="/about">About Us</Link>
-              <Link to="/contact">Contact</Link>
-              <Link to="/privacy">Privacy Policy</Link>
-              <Link to="/terms">Terms</Link>
+              <Link to="/companies">Companies</Link>
+              <Link to="/articles">Career Advice</Link>
+              <Link to="/my-applications">My Applications</Link>
+              <Link to="/settings">Account Settings</Link>
             </>
           )}
         </div>
@@ -83,7 +83,7 @@ function Footer() {
           <div className="footer-column">
             <h3>For Job Seekers</h3>
             <Link to="/jobs">Browse Jobs</Link>
-            <Link to="/register">Create Account</Link>
+            <Link to="/signup">Create Account</Link>
             <Link to="/companies">Top Companies</Link>
           </div>
         )}
@@ -91,8 +91,8 @@ function Footer() {
           <div className="footer-column">
             <h3>For Employers</h3>
             <Link to="/employer/post-job">Post a Job</Link>
-            <Link to="/employer/pricing">Pricing</Link>
-            <Link to="/employer/contact">Sales Contact</Link>
+            <Link to="/companies">Find Companies</Link>
+            <Link to="/articles">Hiring Advice</Link>
           </div>
         )}
 

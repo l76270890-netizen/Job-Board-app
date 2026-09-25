@@ -3,8 +3,8 @@ import "./PostJobs.css";
 import { ArrowLeft, Briefcase, MapPin, DollarSign, FileText, Plus, X, Building2 } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "../context/AuthContext";
-import { db } from "../firebase";
-import { collection, addDoc, serverTimestamp } from "firebase/firestore";
+import { db } from "../lib/firestoreCompat";
+import { collection, addDoc, serverTimestamp } from "../lib/firestoreCompat";
 
 function PostJobs() {
   const navigate = useNavigate();
@@ -80,7 +80,7 @@ function PostJobs() {
         createdAt: serverTimestamp()
       });
       alert("Job posted successfully!");
-      navigate("/employer/manage-jobs"); // FIX 3: go to manage jobs after posting
+      navigate("/employer/jobs");
     } catch (error) {
       console.error("Error posting job: ", error);
       alert("Failed to post job: " + error.message);

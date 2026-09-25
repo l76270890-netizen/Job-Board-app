@@ -1,191 +1,116 @@
-import "./Savedjobs.css";
-import { Bookmark, ArrowLeft, DollarSign, MapPin, Briefcase } from "lucide-react";
-import { useState, useEffect } from "react";
-import { useNavigate, useLocation } from "react-router-dom";
-import { jobs as allJobs } from "./AllJobs"; // your static jobs array
+import "./SavedJobs.css";
+import { Bookmark, Briefcase, DollarSign, MapPin, Trash2 } from "lucide-react";
+import { useCallback, useEffect, useState } from "react";
+import { Link, useNavigate } from "react-router-dom";
 import { useAuth } from "../context/AuthContext";
-import { db } from "../firebase";
-import { doc, getDoc, updateDoc, arrayRemove, onSnapshot } from "firebase/firestore";
+import { api } from "../lib/api";
 
 export default function SavedJobs() {
   const navigate = useNavigate();
-  const location = useLocation();
   const { currentUser } = useAuth();
   const [savedJobs, setSavedJobs] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [error, setError] = useState("");
 
-  // Load saved jobs from FIREBASE and listen for changes
-  useEffect(() => {
+  const loadSavedJobs = useCallback(async () => {
     if (!currentUser) {
+      setSavedJobs([]);
       setLoading(false);
       return;
     }
-
-    const userRef = doc(db, "users", currentUser.uid);
-
-    // onSnapshot = auto updates when you save/unsave from AllJobs page
-    const unsub = onSnapshot(userRef, (snap) => {
-      if (snap.exists()) {
-        const savedIds = snap.data().savedJobs || [];
-        // convert job.id to string to avoid "1" vs 1 mismatch
-        const filtered = allJobs.filter(job => savedIds.includes(String(job.id)));
-        setSavedJobs(filtered);
-      }
+    setLoading(true);
+    setError("");
+    try {
+      setSavedJobs(await api("/api/saved-jobs"));
+    } catch (loadError) {
+      setError(loadError.message || "Could not load your saved jobs.");
+    } finally {
       setLoading(false);
-    });
-
-    return () => unsub(); // cleanup
+    }
   }, [currentUser]);
 
-  // Remove from saved in FIREBASE
-  const handleRemoveSave = async (e, jobId) => {
-    e.stopPropagation();
-    if (!currentUser) return;
+  useEffect(() => { loadSavedJobs(); }, [loadSavedJobs]);
 
-    const userRef = doc(db, "users", currentUser.uid);
-    await updateDoc(userRef, {
-      savedJobs: arrayRemove(String(jobId)) // make sure it's string
-    });
+  const removeSavedJob = async (event, jobId) => {
+    event.stopPropagation();
+    const id = String(jobId);
+    const previousJobs = savedJobs;
+    setSavedJobs((items) => items.filter((job) => String(job.id) !== id));
+    setError("");
+    try {
+      await api(`/api/saved-jobs/${encodeURIComponent(id)}`, { method: "DELETE" });
+    } catch (removeError) {
+      setSavedJobs(previousJobs);
+      setError(removeError.message || "Could not remove this saved job.");
+    }
   };
 
-  const handleApply = (e, job) => {
-    e.stopPropagation();
-    if(!currentUser) navigate('/login', {state: {from: location.pathname}})
-    else alert(`Applying for ${job.title}`);
-  };
+  const openJob = (job) => navigate(`/jobs/${job.id}`, { state: job });
 
-  if (loading) return <div className="allJobs"><p style={{textAlign: 'center', padding: '40px'}}>Loading...</p></div>
-
-  if (!currentUser) return (
-    <div className="allJobs" style={{textAlign: 'center', padding: '60px'}}>
-      <Bookmark size={48} color="#ccc" />
-      <h3>Please login to see saved jobs</h3>
-      <button className="applyBtn" onClick={() => navigate('/login')}>Login</button>
-    </div>
-  )
+  if (!currentUser) {
+    return (
+      <main className="savedJobsPage emptyState">
+        <Bookmark size={42} aria-hidden="true" />
+        <h2>Sign in to view saved jobs</h2>
+        <p>Your saved jobs will appear here.</p>
+        <button className="browseBtn" onClick={() => navigate("/login")}>Sign in</button>
+      </main>
+    );
+  }
 
   return (
-    <section className="allJobs">
-      <div className="desktopJobs">
-        <div className="backHeader">
-         <button className="backBtn" onClick={() => navigate(-1)}>
-            <ArrowLeft size={22} />
-            <span>Back</span>
-          </button>
-        </div>
+    <main className="savedJobsPage">
+      <header className="savedHeader">
+        <h1>Your saved jobs</h1>
+        <p className="savedCount">{savedJobs.length} {savedJobs.length === 1 ? "job" : "jobs"} saved</p>
+      </header>
 
-        <div className="jobsHero">
-          <h1>Your <span>Saved Jobs</span></h1>
-          <p className="resultsCount">{savedJobs.length} jobs saved</p>
-        </div>
+      {error && <p role="alert" className="savedJobsError">{error}</p>}
 
-        <div className="jobsContainer" style={{ gridTemplateColumns: '1fr' }}>
-          <div className="jobsGrid">
-            {savedJobs.length > 0? (
-              savedJobs.map((job) => (
-                <div className="jobCard" key={job.id} onClick={() => navigate(`/jobs/${job.id}`, { state: job })}>
-                  <div className="jobHeader">
-                    <img src={job.logo} alt={job.company} />
-                    <Bookmark
-                      size={20}
-                      fill="#2563eb"
-                      color="#2563eb"
-                      style={{ cursor: 'pointer' }}
-                      onClick={(e) => handleRemoveSave(e, job.id)}
-                    />
-                  </div>
-                  <h2>{job.title}</h2>
-                  <h4>{job.company}</h4>
-                  <div className="jobTags">
-                    <span>{job.category}</span>
-                    <span>{job.type}</span>
-                    <span>{job.location}</span>
-                  </div>
-                  <p className="des">{job.description}</p>
-                  <div className="salaryRow">
-                    <div><DollarSign size={18} />${job.salary.toLocaleString()}/mo</div>
-                    <button onClick={(e) => handleApply(e, job)}>Apply</button>
-                  </div>
-                </div>
-              ))
-            ) : (
-              <div className="no-jobs" style={{ textAlign: 'center', padding: '40px' }}>
-                <Bookmark size={48} color="#ccc" />
-                <h3>No Saved Jobs Yet</h3>
-                <p>Click the bookmark icon on any job to save it here</p>
-                <button className="applyBtn" onClick={() => navigate('/jobs')}>Browse Jobs</button>
-              </div>
-            )}
-          </div>
-        </div>
-      </div>
-
-      {/* MOBILE VIEW - same as yours, just replace handleRemoveSave and handleApply */}
-      <div className="mobileJobs">
-        <div className="mobileBack">
-         <button className="backBtn" onClick={() => navigate(-1)}>
-            <ArrowLeft size={22} />
-            <span>Back</span>
-          </button>
-        </div>
-        <div className="jobsHero">
-          <h1>Your <span>Saved Jobs</span></h1>
-        </div>
-        <div className="mobileJobList">
-          <p className="resultsCount">{savedJobs.length} jobs saved</p>
-          {savedJobs.length > 0? (
-            savedJobs.map((job) => (
-              <div className="mobileCard" key={job.id} onClick={() => navigate(`/jobs/${job.id}`, { state: job })}>
-                <div className="mobileTop">
-                  <img src={job.logo} alt={job.company} />
-                  <Bookmark size={18} fill="#2563eb" color="#2563eb" onClick={(e) => handleRemoveSave(e, job.id)} />
+      {loading ? (
+        <p className="loadingText">Loading saved jobs…</p>
+      ) : savedJobs.length ? (
+        <div className="savedJobsGrid">
+          {savedJobs.map((job) => {
+            const company = job.companyName || job.company || "Company";
+            const logo = job.logo || job.companyLogo;
+            const salary = Number(job.salaryMax || job.salaryMin || job.salary || 0);
+            return (
+              <article className="savedJobCard" key={job.id} onClick={() => openJob(job)}>
+                <div className="savedJobTop">
+                  {logo ? (
+                    <img className="savedCompanyLogo" src={logo} alt={`${company} logo`} />
+                  ) : (
+                    <div className="savedCompanyFallbackLogo" aria-label={`${company} logo`}>{company.slice(0, 1).toUpperCase()}</div>
+                  )}
+                  <button className="unsaveBtn" aria-label={`Remove ${job.title} from saved jobs`} onClick={(event) => removeSavedJob(event, job.id)}>
+                    <Trash2 size={17} />
+                  </button>
                 </div>
                 <h3>{job.title}</h3>
-                <p className="companyName">{job.company}</p>
-                <div className="mobileInfo">
-                  <span><MapPin size={14} />{job.location}</span>
-                  <span><Briefcase size={14} />{job.type}</span>
-                  <span>{job.category}</span>
+                <p className="savedCompanyName">{company}</p>
+                <div className="savedJobInfo">
+                  <span><MapPin size={15} />{job.location || "Nigeria"}</span>
+                  <span><Briefcase size={15} />{job.jobType || job.type || "Full-time"}</span>
+                  {job.category && <span>{job.category}</span>}
                 </div>
-                <p className="mobileDesc">{job.description}</p>
-                <div className="mobileBottom">
-                  <div className="salary"><DollarSign size={16} />${job.salary.toLocaleString()}/mo</div>
-                  <button onClick={(e) => handleApply(e, job)}>Apply</button>
+                <p className="savedJobDesc">{job.description || "View the full job details to learn more about this opportunity."}</p>
+                <div className="savedJobBottom">
+                  <span className="savedSalary"><DollarSign size={16} />{salary ? `₦${salary.toLocaleString()}` : "Salary not listed"}</span>
+                  <button className="applyBtn" onClick={(event) => { event.stopPropagation(); openJob(job); }}>View job</button>
                 </div>
-              </div>
-            ))
-          ) : (
-            <div className="no-jobs" style={{ textAlign: 'center', padding: '40px' }}>
-              <Bookmark size={48} color="#ccc" />
-              <h3>No Saved Jobs Yet</h3>
-            </div>
-          )}
+              </article>
+            );
+          })}
         </div>
-      </div>
-    </section>
+      ) : (
+        <div className="emptyState">
+          <Bookmark size={42} aria-hidden="true" />
+          <h2>No saved jobs yet</h2>
+          <p>Use the bookmark on a job card to keep it here.</p>
+          <Link className="browseBtn" to="/jobs">Browse jobs</Link>
+        </div>
+      )}
+    </main>
   );
 }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-

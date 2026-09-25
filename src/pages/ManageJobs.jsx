@@ -4,8 +4,8 @@ import "./ManageJobs.css";
 import { Plus, Edit, Trash2, Users, Eye, Briefcase, MapPin, Calendar, ArrowLeft, Loader2 } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "../context/AuthContext";
-import { db } from "../firebase";
-import { collection, query, where, getDocs, deleteDoc, doc, orderBy, onSnapshot, or } from "firebase/firestore"; // ADDED or
+import { db } from "../lib/firestoreCompat";
+import { collection, query, where, getDocs, deleteDoc, doc, orderBy, onSnapshot, or } from "../lib/firestoreCompat"; // ADDED or
 
 function ManageJobs() {
   const navigate = useNavigate();

@@ -8,8 +8,8 @@ import { useState, useRef, useEffect } from "react";
 import { Link, useLocation, useNavigate } from "react-router-dom";
 import { useAuth } from "../context/AuthContext";
 import NotificationBell from "./NotificationBell";
-import { db } from "../firebase"; // ADDED
-import { collection, query, where, getDocs, orderBy } from "firebase/firestore"; // ADDED
+import { db } from "../lib/firestoreCompat"; // ADDED
+import { collection, query, where, getDocs, orderBy } from "../lib/firestoreCompat"; // ADDED
 
 function Navbar() {
   const [menuOpen, setMenuOpen] = useState(false);
@@ -92,6 +92,7 @@ function Navbar() {
             <>
               <Link to="/jobs" className={isActive("/jobs")}>Jobs</Link>
               <Link to="/companies" className={isActive("/companies")}>Companies</Link>
+              <Link to="/my-applications" className={isActive("/my-applications")}>Applications</Link>
               <Link to="/saved" className={isActive("/saved")}>Saved</Link>
               <Link to="/articles" className={isActive("/articles")}>Articles</Link>
             </>
@@ -145,7 +146,7 @@ function Navbar() {
         <div className="logo"><Link to="/"><img src="Logo.jpg" alt="NijaJobs logo" className="logo-img" /></Link></div>
         {currentUser && <NotificationBell  />}
 
-        {!currentUser && <Link to="/login" className="mobile-login-btn">Joinnow</Link>}
+        {!currentUser && <Link to="/login" className="mobile-login-btn">Join now</Link>}
        
       </header>
 
@@ -178,6 +179,7 @@ function Navbar() {
             <>
               <Link to="/jobs" className="drawer-item" onClick={toggleMobileMenu}><Briefcase size={18} /><span>Jobs</span></Link>
               <Link to="/saved" className="drawer-item" onClick={toggleMobileMenu}><Bookmark size={18} /><span>Saved</span></Link>
+              <Link to="/my-applications" className="drawer-item" onClick={toggleMobileMenu}><FileText size={18} /><span>Applications</span></Link>
               <Link to="/companies" className="drawer-item" onClick={toggleMobileMenu}><Building2 size={18} /><span>Companies</span></Link>
               <Link to="/articles" className="drawer-item" onClick={toggleMobileMenu}><Newspaper size={18} /><span>Articles</span></Link>
             </>

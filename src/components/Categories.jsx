@@ -13,8 +13,8 @@ import {
 import { useNavigate, useLocation } from "react-router-dom";
 import { useAuth } from "../context/AuthContext";
 import { useMemo, useState, useEffect } from "react";
-import { collection, query, where, getDocs, orderBy, onSnapshot } from "firebase/firestore"; // ADDED
-import { db } from "../firebase";
+import { collection, query, where, getDocs, orderBy, onSnapshot } from "../lib/firestoreCompat"; // ADDED
+import { db } from "../lib/firestoreCompat";
 import { jobs as staticJobs } from "../pages/AllJobs"; // fallback
 
 const categoryIcons = { // 2. MAP ICONS TO TITLE

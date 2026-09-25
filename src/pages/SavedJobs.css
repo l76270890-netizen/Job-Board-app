@@ -53,6 +53,7 @@
   margin-bottom: 20px;
 }
 .browseBtn {
+  display: inline-block;
   background: #2563eb;
   color: white;
   border: none;
@@ -60,6 +61,7 @@
   border-radius: 8px;
   font-weight: 600;
   cursor: pointer;
+  text-decoration: none;
 }
 .browseBtn:hover {
   background: #1d4ed8;
@@ -90,6 +92,13 @@
   justify-content: space-between;
   align-items: center;
   margin-bottom: 12px;
+}
+
+.savedCompanyLogo {
+  width: 44px;
+  height: 44px;
+  border-radius: 10px;
+  object-fit: cover;
 }
 
 .savedCompanyFallbackLogo {
@@ -187,6 +196,15 @@
   text-align: center;
   color: #64748b;
   padding: 40px;
+}
+
+.savedJobsError {
+  margin: 0 0 18px;
+  padding: 12px 14px;
+  color: #b91c1c;
+  background: #fef2f2;
+  border: 1px solid #fecaca;
+  border-radius: 10px;
 }
 
 /* MOBILE */

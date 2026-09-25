@@ -13,8 +13,9 @@ import {
 } from "lucide-react";
 import { useNavigate, useLocation } from "react-router-dom";
 import { useAuth } from "../context/AuthContext";
-import { db } from "../firebase";
-import { collection, query, where, getDocs, orderBy, limit, doc, onSnapshot, updateDoc, arrayUnion, arrayRemove } from "firebase/firestore";
+import { db } from "../lib/firestoreCompat";
+import { collection, query, where, getDocs, orderBy, limit } from "../lib/firestoreCompat";
+import { api } from "../lib/api";
 
 // 1. KEEP STATIC AS FALLBACK
 export const staticJobs = [
@@ -33,16 +34,17 @@ function FeaturedJobs() {
 
   const isEmployer = userData?.role === 'employer';
 
-  // 1. LISTEN TO FIREBASE SAVED JOBS - SAME AS ALLJOBS
+  // Load saved job IDs from the backend.
   useEffect(() => {
-    if (!currentUser) return;
-    const userRef = doc(db, "users", currentUser.uid);
-    const unsub = onSnapshot(userRef, (snap) => {
-      if (snap.exists()) {
-        setSavedIds(snap.data().savedJobs || []);
-      }
-    });
-    return () => unsub();
+    if (!currentUser) {
+      setSavedIds([]);
+      return;
+    }
+    let active = true;
+    api("/api/saved-jobs")
+      .then((items) => { if (active) setSavedIds(items.map((job) => String(job.id))); })
+      .catch((error) => console.error("Could not load saved jobs:", error));
+    return () => { active = false; };
   }, [currentUser]);
 
   useEffect(() => {
@@ -133,17 +135,22 @@ function FeaturedJobs() {
 
   const toggleSave = async (e, jobId) => {
     e.stopPropagation();
-    requireAuth(async () => {
-      const userRef = doc(db, "users", currentUser.uid);
-      const jobIdStr = String(jobId);
-      const isSaved = savedIds.includes(jobIdStr);
-
-      await updateDoc(userRef, {
-        savedJobs: isSaved
-      ? arrayRemove(jobIdStr)
-          : arrayUnion(jobIdStr)
-      });
-    })
+    if (!currentUser) {
+      navigate("/login", { state: { from: location } });
+      return;
+    }
+    const id = String(jobId);
+    const wasSaved = savedIds.includes(id);
+    const nextSavedIds = wasSaved ? savedIds.filter((item) => item !== id) : [...savedIds, id];
+    setSavedIds(nextSavedIds);
+    setFeaturedJobs((items) => items.map((job) => ({ ...job, is_saved: nextSavedIds.includes(String(job.id)) })));
+    try {
+      await api(`/api/saved-jobs/${encodeURIComponent(id)}`, { method: wasSaved ? "DELETE" : "PUT" });
+    } catch (error) {
+      setSavedIds(savedIds);
+      setFeaturedJobs((items) => items.map((job) => ({ ...job, is_saved: savedIds.includes(String(job.id)) })));
+      window.alert(error.message || "Could not update saved jobs. Please try again.");
+    }
   };
 
   const handleApplyClick = (e, job) => {

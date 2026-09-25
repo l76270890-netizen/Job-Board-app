@@ -1,18 +1,17 @@
 import { useState, useEffect } from "react"; // ADD useEffect
-import { useNavigate, Link } from "react-router-dom";
+import { useNavigate, Link, useSearchParams } from "react-router-dom";
 import { useAuth } from "../context/AuthContext"; 
 import { Mail, Lock, User, Eye, EyeOff, Briefcase, UserCheck } from "lucide-react";
-import { FcGoogle } from "react-icons/fc";
-import { FaApple, FaFacebook } from "react-icons/fa";
 import "./Auth.css";
 
 export default function SignUpPage() {
-  const [form, setForm] = useState({ name: "", email: "", password: "", role: "jobseeker" });
+  const [searchParams] = useSearchParams();
+  const [form, setForm] = useState(() => ({ name: "", email: "", password: "", role: searchParams.get("role") === "employer" ? "employer" : "jobseeker" }));
   const [error, setError] = useState("");
   const [showPass, setShowPass] = useState(false);
   const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
-  const { signup, loginWithGoogle, userData } = useAuth(); // GET userData
+  const { signup, userData } = useAuth();
 
   // AUTO REDIRECT AFTER SIGNUP
   useEffect(() => {
@@ -28,17 +27,6 @@ export default function SignUpPage() {
     setError("");
     try {
       await signup(form.email, form.password, form.name, form.role); 
-    } catch (err) {
-      setError(err.message);
-      setLoading(false);
-    }
-  };
-
-  const handleSocialSignup = async () => {
-    setError("");
-    setLoading(true);
-    try {
-      await loginWithGoogle(form.role);
     } catch (err) {
       setError(err.message);
       setLoading(false);
@@ -120,20 +108,6 @@ export default function SignUpPage() {
             {loading ? "Creating..." : "Sign Up"}
           </button>
         </form>
-
-        <div className="divider">or sign up with</div>
-
-        <div className="social-login">
-          <button className="social-btn google" onClick={handleSocialSignup} disabled={loading}>
-            <FcGoogle size={20} /> Continue with Google
-          </button>
-          <button className="social-btn apple" onClick={() => alert("Enable Apple in Firebase first")}>
-            <FaApple size={20} /> Continue with Apple
-          </button>
-          <button className="social-btn facebook" onClick={() => alert("Enable Facebook in Firebase first")}>
-            <FaFacebook size={20} /> Continue with Facebook
-          </button>
-        </div>
 
         <p className="auth-footer">
           Already have an account? <Link to="/login">Sign In</Link>

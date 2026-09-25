@@ -13,7 +13,7 @@ import {
 } from "lucide-react";
 import { useNavigate, useLocation } from "react-router-dom";
 import { useState } from "react";
-import { db } from "../firebase";
+import { db } from "../lib/firestoreCompat";
 import { useAuth } from "../context/AuthContext";
 
 function Hero() {
@@ -111,7 +111,7 @@ function Hero() {
 
             <div className="hero-stats">
               <div> <h3>{stats.jobs || 0}</h3><span>Job Seekers</span></div>
-              <div><h2>127</h2><span>Your Applicants</span></div>
+               <div> <h3>{stats.jobs || 0}</h3><span>Your Applicants</span></div>
               <div><h3>{stats.jobs || 0}</h3><span>Active Jobs</span></div>
             </div>
           </div>

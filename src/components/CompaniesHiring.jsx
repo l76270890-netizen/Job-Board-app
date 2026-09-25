@@ -4,8 +4,8 @@ import "./CompaniesHiring.css";
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "../context/AuthContext";
 import { jobs as staticJobs } from "../pages/AllJobs";
-import { db } from "../firebase";
-import { collection, query, where, getDocs, onSnapshot, doc, getDoc } from "firebase/firestore";
+import { db } from "../lib/firestoreCompat";
+import { collection, query, where, getDocs, onSnapshot, doc, getDoc } from "../lib/firestoreCompat";
 
 function CompaniesHiring() {
   const navigate = useNavigate();

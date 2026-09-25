@@ -3,11 +3,11 @@ import { Send, ArrowLeft, Search, MoreVertical, Check, CheckCheck } from "lucide
 import "./MessagesPage.css";
 import { useNavigate, useParams } from "react-router-dom";
 import { useAuth } from "../context/AuthContext";
-import { db } from "../firebase";
+import { db } from "../lib/firestoreCompat";
 import {
   collection, query, where, orderBy, onSnapshot, addDoc,
   serverTimestamp, doc, getDoc, updateDoc
-} from "firebase/firestore";
+} from "../lib/firestoreCompat";
 
 function MessagesPage() {
   const navigate = useNavigate();
@@ -187,7 +187,7 @@ function MessagesPage() {
                 <p>{msg.text}</p>
                 <div className="message-meta">
                   <span className="message-time">
-                    {msg.createdAt?.toDate().toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" })}
+                    {new Date(msg.createdAt?.toDate?.() || msg.createdAt).toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" })}
                   </span>
                   {msg.senderId === currentUser.uid && (
                     <span className="message-status">

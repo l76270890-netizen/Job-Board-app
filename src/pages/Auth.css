@@ -158,6 +158,10 @@ form {
 .social-btn:hover {
   background: #F9FAFB;
 }
+.social-btn:disabled {
+  cursor: wait;
+  opacity: 0.65;
+}
 .social-btn:active {
   transform: scale(0.98);
 }
@@ -172,6 +176,14 @@ form {
 }
 .social-btn.apple:hover {
   background: #1F2937;
+}
+.social-btn.github {
+  background: #24292f;
+  color: #fff;
+  border-color: #24292f;
+}
+.social-btn.github:hover {
+  background: #1f2328;
 }
 .social-btn.facebook {
   background: #1877F2;

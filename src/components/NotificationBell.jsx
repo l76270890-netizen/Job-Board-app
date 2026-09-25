@@ -1,7 +1,7 @@
 import { useState, useEffect, useRef } from "react";
 import { Bell } from "lucide-react";
-import { db } from "../firebase";
-import { collection, query, where, onSnapshot, orderBy, updateDoc, doc } from "firebase/firestore";
+import { db } from "../lib/firestoreCompat";
+import { collection, query, where, onSnapshot, orderBy, updateDoc, doc } from "../lib/firestoreCompat";
 import { useAuth } from "../context/AuthContext";
 import { useNavigate } from "react-router-dom";
 import toast from "react-hot-toast";
@@ -92,7 +92,7 @@ function NotificationBell() {
                 <div className="notification-title">{notif.title}</div>
                 <div className="notification-message">{notif.message}</div>
                 <div className="notification-time">
-                  {notif.createdAt?.toDate().toLocaleString()}
+                  {new Date(notif.createdAt?.toDate?.() || notif.createdAt).toLocaleString()}
                 </div>
               </div>
             ))

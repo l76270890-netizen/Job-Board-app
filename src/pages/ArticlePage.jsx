@@ -5,78 +5,7 @@ import { ArrowLeft } from "lucide-react";
 import { useAuth } from "../context/AuthContext"; // 2. ADD
 import "./ArticlePage.css";
 
-const articles = [
-  {
-    id: 1,
-    image: "6.jpg", 
-    tags: ["Job Market", "Career"],
-    title: "Fractional Leadership: Why Your Next Senior Hire Might Only Need Part-Time Hours",
-    excerpt: "Companies are hiring senior leaders for 10-20 hours per week instead of full-time roles.",
-    content: `Fractional leadership is the biggest hiring trend of 2026...`,
-    date: "May 26, 2026",
-    publishedDate: "2026-05-26",
-    views: 1906,
-    comments: 6,
-    author: "Aisha Bello",
-    authorImg: "https://i.pravatar.cc/100?img=5",
-    category: "Career",
-    readTime: "5 min read",
-    coverImage: "6.jpg",
-    topPick: true
-  },
-  {
-    id: 2,
-    image: "6.jpg",
-    tags: ["Technology", "AI"],
-    title: "How Generative AI is Reshaping Tech Recruitment in Emerging Markets",
-    excerpt: "AI is screening CVs and doing first interviews. Here is what it means for job seekers.",
-    content: `Generative AI is changing how recruiters hire...`,
-    date: "June 02, 2026",
-    publishedDate: "2026-06-02",
-    views: 1420,
-    comments: 12,
-    author: "David Okoro",
-    authorImg: "https://i.pravatar.cc/100?img=6",
-    category: "Technology",
-    readTime: "7 min read",
-    coverImage: "6.jpg"
-  },
-  {
-    id: 3,
-    image: "6.jpg",
-    tags: ["Workplace", "Remote"],
-    title: "The Silent Shift Back to the Office: Balancing Autonomy and Corporate Culture",
-    excerpt: "Hybrid is the new default. But companies are getting stricter with office days.",
-    content: `After 3 years of remote work, companies want people back...`,
-    date: "June 14, 2026",
-    publishedDate: "2026-06-14",
-    views: 2844,
-    comments: 19,
-    author: "Fatima Yusuf",
-    authorImg: "https://i.pravatar.cc/100?img=7",
-    category: "Workplace",
-    readTime: "6 min read",
-    coverImage: "6.jpg",
-    topPick: true
-  },
-   {
-    id: 4,
-    image: "6.jpg",
-    tags: ["Career", "Interview"],
-    title: "5 Questions to Ask in an Interview to Land the Job",
-    excerpt: "The questions you ask matter more than the answers you give.",
-    content: `Asking good questions shows you are serious...`,
-    date: "June 20, 2026",
-    publishedDate: "2026-06-20",
-    views: 980,
-    comments: 4,
-    author: "Tunde Ade",
-    authorImg: "https://i.pravatar.cc/100?img=8",
-    category: "Career",
-    readTime: "4 min read",
-    coverImage: "6.jpg"
-  }
-];
+import { articles } from "../data/articles";
 
 function ArticleCard() {
   const navigate = useNavigate();

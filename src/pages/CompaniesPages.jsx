@@ -3,8 +3,8 @@ import { useNavigate } from "react-router-dom";
 import { MapPin, Briefcase, Search, X, ArrowLeft } from "lucide-react";
 import "./CompaniesPages.css";
 import { jobs as staticJobs } from "./AllJobs"; // renamed
-import { db } from "../firebase"; // ADD
-import { collection, getDocs } from "firebase/firestore"; // ADD
+import { db } from "../lib/firestoreCompat"; // ADD
+import { collection, getDocs } from "../lib/firestoreCompat"; // ADD
 
 function CompaniesPages() {
   const navigate = useNavigate();

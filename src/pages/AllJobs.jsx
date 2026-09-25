@@ -6,8 +6,9 @@ import {
 import { useState, useMemo, useEffect } from "react";
 import { useNavigate, useSearchParams, useLocation } from "react-router-dom";
 import { useAuth } from "../context/AuthContext";
-import { collection, query, where, getDocs, orderBy, doc, updateDoc, arrayUnion, arrayRemove, onSnapshot } from "firebase/firestore";
-import { db } from "../firebase";
+import { collection, query, where, getDocs, orderBy } from "../lib/firestoreCompat";
+import { db } from "../lib/firestoreCompat";
+import { api } from "../lib/api";
 
 export const jobs = [
   // TEACHING - 7 - paste your static jobs here
@@ -49,21 +50,17 @@ export default function AllJobs() {
   const sortOptions = ["Newest", "Oldest", "A-Z", "Z-A", "Salary: High-Low", "Salary: Low-High"];
   const allCategories = ["Teaching", "Business", "IT", "Finance", "Healthcare", "Marketing", "Technology"];
 
- // 1. LISTEN TO FIREBASE SAVED JOBS
+ // Load this user's saved job IDs from the backend.
  useEffect(() => {
    if (!currentUser) {
-     setSavedIds([]); // clear when logged out
+     setSavedIds([]);
      return;
    }
-   const userRef = doc(db, "users", currentUser.uid);
-   const unsub = onSnapshot(userRef, (snap) => {
-     if (snap.exists()) {
-       setSavedIds(snap.data().savedJobs || []);
-     } else {
-       setSavedIds([]);
-     }
-   });
-   return () => unsub();
+   let active = true;
+   api("/api/saved-jobs")
+     .then((items) => { if (active) setSavedIds(items.map((job) => String(job.id))); })
+     .catch((error) => console.error("Could not load saved jobs:", error))
+   return () => { active = false; };
  }, [currentUser]);
 
  // 2. LOAD JOBS + MERGE WITH SAVED STATE
@@ -85,7 +82,7 @@ export default function AllJobs() {
           salary: data.salaryMax || data.salaryMin || 50000,
           category: data.category || "Other",
           experience: data.experience || "Mid-Level",
-          postedDate: data.createdAt?.toDate().toISOString().split('T')[0] || "2026-01-01",
+          postedDate: data.createdAt?.toDate?.()?.toISOString?.().split('T')[0] || (data.createdAt ? new Date(data.createdAt).toISOString().split('T')[0] : "2026-01-01"),
           description: data.description || "",
           responsibilities: [],
           skills: data.requirements || [],
@@ -94,10 +91,7 @@ export default function AllJobs() {
         }
       });
 
-      const allJobs = [...jobs,...firestoreJobs].map(job => ({
-     ...job,
-        is_saved: savedIds.includes(String(job.id)) // Check Firebase
-      }));
+      const allJobs = [...jobs,...firestoreJobs].map(job => ({ ...job, is_saved: false }));
 
       setJobsList(allJobs);
     } catch (error) {
@@ -107,7 +101,11 @@ export default function AllJobs() {
     setLoading(false);
   };
   fetchJobs();
- }, [savedIds]); // re-run when savedIds changes
+ }, []);
+
+  useEffect(() => {
+    setJobsList((items) => items.map((job) => ({ ...job, is_saved: savedIds.includes(String(job.id)) })));
+  }, [savedIds]);
 
   useEffect(() => {
     const state = location.state;
@@ -146,18 +144,19 @@ export default function AllJobs() {
   // 3. FIXED: NOW SAVES TO FIREBASE
   const handleToggleSave = async (e, jobId) => {
     e.stopPropagation();
-    requireAuth(async () => {
-      const userRef = doc(db, "users", currentUser.uid);
-      const jobIdStr = String(jobId);
-      const isSaved = savedIds.includes(jobIdStr);
-
-      await updateDoc(userRef, {
-        savedJobs: isSaved
-       ? arrayRemove(jobIdStr)
-          : arrayUnion(jobIdStr)
-      });
-      // UI updates automatically because of onSnapshot
-    })
+    if (!currentUser) {
+      navigate("/login", { state: { from: location } });
+      return;
+    }
+    const id = String(jobId);
+    const wasSaved = savedIds.includes(id);
+    setSavedIds((items) => wasSaved ? items.filter((item) => item !== id) : [...items, id]);
+    try {
+      await api(`/api/saved-jobs/${encodeURIComponent(id)}`, { method: wasSaved ? "DELETE" : "PUT" });
+    } catch (error) {
+      setSavedIds((items) => wasSaved ? [...new Set([...items, id])] : items.filter((item) => item !== id));
+      window.alert(error.message || "Could not update saved jobs. Please try again.");
+    }
   };
 
   const handleApplyClick = (e, job) => {

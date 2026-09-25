@@ -10,38 +10,8 @@ import {
   Check
 } from "lucide-react";
 import { useNavigate, useLocation, useParams } from "react-router-dom";
-import { useState } from "react"; // <-- add this
-
-// Dummy articles array. Replace with import from your articles file
-export const articles = [
-  { 
-    id: 1, 
-    title: "How to Land a Remote Tech Job in 2026",
-    excerpt: "Remote work is booming in Africa. Here are 7 proven strategies to get hired remotely.",
-    content: `Remote tech jobs have opened doors for thousands of developers, designers, and product people across Africa.\n\nIn 2026, companies are hiring more than ever. But competition is also higher.\n\nHere are 7 things that actually work:\n\n1. Build a public portfolio on GitHub and Dribbble\n2. Apply to companies that are already remote-first\n3. Tailor your CV to highlight async communication skills\n4. Get active on LinkedIn and Twitter\n5. Take assessments seriously\n6. Practice system design and behavioral interviews\n7. Follow up within 48 hours\nThe key is consistency. Apply to 5 jobs per week and you’ll get interviews within 30 days.`,
-    author: "Sarah Johnson",
-    authorImg: "https://i.pravatar.cc/100?img=1",
-    category: "Career Advice",
-    readTime: "6 min read",
-    publishedDate: "2026-09-28",
-    coverImage: "https://images.unsplash.com/photo-1522202176988-66273c2fd55f?q=80&w=1200",
-    tags: ["Remote Work", "Career", "Tech"]
-  },
-  { 
-    id: 2, 
-    title: "Top 10 Skills Employers Want in 2026",
-    excerpt: "AI, Data, and Communication are top. Here is the full list and how to learn them.",
-    content: `The job market is shifting fast...\n\nFull article content here.`,
-    author: "Michael Ade",
-    authorImg: "https://i.pravatar.cc/100?img=2",
-    category: "Skills",
-    readTime: "8 min read",
-    publishedDate: "2026-09-25",
-    coverImage: "https://images.unsplash.com/photo-1552664730-d307ca884978?q=80&w=1200",
-    tags: ["Skills", "AI", "Learning"]
-  },
-];
-
+import { useState } from "react";
+import { articles } from "../data/articles";
 function ArticleDetail() {
   const navigate = useNavigate();
   const { state: articleFromState } = useLocation();
