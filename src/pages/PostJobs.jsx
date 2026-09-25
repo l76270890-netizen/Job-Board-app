@@ -4,12 +4,13 @@ import { ArrowLeft, Briefcase, MapPin, DollarSign, FileText, Plus, X, Building2 
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "../context/AuthContext";
 import { db } from "../lib/firestoreCompat";
-import { collection, addDoc, serverTimestamp } from "../lib/firestoreCompat";
+import { collection, addDoc } from "../lib/firestoreCompat";
 
 function PostJobs() {
   const navigate = useNavigate();
   const { currentUser, userData } = useAuth();
   const [loading, setLoading] = useState(false);
+  const [submitError, setSubmitError] = useState("");
   const [requirements, setRequirements] = useState([""]);
   const [benefits, setBenefits] = useState([""]);
   const [responsibilities, setResponsibilities] = useState([""]);
@@ -29,6 +30,7 @@ function PostJobs() {
   });
 
   const handleChange = (e) => {
+    setSubmitError("");
     setFormData({...formData, [e.target.name]: e.target.value });
   };
 
@@ -64,28 +66,44 @@ function PostJobs() {
     e.preventDefault();
     if (!currentUser) return navigate('/login');
 
+    const title = formData.title.trim();
+    const companyName = formData.companyName.trim();
+    const description = formData.description.trim();
+    const salaryMin = Number(formData.salaryMin) || 0;
+    const salaryMax = Number(formData.salaryMax) || 0;
+    if (title.length < 3) return setSubmitError("Enter a job title with at least 3 characters.");
+    if (companyName.length < 2) return setSubmitError("Enter a company name with at least 2 characters.");
+    if (description.length < 20) return setSubmitError("Job description must be at least 20 characters.");
+    if (salaryMax > 0 && salaryMin > salaryMax) return setSubmitError("Maximum salary must be greater than or equal to minimum salary.");
+
     setLoading(true);
+    setSubmitError("");
     try {
       await addDoc(collection(db, "jobs"), {
-      ...formData,
-        salaryMin: Number(formData.salaryMin) || 0,
-        salaryMax: Number(formData.salaryMax) || 0,
+        title,
+        companyName,
+        category: formData.category,
+        jobType: formData.jobType,
+        workMode: formData.workMode,
+        location: formData.location.trim(),
+        salaryMin,
+        salaryMax,
+        experience: formData.experience.trim(),
+        description,
+        deadline: formData.deadline,
         requirements: requirements.filter(r => r.trim()!== ""),
         responsibilities: responsibilities.filter(r => r.trim()!== ""),
         benefits: benefits.filter(b => b.trim()!== ""),
-        employerId: currentUser.uid, // for ManageJobs
-        companyId: currentUser.uid, // for Categories + old data
-        status: "active", // FIX 2: IMPORTANT for filtering
-        applicants: 0,
-        createdAt: serverTimestamp()
+        status: "active"
       });
       alert("Job posted successfully!");
       navigate("/employer/jobs");
     } catch (error) {
       console.error("Error posting job: ", error);
-      alert("Failed to post job: " + error.message);
+      setSubmitError(error.message || "Could not post this job. Please try again.");
+    } finally {
+      setLoading(false);
     }
-    setLoading(false);
   };
 
   return (
@@ -99,6 +117,7 @@ function PostJobs() {
       </div>
 
       <form className="postjob-form" onSubmit={handleSubmit}>
+        {submitError && <div role="alert" style={{ padding: "12px 16px", border: "1px solid #fca5a5", borderRadius: 8, background: "#fef2f2", color: "#b91c1c", fontSize: 14 }}>{submitError}</div>}
         <div className="form-section">
           <h2><Briefcase size={20}/> Job Details</h2>
           <div className="form-grid">
@@ -172,7 +191,7 @@ function PostJobs() {
           <h2><FileText size={20}/> Job Description</h2>
           <div className="form-group">
             <label>Description *</label>
-            <textarea name="description" value={formData.description} onChange={handleChange} rows="6" placeholder="Describe the role, responsibilities..." required></textarea>
+            <textarea name="description" value={formData.description} onChange={handleChange} rows="6" minLength={20} placeholder="Describe the role, responsibilities..." required></textarea>
           </div>
         </div>
 
