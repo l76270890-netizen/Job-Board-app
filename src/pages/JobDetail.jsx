@@ -25,6 +25,7 @@ function JobDetail() {
   const [coverLetter, setCoverLetter] = useState("");
   const [loading, setLoading] = useState(!state);
   const [submitting, setSubmitting] = useState(false);
+  const [applyError, setApplyError] = useState("");
 
   // 1. CREATE NOTIFICATION FUNCTION - ADDED
   const createNotification = async (employerId, jobTitle, applicantName, jobId) => {
@@ -144,15 +145,22 @@ function JobDetail() {
 
   const handleApplyClick = () => {
     requireAuth(() => {
-      if (!applied) setShowApplyModal(true)
+      if (!applied) {
+        setApplyError("");
+        setShowApplyModal(true);
+      }
     })
   }
 
   // UPDATED: Real Firestore submit + NOTIFICATION
   const handleApplySubmit = async () => {
-    if (!resume) return alert("Please upload your resume");
+    if (!resume) {
+      setApplyError("Please upload your resume.");
+      return;
+    }
 
     setSubmitting(true);
+    setApplyError("");
     try {
       const applicantName = userData?.name || currentUser.displayName || currentUser.email;
       const upload = new FormData();
@@ -187,9 +195,10 @@ function JobDetail() {
 
     } catch (error) {
       console.error("Error applying:", error);
-      alert("Failed to submit application. Please try again.");
+      setApplyError(error.message || "Failed to submit application. Please try again.");
+    } finally {
+      setSubmitting(false);
     }
-    setSubmitting(false);
   };
 
   const handleMessageRecruiter = () =>{
@@ -323,6 +332,7 @@ function JobDetail() {
                 onChange={(e) => setCoverLetter(e.target.value)}
                 className="cover-letter-input"
               />
+              {applyError && <p role="alert" style={{ color: "#dc2626", marginTop: 12 }}>{applyError}</p>}
             </div>
 
             <div className="modal-footer">

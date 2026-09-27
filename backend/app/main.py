@@ -22,7 +22,7 @@ from jwt import PyJWKClient
 from dotenv import load_dotenv
 from pwdlib import PasswordHash
 from pydantic import BaseModel, ConfigDict, EmailStr, Field
-from sqlalchemy import Boolean, DateTime, ForeignKey, Integer, JSON, String, Text, UniqueConstraint, create_engine, func, or_, select
+from sqlalchemy import Boolean, DateTime, ForeignKey, Integer, JSON, LargeBinary, String, Text, UniqueConstraint, create_engine, func, or_, select
 from sqlalchemy.exc import SQLAlchemyError
 from sqlalchemy.orm import DeclarativeBase, Mapped, Session, mapped_column, relationship, sessionmaker
 
@@ -62,8 +62,8 @@ else:
         "http://127.0.0.1:5173",
         "http://127.0.0.1:5174",
     ]))
-# Vercel's packaged filesystem is read-only; /tmp is writable but ephemeral.
-# Uploads are disabled on Vercel until durable object storage is integrated.
+# Vercel's filesystem is ephemeral. Keep uploaded file contents in the
+# persistent database so resumes remain available after a function restart.
 DEFAULT_UPLOAD_DIR = "/tmp/9ja-uploads" if os.getenv("VERCEL") else str(BACKEND_DIR / "uploads")
 UPLOAD_DIR = Path(os.getenv("UPLOAD_DIR", DEFAULT_UPLOAD_DIR)).resolve()
 UPLOAD_DIR.mkdir(parents=True, exist_ok=True)
@@ -207,6 +207,12 @@ class UploadedFile(Base):
     original_name: Mapped[str] = mapped_column(String(255))
     mime_type: Mapped[str] = mapped_column(String(120))
     created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), default=lambda: datetime.now(timezone.utc))
+
+
+class UploadedFileContent(Base):
+    __tablename__ = "uploaded_file_contents"
+    file_id: Mapped[int] = mapped_column(ForeignKey("uploaded_files.id", ondelete="CASCADE"), primary_key=True)
+    content: Mapped[bytes] = mapped_column(LargeBinary)
 
 
 Base.metadata.create_all(bind=engine)
@@ -643,8 +649,6 @@ def update_profile(data: ProfileIn, db: Session = Depends(get_db), user: User = 
 
 @app.post("/api/users/me/upload", status_code=201)
 async def upload_file(file: UploadFile = File(...), db: Session = Depends(get_db), user: User = Depends(current_user)):
-    if os.getenv("VERCEL"):
-        raise HTTPException(503, "File uploads are temporarily unavailable until durable file storage is configured")
     suffix = Path(file.filename or "").suffix.lower()
     allowed = {".pdf", ".doc", ".docx", ".png", ".jpg", ".jpeg", ".webp"}
     if suffix not in allowed: raise HTTPException(415, "Upload a PDF, DOC, DOCX, JPG, PNG, or WEBP file")
@@ -659,10 +663,11 @@ async def upload_file(file: UploadFile = File(...), db: Session = Depends(get_db
     if suffix == ".doc" and not (contents.startswith(b"\xd0\xcf\x11\xe0\xa1\xb1\x1a\xe1") or contents.startswith(b"PK\x03\x04")): raise HTTPException(415, "This file is not a valid DOC file")
     if suffix == ".docx" and not contents.startswith(b"PK\x03\x04"): raise HTTPException(415, "This file is not a valid DOCX file")
     name = f"{secrets.token_hex(20)}{suffix}"
-    (UPLOAD_DIR / name).write_bytes(contents)
     original_name = Path((file.filename or name).replace("\\", "/")).name
     record = UploadedFile(owner_id=user.id, stored_name=name, original_name=original_name[:255], mime_type=mime_type)
-    db.add(record); db.commit(); db.refresh(record)
+    db.add(record); db.flush()
+    db.add(UploadedFileContent(file_id=record.id, content=contents))
+    db.commit(); db.refresh(record)
     return {"id": record.id, "url": f"/api/files/{record.id}", "filename": record.original_name}
 
 @app.get("/api/files/{file_id}")
@@ -676,6 +681,10 @@ def download_file(file_id: int, db: Session = Depends(get_db), user: User | None
         job = db.get(Job, application.job_id) if application else None
         permitted = bool(job and job.employer_id == user.id)
     if not permitted: raise HTTPException(403, "You cannot access this file")
+    stored_content = db.get(UploadedFileContent, record.id)
+    if stored_content:
+        filename = quote(record.original_name, safe="")
+        return Response(stored_content.content, media_type=record.mime_type, headers={"Content-Disposition": f"attachment; filename*=UTF-8''{filename}", "X-Content-Type-Options": "nosniff"})
     path = UPLOAD_DIR / record.stored_name
     if not path.is_file(): raise HTTPException(404, "File not found")
     return FileResponse(path, media_type=record.mime_type, filename=record.original_name, headers={"X-Content-Type-Options": "nosniff"})
