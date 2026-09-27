@@ -514,7 +514,9 @@ def start_oauth(provider: str, role: str = Query(default="jobseeker")):
     else:
         params = {**common, "scope": "name email", "response_mode": "form_post"}
         url = "https://appleid.apple.com/auth/authorize?" + urlencode(params)
-    response = JSONResponse({"authorizationUrl": url})
+    # Start OAuth as a top-level navigation so browsers accept the state cookie
+    # even when the frontend and API are hosted on different sites.
+    response = RedirectResponse(url, status_code=303)
     response.set_cookie(oauth_state_cookie(provider), state, httponly=True, secure=COOKIE_SECURE, samesite="none" if COOKIE_SECURE else "lax", max_age=600, path="/api/auth/oauth")
     return response
 

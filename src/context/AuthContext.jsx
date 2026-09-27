@@ -34,8 +34,7 @@ export function AuthProvider({ children }) {
   };
 
   const loginWithProvider = async (provider, role = "jobseeker") => {
-    const { authorizationUrl } = await api(`/api/auth/oauth/${provider}/start?role=${encodeURIComponent(role)}`);
-    window.location.assign(authorizationUrl);
+    window.location.assign(apiUrl(`/api/auth/oauth/${provider}/start?role=${encodeURIComponent(role)}`));
   };
 
   const logout = async () => {
