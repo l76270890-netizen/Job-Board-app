@@ -21,7 +21,7 @@ export default function LoginPage() {
   // 1. AUTO REDIRECT WHEN userData LOADS
   useEffect(() => {
     if (userData) {
-      if(userData.role === "employer") navigate("/employer/post-job", { replace: true });
+      if (userData.role === "employer") navigate("/employer/post-job", { replace: true });
       else navigate(from, { replace: true });
     }
   }, [userData, navigate, from]);
@@ -60,29 +60,29 @@ export default function LoginPage() {
       <div className="auth-card">
         <h1>Welcome Back</h1>
         <p>Sign in to continue</p>
-        
+
         {error && <div className="auth-error">{error}</div>}
 
         <div className="role-toggle">
           <p>I am logging in as:</p>
           <div className="role-options">
             <label className={role === "jobseeker" ? "active" : ""}>
-              <input 
-                type="radio" 
-                name="loginRole" 
-                value="jobseeker" 
-                checked={role === "jobseeker"} 
-                onChange={e => setRole(e.target.value)} 
+              <input
+                type="radio"
+                name="loginRole"
+                value="jobseeker"
+                checked={role === "jobseeker"}
+                onChange={e => setRole(e.target.value)}
               />
               <UserCheck size={16} /> Job Seeker
             </label>
             <label className={role === "employer" ? "active" : ""}>
-              <input 
-                type="radio" 
-                name="loginRole" 
-                value="employer" 
-                checked={role === "employer"} 
-                onChange={e => setRole(e.target.value)} 
+              <input
+                type="radio"
+                name="loginRole"
+                value="employer"
+                checked={role === "employer"}
+                onChange={e => setRole(e.target.value)}
               />
               <Briefcase size={16} /> Employer
             </label>
@@ -92,26 +92,26 @@ export default function LoginPage() {
         <form onSubmit={handleLogin}>
           <div className="input-group">
             <Mail size={18} />
-            <input 
-              type="email" 
+            <input
+              type="email"
               placeholder="Email"
               value={form.email}
-              onChange={e => setForm({...form, email: e.target.value})}
+              onChange={e => setForm({ ...form, email: e.target.value })}
               required
             />
           </div>
 
           <div className="input-group">
             <Lock size={18} />
-            <input 
-              type={showPass? "text" : "password"} 
+            <input
+              type={showPass ? "text" : "password"}
               placeholder="Password"
               value={form.password}
-              onChange={e => setForm({...form, password: e.target.value})}
+              onChange={e => setForm({ ...form, password: e.target.value })}
               required
             />
             <button type="button" onClick={() => setShowPass(!showPass)}>
-              {showPass? <EyeOff size={18}/> : <Eye size={18}/>}
+              {showPass ? <EyeOff size={18} /> : <Eye size={18} />}
             </button>
           </div>
 
@@ -128,9 +128,7 @@ export default function LoginPage() {
           <button type="button" className="social-btn apple" onClick={() => handleProviderLogin("apple")} disabled={loading}>
             <FaApple size={20} aria-hidden="true" /> Continue with Apple
           </button>
-          <button type="button" className="social-btn github" onClick={() => handleProviderLogin("github")} disabled={loading}>
-            <FaGithub size={20} aria-hidden="true" /> Continue with GitHub
-          </button>
+
         </div>
 
         <p className="auth-footer">

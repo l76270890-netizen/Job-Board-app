@@ -1,5 +1,5 @@
 import "./SavedJobs.css";
-import { Bookmark, Briefcase, DollarSign, MapPin, Trash2 } from "lucide-react";
+import { Bookmark, Briefcase, DollarSign, MapPin, Trash2, ArrowLeft } from "lucide-react";
 import { useCallback, useEffect, useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { useAuth } from "../context/AuthContext";
@@ -61,6 +61,12 @@ export default function SavedJobs() {
   return (
     <main className="savedJobsPage">
       <header className="savedHeader">
+        <div className="savedHeaderTop">
+          <button className="backBtn" onClick={() => navigate(-1)} aria-label="Go back">
+            <ArrowLeft size={20} />
+            Back
+          </button>
+        </div>
         <h1>Your saved jobs</h1>
         <p className="savedCount">{savedJobs.length} {savedJobs.length === 1 ? "job" : "jobs"} saved</p>
       </header>

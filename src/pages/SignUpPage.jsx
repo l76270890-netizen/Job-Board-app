@@ -1,22 +1,29 @@
-import { useState, useEffect } from "react"; // ADD useEffect
+import { useState, useEffect } from "react";
 import { useNavigate, Link, useSearchParams } from "react-router-dom";
-import { useAuth } from "../context/AuthContext"; 
-import { Mail, Lock, User, Eye, EyeOff, Briefcase, UserCheck } from "lucide-react";
+import { useAuth } from "../context/AuthContext";
+import { Mail, Lock, User, Eye, EyeOff, Briefcase, UserCheck, ArrowLeft } from "lucide-react";
+import { FcGoogle } from "react-icons/fc";
+import { FaApple, FaGithub } from "react-icons/fa";
 import "./Auth.css";
 
 export default function SignUpPage() {
   const [searchParams] = useSearchParams();
-  const [form, setForm] = useState(() => ({ name: "", email: "", password: "", role: searchParams.get("role") === "employer" ? "employer" : "jobseeker" }));
+  const [form, setForm] = useState({
+    name: "",
+    email: "",
+    password: "",
+    role: searchParams.get("role") === "employer" ? "employer" : "jobseeker"
+  });
   const [error, setError] = useState("");
   const [showPass, setShowPass] = useState(false);
   const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
-  const { signup, userData } = useAuth();
+  const { signup, loginWithProvider, userData } = useAuth();
 
   // AUTO REDIRECT AFTER SIGNUP
   useEffect(() => {
     if (userData) {
-      if(userData.role === "employer") navigate("/employer/post-job", { replace: true });
+      if (userData.role === "employer") navigate("/employer/post-job", { replace: true });
       else navigate("/", { replace: true });
     }
   }, [userData, navigate]);
@@ -26,9 +33,21 @@ export default function SignUpPage() {
     setLoading(true);
     setError("");
     try {
-      await signup(form.email, form.password, form.name, form.role); 
+      await signup(form.email, form.password, form.name, form.role);
+      // navigate will happen via useEffect
     } catch (err) {
-      setError(err.message);
+      setError(err.message || "Failed to create account");
+      setLoading(false);
+    }
+  };
+
+  const handleProviderLogin = async (provider) => {
+    setLoading(true);
+    setError("");
+    try {
+      await loginWithProvider(provider, form.role);
+    } catch (err) {
+      setError(err.message || `Failed with ${provider}`);
       setLoading(false);
     }
   };
@@ -36,6 +55,7 @@ export default function SignUpPage() {
   return (
     <div className="auth-page">
       <div className="auth-card">
+
         <h1>Create Account</h1>
         <p>Join and find your dream job</p>
 
@@ -44,37 +64,37 @@ export default function SignUpPage() {
         <form onSubmit={handleSignup}>
           <div className="input-group">
             <User size={18} />
-            <input 
-              type="text" 
+            <input
+              type="text"
               placeholder="Full Name"
               value={form.name}
-              onChange={e => setForm({...form, name: e.target.value})}
+              onChange={e => setForm({ ...form, name: e.target.value })}
               required
             />
           </div>
 
           <div className="input-group">
             <Mail size={18} />
-            <input 
-              type="email" 
+            <input
+              type="email"
               placeholder="Email"
               value={form.email}
-              onChange={e => setForm({...form, email: e.target.value})}
+              onChange={e => setForm({ ...form, email: e.target.value })}
               required
             />
           </div>
 
           <div className="input-group">
             <Lock size={18} />
-            <input 
-              type={showPass? "text" : "password"} 
+            <input
+              type={showPass ? "text" : "password"}
               placeholder="Password"
               value={form.password}
-              onChange={e => setForm({...form, password: e.target.value})}
+              onChange={e => setForm({ ...form, password: e.target.value })}
               required
             />
-            <button type="button" onClick={() => setShowPass(!showPass)}>
-              {showPass? <EyeOff size={18}/> : <Eye size={18}/>}
+            <button type="button" className="eye-btn" onClick={() => setShowPass(!showPass)}>
+              {showPass ? <EyeOff size={18} /> : <Eye size={18} />}
             </button>
           </div>
 
@@ -82,22 +102,22 @@ export default function SignUpPage() {
             <p>I am a:</p>
             <div className="role-options">
               <label className={form.role === "jobseeker" ? "active" : ""}>
-                <input 
-                  type="radio" 
-                  name="role" 
-                  value="jobseeker" 
-                  checked={form.role === "jobseeker"} 
-                  onChange={e => setForm({...form, role: e.target.value})} 
+                <input
+                  type="radio"
+                  name="role"
+                  value="jobseeker"
+                  checked={form.role === "jobseeker"}
+                  onChange={e => setForm({ ...form, role: e.target.value })}
                 />
                 <UserCheck size={16} /> Job Seeker
               </label>
               <label className={form.role === "employer" ? "active" : ""}>
-                <input 
-                  type="radio" 
-                  name="role" 
-                  value="employer" 
-                  checked={form.role === "employer"} 
-                  onChange={e => setForm({...form, role: e.target.value})} 
+                <input
+                  type="radio"
+                  name="role"
+                  value="employer"
+                  checked={form.role === "employer"}
+                  onChange={e => setForm({ ...form, role: e.target.value })}
                 />
                 <Briefcase size={16} /> Employer
               </label>
@@ -108,6 +128,18 @@ export default function SignUpPage() {
             {loading ? "Creating..." : "Sign Up"}
           </button>
         </form>
+
+        <div className="divider"><span>or</span></div>
+
+        <div className="social-login">
+          <button type="button" className="social-btn google" onClick={() => handleProviderLogin("google")} disabled={loading}>
+            <FcGoogle size={20} /> Continue with Google
+          </button>
+          <button type="button" className="social-btn apple" onClick={() => handleProviderLogin("apple")} disabled={loading}>
+            <FaApple size={20} /> Continue with Apple
+          </button>
+
+        </div>
 
         <p className="auth-footer">
           Already have an account? <Link to="/login">Sign In</Link>
