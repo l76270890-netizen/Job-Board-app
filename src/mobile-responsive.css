@@ -1,0 +1,421 @@
+/* Mobile-only layout corrections. Desktop styles remain unchanged. */
+@media (max-width: 767px) {
+  html,
+  body,
+  #root {
+    width: 100%;
+    min-width: 320px;
+    max-width: 100%;
+    overflow-x: clip;
+  }
+
+  body {
+    padding: 0 !important;
+    height: auto;
+    min-height: 100vh;
+  }
+
+  img {
+    max-width: 100%;
+  }
+
+  button,
+  input,
+  select,
+  textarea {
+    max-width: 100%;
+  }
+
+  .home-page {
+    min-height: 100vh;
+    padding: 56px 0 calc(68px + env(safe-area-inset-bottom));
+  }
+
+  /* Keep the fixed home header centered instead of offsetting the logo. */
+  .mobile-top-bar {
+    gap: 10px;
+    padding-inline: max(12px, env(safe-area-inset-left));
+  }
+
+  .mobile-menu-icon {
+    position: static;
+    left: auto;
+    flex: 0 0 40px;
+    min-height: 44px;
+  }
+
+  .mobile-top-bar .logo {
+    position: static;
+    left: auto;
+    flex: 1 1 auto;
+    justify-content: center;
+    min-width: 0;
+  }
+
+  .mobile-top-bar .logo-img {
+    position: static;
+    left: auto;
+    height: 34px;
+    width: auto;
+    max-width: min(150px, 100%);
+    margin: 0;
+  }
+
+  .mobile-top-bar .mobile-login-btn {
+    flex: 0 0 auto;
+    position: static;
+    left: auto;
+    white-space: nowrap;
+  }
+
+  .mobile-bottom-nav {
+    height: calc(64px + env(safe-area-inset-bottom));
+    padding-bottom: env(safe-area-inset-bottom);
+    padding-inline: max(4px, env(safe-area-inset-left));
+  }
+
+  .mobile-nav-item {
+    min-width: 0;
+    font-size: clamp(9px, 2.8vw, 11px);
+  }
+
+  .notification-dropdown {
+    width: min(320px, calc(100vw - 24px));
+    max-width: calc(100vw - 24px);
+    right: -4px;
+  }
+
+  /* Remove old offsets that compensated for global body padding. */
+  .mobileJobs,
+  .jobDetail,
+  .articleDetail,
+  .articleContainer,
+  .articlePage-section,
+  .companiesPage-section,
+  .searchPage-wrapper,
+  .company-banner {
+    position: relative;
+    top: auto;
+    bottom: auto;
+  }
+
+  .articlePage-section,
+  .companiesPage-section {
+    height: auto;
+    min-height: 0;
+  }
+
+  .articlePage-section {
+    padding: 24px 14px 40px;
+  }
+
+  .articlePage-header {
+    margin-bottom: 22px;
+  }
+
+  .sectionPage-title,
+  .companiesPage-title {
+    font-size: clamp(1.55rem, 6vw, 2rem);
+    line-height: 1.2;
+  }
+
+  .companiesPage-section {
+    padding: 24px 14px 40px;
+  }
+
+  .companiesPage-subtitle {
+    display: block;
+    position: static;
+    left: auto;
+    bottom: auto;
+    text-align: center;
+  }
+
+  .companyPage-location,
+  .job-count-badge,
+  .View-button,
+  .companiesPage-title {
+    position: static;
+    left: auto;
+    top: auto;
+    bottom: auto;
+  }
+
+  .View-button {
+    width: 100%;
+  }
+
+  .companyPage-card {
+    height: auto;
+  }
+
+  .companyPage-card-bottom {
+    align-items: flex-start;
+  }
+
+  .searchPage-wrapper {
+    left: auto;
+  }
+
+  .companiesPage-grid,
+  .articlePage-grid,
+  .article-grid,
+  .testimonials-grid,
+  .jobs-grid,
+  .relatedJobsGrid,
+  .savedJobsGrid,
+  .jobs-grid1 {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .articleDetail {
+    display: flex;
+    flex-direction: column;
+    width: 100%;
+    gap: 20px;
+    padding: 16px 14px 32px;
+  }
+
+  .articleContainer {
+    width: 100%;
+    max-width: 100%;
+  }
+
+  .articleHero h1 {
+    font-size: clamp(1.65rem, 7vw, 2.2rem);
+    overflow-wrap: anywhere;
+  }
+
+  .articleCover {
+    height: auto;
+    aspect-ratio: 16 / 9;
+  }
+
+  .articleSidebar {
+    display: none;
+  }
+
+  .jobDetail {
+    width: 100%;
+    grid-template-columns: minmax(0, 1fr);
+    padding: 20px 14px 36px;
+  }
+
+  .jobDetailRight {
+    flex-direction: column;
+  }
+
+  .jobHeroCard,
+  .detailCard,
+  .sideCard {
+    min-width: 0;
+    padding: 18px 16px;
+    border-radius: 16px;
+  }
+
+  .jobHeroInfo h1 {
+    font-size: clamp(1.4rem, 6vw, 1.8rem);
+    overflow-wrap: anywhere;
+  }
+
+  .apply-sticky-mobile {
+    bottom: calc(12px + env(safe-area-inset-bottom));
+  }
+
+  .allJobs {
+    width: 100%;
+  }
+
+  .mobileJobs {
+    width: 100%;
+    padding: 12px 12px 28px;
+  }
+
+  .mobileInfo,
+  .filterChips,
+  .heroMeta,
+  .company-meta,
+  .articleMetaTop {
+    flex-wrap: wrap;
+    min-width: 0;
+  }
+
+  .mobileCard,
+  .jobCard,
+  .articlePage-card,
+  .companyPage-card,
+  .application-card,
+  .applicant-card {
+    min-width: 0;
+    overflow-wrap: anywhere;
+  }
+
+  .company-banner {
+    height: clamp(160px, 48vw, 220px);
+  }
+
+  .company-page-fuzu .container,
+  .company-page .container {
+    width: 100%;
+    padding-inline: 14px;
+    margin-inline: auto;
+  }
+
+  .company-tabs {
+    overflow-x: auto;
+    overscroll-behavior-x: contain;
+    scrollbar-width: none;
+  }
+
+  .company-tabs::-webkit-scrollbar {
+    display: none;
+  }
+
+  .company-tabs .tab {
+    flex: 0 0 auto;
+    white-space: nowrap;
+    margin-right: 18px;
+  }
+
+  .categories-header h2,
+  .categories-header p,
+  .view-all {
+    position: static;
+    left: auto;
+  }
+
+  .categories-header {
+    align-items: flex-start;
+    width: 100%;
+  }
+
+  .categories-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .featured,
+  .employer-featured {
+    margin-top: 0;
+  }
+
+  .featured-header {
+    margin-top: 0;
+    padding-inline: 16px;
+  }
+
+  .mobileJobList1 hr {
+    margin-top: 0;
+  }
+
+  .footer-cta-group {
+    justify-content: center;
+    margin-left: 0;
+  }
+
+  .footer-cta-btn,
+  .footer-cta-btn-outline {
+    margin-left: 0;
+  }
+
+  .applicants-container {
+    width: 100%;
+    padding: 16px 14px 32px;
+  }
+
+  .applicants-header h1 {
+    font-size: clamp(1.35rem, 5.5vw, 1.8rem);
+    overflow-wrap: anywhere;
+  }
+
+  .status-tabs {
+    flex-wrap: nowrap;
+    overflow-x: auto;
+    overscroll-behavior-x: contain;
+    scrollbar-width: none;
+  }
+
+  .status-tabs::-webkit-scrollbar {
+    display: none;
+  }
+
+  .status-tabs button {
+    flex: 0 0 auto;
+    padding-inline: 12px;
+  }
+
+  .applicant-card {
+    padding: 16px;
+  }
+
+  .applicant-top,
+  .applicant-info,
+  .applicant-actions {
+    min-width: 0;
+  }
+
+  .applicant-top {
+    flex-wrap: wrap;
+    gap: 12px;
+  }
+
+  .applicant-info > div:last-child {
+    min-width: 0;
+    overflow-wrap: anywhere;
+  }
+
+  .status-buttons {
+    width: 100%;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .status-buttons button,
+  .modal-actions button {
+    justify-content: center;
+    min-width: 0;
+    padding: 9px 8px;
+    font-size: 12px;
+  }
+
+  .modal-overlay {
+    padding: 8px;
+  }
+
+  .applicant-modal {
+    width: 100%;
+    max-height: 92dvh;
+  }
+
+  .applicant-profile-top {
+    align-items: flex-start;
+    flex-wrap: wrap;
+  }
+
+  .modal-body,
+  .modal-header {
+    padding: 16px;
+  }
+}
+
+@media (max-width: 380px) {
+  .mobile-top-bar {
+    gap: 6px;
+    padding-inline: 8px;
+  }
+
+  .mobile-top-bar .logo-img {
+    height: 30px;
+    max-width: 120px;
+  }
+
+  .mobileCard,
+  .jobHeroCard,
+  .detailCard,
+  .sideCard,
+  .applicant-card {
+    padding: 14px;
+  }
+
+  .categories-grid {
+    gap: 10px;
+  }
+}

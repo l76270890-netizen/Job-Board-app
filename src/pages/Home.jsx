@@ -17,7 +17,7 @@ function Home() {
   const isEmployer = userData?.role === 'employer'; // 3. ADD
 
   return (
-    <>
+    <div className="home-page">
       <Navbar />
       <Hero />
       <FeaturedJobs />
@@ -34,7 +34,7 @@ function Home() {
       
       <FinalCTA />
       <Footer />
-    </>
+    </div>
   );
 }
 
