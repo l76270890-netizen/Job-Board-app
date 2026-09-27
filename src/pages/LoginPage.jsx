@@ -125,10 +125,9 @@ export default function LoginPage() {
           <button type="button" className="social-btn google" onClick={() => handleProviderLogin("google")} disabled={loading}>
             <FcGoogle size={20} aria-hidden="true" /> Continue with Google
           </button>
-          <button type="button" className="social-btn apple" onClick={() => handleProviderLogin("apple")} disabled={loading}>
-            <FaApple size={20} aria-hidden="true" /> Continue with Apple
+          <button type="button" className="social-btn github" onClick={() => handleProviderLogin("github")} disabled={loading}>
+            <FaGithub size={20} aria-hidden="true" /> Continue with GitHub
           </button>
-
         </div>
 
         <p className="auth-footer">
